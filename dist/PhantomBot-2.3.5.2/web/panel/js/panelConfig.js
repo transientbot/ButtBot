@@ -3,9 +3,9 @@
 //Do NOT Modify! Overwritten when PhantomBot is restarted!
 var panelSettings = {
     panelPort   : 25004,
-    channelName : "",
-    auth        : "",
-    http        : ""
+    channelName : "transientgamers",
+    auth        : "V0jZKQm7ZyTmfSrQHZaugN4AJqJfd2",
+    http        : "http://"
 };
 
 function getPanelPort() { return panelSettings.panelPort; }

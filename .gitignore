@@ -66,3 +66,5 @@ nbproject/
 .classpath
 .project
 
+dist/*
+javascript-source/customscripts/customRanks.js
