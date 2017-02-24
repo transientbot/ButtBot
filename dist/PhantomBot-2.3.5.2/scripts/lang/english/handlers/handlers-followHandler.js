@@ -28,5 +28,14 @@ $.lang.register('followhandler.fixfollow.added', 'added $1 to the followed list!
 $.lang.register('followhandler.set.followdelay.usage', 'usage: !followdelay [amount in seconds]');
 $.lang.register('followhandler.set.followdelay.success', 'follow delay set to $1 seconds.');
 $.lang.register('followhandler.follow.age.err.404', '$1 $2 is not following channel $3');
+<<<<<<< HEAD
 $.lang.register('followhandler.follow.age.time.days', '$2 has been a transient gamer since $4. ($5 days)');
 $.lang.register('followhandler.follow.age.time', '$2 has been a transient gamer since $4.');
+=======
+$.lang.register('followhandler.follow.age.time.days', '$1 $2 has been following channel $3 since $4. ($5 days)');
+<<<<<<< HEAD
+$.lang.register('followhandler.follow.age.time', '$1 $2 has been following channel $3 since $4.');
+>>>>>>> a96f1e3ff8fbf66836a06f1df5fce6a93e01d823
+=======
+$.lang.register('followhandler.follow.age.time', '$1 $2 has been following channel $3 since $4.');
+>>>>>>> d009801dbdb2c950b87f016136dc8ce3f76cb3e7
