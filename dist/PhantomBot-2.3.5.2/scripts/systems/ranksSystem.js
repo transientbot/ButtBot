@@ -48,7 +48,12 @@
         var userTime;
 
         username = username.toLowerCase();
-
+		
+		if ($.checkIndividualRanks(username))
+		{
+			return true;
+		}
+		
         // Has a custom rank.
         if ($.inidb.exists('viewerRanks', username.toLowerCase())) {
             return true;
@@ -91,6 +96,12 @@
         if (!hasRank(username)) {
             return '';
         }
+		
+		var rank = $.checkIndividualRanks(username);
+		if (rank)
+		{
+			return rank;
+		}
 
         // Return Custom Rank
         if ($.inidb.exists('viewerRanks', username.toLowerCase())) {

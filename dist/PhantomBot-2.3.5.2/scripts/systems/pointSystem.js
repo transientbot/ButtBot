@@ -316,7 +316,11 @@
      */
     function getPointsMessage(username, displayName) {
         var s = pointsMessage;
-
+		if (username.toLowerCase() != displayName.toLowerCase())
+        {
+            var how = [ "sniff", "check out", "stare at", "ogle", "poke", "touch", "squint at" ];
+            s = "It is impolite to " + how[Math.floor(Math.random() * how.length)] + " another person's butt.  You should be ashamed, " + username + ".";
+        }
         if (s.match(/\(userprefix\)/)) {
             s = $.replace(s, '(userprefix)', $.whisperPrefix(username));
         }
@@ -367,9 +371,15 @@
          * @commandpath points - Announce points in chat when no parameters are given.
          */
         if (command.equalsIgnoreCase('points') || command.equalsIgnoreCase('point') || command.equalsIgnoreCase(pointNameMultiple) || command.equalsIgnoreCase(pointNameSingle)) {
-            if (!action) {
+            if (!action)
+            {
                 $.say(getPointsMessage(sender, username));
-            } else {
+            }
+            else if ($.user.isKnown(action.toLowerCase()))
+            {
+               $.say(getPointsMessage(username, action));
+            }
+            else {
                 if (action && $.user.isKnown(action.toLowerCase())) {
                     $.say($.whisperPrefix(sender) + $.lang.get('pointsystem.user.success', $.username.resolve(action), getPointsString(getUserPoints(action.toLowerCase()))));
                 }

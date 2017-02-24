@@ -24,12 +24,18 @@
      * @returns {Number}
      */
     function saveQuote(username, quote) {
-        var newKey = $.inidb.GetKeyList('quotes', '').length,
-            game = ($.getGame($.channelName) != '' ? $.getGame($.channelName) : "Some Game");
+	        var newKey = $.inidb.GetKeyList('quotes', '').length,
+	            game = ($.getGame($.channelName) != '' ? $.getGame($.channelName) : "Some Game"),
+	            quoted = quote.substring(quote.lastIndexOf("~") + 1);
+	        quote = quote.substring(0, quote.lastIndexOf("~"));
 
-        $.inidb.set('quotes', newKey, JSON.stringify([username, quote, $.systemTime(), game + '']));
-        return newKey;
-    };
+	        // Trim the whitespace outside the quote.
+	        quoted = quoted.replace(/^\s+|\s+$/g,"");
+	        quote = quote.replace(/^\s+|\s+$/g,"");
+
+	        $.inidb.set('quotes', newKey, JSON.stringify([quoted, quote, $.systemTime(), game + '']));
+	        return newKey;
+	    };
 
     /**
      * @function deleteQuote
@@ -230,9 +236,9 @@
                 quoteStr = ($.inidb.exists('settings', 'quoteMessage') ? $.inidb.get('settings', 'quoteMessage') : $.lang.get('quotesystem.get.success'));
                 quoteStr = quoteStr.replace('(id)', (quote.length == 5 ? quote[4].toString() : quote[3].toString())).
                 replace('(quote)', quote[1]).
-                replace('(user)', $.resolveRank(quote[0])).
+                replace('(user)', quote[0]).
                 replace('(game)', (quote.length == 5 ? quote[3] : "Some Game")).
-                replace('(date)', $.getLocalTimeString('dd-MM-yyyy', parseInt(quote[2])));
+                replace('(date)', $.getLocalTimeString('MM/dd/yyyy', parseInt(quote[2])));
                 $.say(quoteStr);
             } else {
                 $.say($.whisperPrefix(sender) + $.lang.get('quotesystem.get.404', (typeof args[0] != 'undefined' ? args[0] : '')));
