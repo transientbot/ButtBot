@@ -901,6 +901,7 @@
         $.registerChatCommand('./core/permissions.js', 'permissions', 1);
         $.registerChatCommand('./core/permissions.js', 'permissionlist', 1);
         $.registerChatCommand('./core/permissions.js', 'permissionpoints', 1);
+        //$.registerChatCommand('./core/permissions.js', 'users', 2);       // This command is a useless piece of uselessness.
         //$.registerChatCommand('./core/permissions.js', 'moderators', 2);  // This command is a useless piece of uselessness.
 
         /** Load groups and generate default groups if they don't exist */
