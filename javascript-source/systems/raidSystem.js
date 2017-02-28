@@ -27,7 +27,7 @@
 
             $.inidb.incr('outgoingRaids', username, 1);
             $.say($.lang.get('raidsystem.raid', $.username.resolve(username), ""));
-            $.say($.getIniDbString('settings', 'raidMessage', ''));
+            $.say("When you see that, paste the raid message: " + $.getIniDbString('settings', 'raidMessage', ''));
         }
 
         /**
