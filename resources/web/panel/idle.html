@@ -1,0 +1,70 @@
+<!--
+
+ Copyright (C) 2017 phantombot.tv
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ @author Invariel
+-->
+
+<!-- This is outside of the accordion, so will always be on top of the tab -->
+
+<!-- Accordion object.  Each section is separated by an <h3 /> header and the content is to be enclosed in <div />.  -->
+<div id="idleAccordion">
+    <h3>Idle Settings</h3>
+    <div>
+        <div id="_idlePanelDisabled" />
+        <div id="_idlePanel">
+            <table>
+                <tr class="textList">
+                    <td>Enable Chat Idleness</td>
+                    <td style="width: 25px"><div id="chatIdlenessMode" /></td>
+                    <td style="width: 25px">
+                        <div data-toggle="tooltip" title="Toggle" class="button"
+                             onclick="$.toggleChatIdleness();"><i class="fa fa-refresh" />
+                         </div>
+                    </td>
+                </tr>
+            </table>
+
+            <br />
+
+            Set the amount of time that someone can be silent in chat and still receive channel currency.  Set these to 0 to allow everyone in chat to receive currency regardless of activity.
+
+            <div class="form-group" onkeypress="return event.keyCode != 13">
+                <label for="idleCurrencyIntervalInputHours">Activity Level for Currency</label>
+                <button type="button" class="btn btn-primary inline pull-right" onClick="$.updateCurrencyActivityLevel('#idleCurrencyIntervalInputHours', '#idleCurrencyIntervalInputMinutes', '#idleCurrencyIntervalInputSeconds')">Update</button>
+                <input type="number" min="0" class="form-control" id="idleCurrencyIntervalInputHours" placeholder="Hours" data-toggle="tooltip" title="Set the interval (in hours) before a user is considered too idle to receive channel currency." />
+                <input type="number" min="0" max="60" class="form-control" id="idleCurrencyIntervalInputHours" placeholder="Minutes" data-toggle="tooltip" title="Set the interval (in minutes) before a user is considered too idle to receive channel currency." />
+                <input type="number" min="0" max="60" class="form-control" id="idleCurrencyIntervalInputSeconds" placeholder="Seconds" data-toggle="tooltip" title="Set the interval (in seconds) before a user is considered too idle to receive channel currency." />
+            </div>
+
+            <br />
+
+            Set the amount of time that someone can be silent in chat and still be targeted by (random) commands.  Set these to 0 to allow everyone in chat to be targeted by (random) commands regardless of activity.
+
+            <div class="form-group" onkeypress="return event.keyCode != 13">
+                <label for="idleRandomIntervalInputHours">Activity Level for (random)</label>
+                <button type="button" class="btn btn-primary inline pull-right" onClick="$.updateRandomActivityLevel('#idleRandomIntervalInputHours', '#idleRandomIntervalInputMinutes', '#idleRandomIntervalInputSeconds')">Update</button>
+                <input type="number" min="0" class="form-control" id="idleRandomIntervalInputHours" placeholder="Hours" data-toggle="tooltip" title="Set the interval (in hours) before a user is considered too idle to be targeted by (random) commands." />
+                <input type="number" min="0" max="60" class="form-control" id="idleRandomIntervalInputHours" placeholder="Minutes" data-toggle="tooltip" title="Set the interval (in minutes) before a user is considered too idle to be targeted by (random) commands." />
+                <input type="number" min="0" max="60" class="form-control" id="idleRandomIntervalInputSeconds" placeholder="Seconds" data-toggle="tooltip" title="Set the interval (in seconds) before a user is considered too idle to be targeted by (random) commands." />
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Run the Acordion -->
+<script>$("#idleAccordion").accordion( { clearStyle: true, heightStyle: "panel", icons: null } );</script>
+<script>handleInputFocus();</script>
