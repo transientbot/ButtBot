@@ -1,6 +1,10 @@
 (function() {
 	var recentChatters = { };	// { "user" : [ last_word, previous_word ] }
+
 	var active = false;
+	var idlePoints = 0;
+	var idleTime = 0;
+	var randomTime = 0;
 
 	// Logging who said what and when.  And also previously when.
 	function receivedChatMessage (who)
@@ -54,6 +58,27 @@
 	function idleUpdate ()
 	{
 		active = $.inidb.get('idleSettings', 'idle_toggle') == "true";
+		idleTime = ($.inidb.get('idleSettings', 'idlehours') * 3600 +
+				    $.inidb.get('idleSettings', 'idleminutes') * 60 +
+				    $.inidb.get('idleSettings', 'idleseconds')) * 1000;
+		randomTime = ($.inidb.get('idleSettings', 'randomhours') * 3600 +
+				      $.inidb.get('idleSettings', 'randomminutes') * 60 +
+				      $.inidb.get('idleSettings', 'randomseconds')) * 1000;
+	}
+
+	function idlePoints ()
+	{
+		return active && idlePoints;
+	}
+
+	function idlePointsDuration ()
+	{
+		return active && idleTime;
+	}
+
+	function idleRandomDuration ()
+	{
+		return active && randomTime;
 	}
 
 	$.bind('ircChannelMessage', function (event)
@@ -66,9 +91,14 @@
 	});
 
     $.reloadIdle = idleUpdate;
+
 	$.receivedChatMessage = receivedChatMessage;
 	$.mostRecentChatMessage = mostRecentChatMessage;
 	$.previousChatMessage = previousChatMessage;
 	$.getRecentChatters = getRecentChatters;
+
+	$.idlePoints = idlePoints;
+	$.idlePointsDuration = idlePointsDuration;
+	$.idleRandomDuration = idleRandomDuration;
 
 })();
