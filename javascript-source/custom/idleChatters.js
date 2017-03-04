@@ -85,7 +85,6 @@
 	{
 		if (active)
 		{
-			$.say ("Active is currently " + active + ".");
 			receivedChatMessage (event.getSender().toLowerCase());
 		}
 	});

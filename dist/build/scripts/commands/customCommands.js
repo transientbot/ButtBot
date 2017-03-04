@@ -170,7 +170,13 @@
         }
 
         if (message.match(/\(random\)/g)) {
-            message = $.replace(message, '(random)', $.username.resolve($.randElement($.users)[0]));
+            var users;
+            if ($.idleRandomDuration()) {
+                users = $.getRecentChatters($.idleRandomDuration())
+            } else {
+                users = $.users;
+            }
+            message = $.replace(message, '(random)', $.username.resolve($.randElement(users)[0]));
         }
 
         if (message.match(/\(randomrank\)/g)) {

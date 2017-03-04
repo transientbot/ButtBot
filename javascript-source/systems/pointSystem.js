@@ -136,6 +136,15 @@
             return;
         }
 
+        var idlePoints = $.idlePoints();
+        var activeUsers;
+
+        if ($.idlePointsDuration() != false) {
+            activeUsers = getRecentChatters ($.idlePointsDuration());
+        } else {
+            activeUsers = false;
+        }
+
         if ($.isOnline($.channelName)) {
             if (onlinePayoutInterval > 0 && (lastPayout + (onlinePayoutInterval * 6e4)) <= now) {
                 amount = onlineGain;
@@ -199,6 +208,12 @@
             }
 
             if (!getUserPenalty(username)) {
+                // If the channel is online, the channel is giving out a different number of points to idle users, and the user is not active,
+                // assign the different number of points.  This value does not get affected by bonuses.
+                if ($.isOnline($.channelName) && $.idlePointsDuration() && !jQuery.inArray(username, activeUsers)) {
+                    amount = idlePoints;
+                }
+
                 $.inidb.incr('points', username, amount);
                 uUsers.push(username + '(' + amount + ')');
             }
