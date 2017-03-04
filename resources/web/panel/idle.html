@@ -45,9 +45,19 @@
             <div class="form-group" onkeypress="return event.keyCode != 13">
                 <label for="idleCurrencyIntervalInputHours">Activity Level for Currency</label>
                 <button type="button" class="btn btn-primary inline pull-right" onClick="$.updateCurrencyActivityLevel('#idleCurrencyIntervalInputHours', '#idleCurrencyIntervalInputMinutes', '#idleCurrencyIntervalInputSeconds')">Update</button>
-                <input type="number" min="0" class="form-control" id="idleCurrencyIntervalInputHours" placeholder="Hours" data-toggle="tooltip" title="Set the interval (in hours) before a user is considered too idle to receive channel currency." />
-                <input type="number" min="0" max="60" class="form-control" id="idleCurrencyIntervalInputHours" placeholder="Minutes" data-toggle="tooltip" title="Set the interval (in minutes) before a user is considered too idle to receive channel currency." />
-                <input type="number" min="0" max="60" class="form-control" id="idleCurrencyIntervalInputSeconds" placeholder="Seconds" data-toggle="tooltip" title="Set the interval (in seconds) before a user is considered too idle to receive channel currency." />
+                <input type="number" min="0" value="0" class="form-control" id="idleCurrencyIntervalInputHours" placeholder="Hours" data-toggle="tooltip" title="Set the interval (in hours) before a user is considered too idle to receive channel currency." />
+                <input type="number" min="0" max="60" value="0" class="form-control" id="idleCurrencyIntervalInputMinutes" placeholder="Minutes" data-toggle="tooltip" title="Set the interval (in minutes) before a user is considered too idle to receive channel currency." />
+                <input type="number" min="0" max="60" value="0" class="form-control" id="idleCurrencyIntervalInputSeconds" placeholder="Seconds" data-toggle="tooltip" title="Set the interval (in seconds) before a user is considered too idle to receive channel currency." />
+            </div>
+
+            <br />
+
+            Set the number of points that a user will receive when they have been silent for the above duration.  Setting a value higher than your points per interval will result in idlers receiving more points than active chatters, and setting a value lower than 0 will penalize users points every interval.  Points will not drop below 0.  This value will only be awarded while you are live; while you are offline, all users will receive your full offline points value.
+
+            <div class="form-group" onkeypress="return event.keyCode != 13">
+                <label for="idleCurrencyReceivedWhileIdle">Idle Points Received</label>
+                <button type="button" class="btn btn-primary inline pull-right" onClick="$.updateCurrencyReceivedWhileIdle('#idleCurrencyWhileIdle')">Update</button>
+                <input type="number" value="0" class="form-control" id="idleCurrencyWhileIdle" placeholder="Points Received While Idle" data-toggle="tooltip" title="Set the amount of points an idle user will receive every interval." />
             </div>
 
             <br />
@@ -57,9 +67,9 @@
             <div class="form-group" onkeypress="return event.keyCode != 13">
                 <label for="idleRandomIntervalInputHours">Activity Level for (random)</label>
                 <button type="button" class="btn btn-primary inline pull-right" onClick="$.updateRandomActivityLevel('#idleRandomIntervalInputHours', '#idleRandomIntervalInputMinutes', '#idleRandomIntervalInputSeconds')">Update</button>
-                <input type="number" min="0" class="form-control" id="idleRandomIntervalInputHours" placeholder="Hours" data-toggle="tooltip" title="Set the interval (in hours) before a user is considered too idle to be targeted by (random) commands." />
-                <input type="number" min="0" max="60" class="form-control" id="idleRandomIntervalInputHours" placeholder="Minutes" data-toggle="tooltip" title="Set the interval (in minutes) before a user is considered too idle to be targeted by (random) commands." />
-                <input type="number" min="0" max="60" class="form-control" id="idleRandomIntervalInputSeconds" placeholder="Seconds" data-toggle="tooltip" title="Set the interval (in seconds) before a user is considered too idle to be targeted by (random) commands." />
+                <input type="number" min="0" value="0" class="form-control" id="idleRandomIntervalInputHours" placeholder="Hours" data-toggle="tooltip" title="Set the interval (in hours) before a user is considered too idle to be targeted by (random) commands." />
+                <input type="number" min="0" max="60" value="0" class="form-control" id="idleRandomIntervalInputMinutes" placeholder="Minutes" data-toggle="tooltip" title="Set the interval (in minutes) before a user is considered too idle to be targeted by (random) commands." />
+                <input type="number" min="0" max="60" value="0" class="form-control" id="idleRandomIntervalInputSeconds" placeholder="Seconds" data-toggle="tooltip" title="Set the interval (in seconds) before a user is considered too idle to be targeted by (random) commands." />
             </div>
         </div>
     </div>
@@ -67,4 +77,5 @@
 
 <!-- Run the Acordion -->
 <script>$("#idleAccordion").accordion( { clearStyle: true, heightStyle: "panel", icons: null } );</script>
+<script>$('[data-toggle="tooltip"]').tooltip({ trigger: 'hover' });</script>
 <script>handleInputFocus();</script>

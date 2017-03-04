@@ -124,6 +124,7 @@ connection.onmessage = function(e) {
     if (e.data.indexOf('queue_') !== -1) $.queueOnMessage(e);
     if (e.data.indexOf('twitter_') !== -1) $.twitterOnMessage(e);
     if (e.data.indexOf('discord_') !== -1) $.discordOnMessage(e);
+    if (e.data.indexOf('idle_') !== -1) $.idleOnMessage(e);
 
     if (e.data.indexOf('audio_') !== -1) $.audioOnMessage(e);
     if (e.data.indexOf('help_') !== -1) $.helpOnMessage(e);
@@ -459,6 +460,9 @@ function performCurrentPanelRefresh() {
              newPanelAlert('Refreshing Data', 'success', 1000);
              $.audioDoQuery();
              break;
-
+         case 21 :
+             newPanelAlert('Refreshing Data', 'success', 1000);
+             $.idleDoQuery();
+             break;
     }
 }
