@@ -760,9 +760,9 @@
         }
 
         /**
-         * @commandpath mods - List mods currently in the channel
+         * @commandpath moderators - List mods currently in the channel
          */
-        if (command.equalsIgnoreCase('mods')) {
+        if (command.equalsIgnoreCase('moderators')) {
             var tmp = getUsernamesArrayByGroupId(2);
             if (tmp.length > 20) {
                 $.say($.whisperPrefix(sender) + $.lang.get('permissions.current.listtoolong', tmp.length));
@@ -901,8 +901,8 @@
         $.registerChatCommand('./core/permissions.js', 'permissions', 1);
         $.registerChatCommand('./core/permissions.js', 'permissionlist', 1);
         $.registerChatCommand('./core/permissions.js', 'permissionpoints', 1);
-        $.registerChatCommand('./core/permissions.js', 'users', 2);
-        $.registerChatCommand('./core/permissions.js', 'mods', 2);
+        //$.registerChatCommand('./core/permissions.js', 'users', 2);       // This command is a useless piece of uselessness.
+        //$.registerChatCommand('./core/permissions.js', 'moderators', 2);  // This command is a useless piece of uselessness.
 
         /** Load groups and generate default groups if they don't exist */
         reloadGroups();

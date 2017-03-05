@@ -240,7 +240,7 @@
         }
 
         /*
-         * @commandpath followtaintoggle - Enable or disable the follow train anouncements
+         * @commandpath followtraintoggle - Enable or disable the follow train anouncements
          */
         if (command.equalsIgnoreCase('followtraintoggle')) {
             followTrainToggle = !followTrainToggle;
