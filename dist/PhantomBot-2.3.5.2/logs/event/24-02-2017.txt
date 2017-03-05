@@ -1,9 +1,0 @@
-[02-24-2017 @ 00:00:30.844 UTC] [followHandler.js:119] Follow announcements enabled
-[02-24-2017 @ 19:19:35.449 UTC] [init.js:769] Core loaded, initializing bot...
-[02-24-2017 @ 19:19:36.631 UTC] [init.js:1370] init.js api's loaded.
-[02-24-2017 @ 19:19:36.656 UTC] [logging.js:207] Starting Log Rotation
-[02-24-2017 @ 19:19:36.661 UTC] [logging.js:219] Finished Log Rotation
-[02-24-2017 @ 19:23:44.880 UTC] [init.js:769] Core loaded, initializing bot...
-[02-24-2017 @ 19:23:46.128 UTC] [init.js:1370] init.js api's loaded.
-[02-24-2017 @ 19:23:46.160 UTC] [logging.js:207] Starting Log Rotation
-[02-24-2017 @ 19:23:46.163 UTC] [logging.js:219] Finished Log Rotation
