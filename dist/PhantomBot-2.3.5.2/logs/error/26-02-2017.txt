@@ -1,0 +1,7 @@
+[02-26-2017 @ 05:13:45.950 UTC] [init.js:317] (hook.call, command, ./systems/pointSystem.js) TypeError: Cannot read property "10" from undefined
+[02-26-2017 @ 05:17:26.079 UTC] [init.js:317] (hook.call, command, ./handlers/followHandler.js) JavaException: org.json.JSONException: JSONObject["message"] not found.
+[02-26-2017 @ 17:39:52.285 UTC] [init.js:317] (hook.call, command, ./handlers/followHandler.js) JavaException: org.json.JSONException: JSONObject["message"] not found.
+[02-26-2017 @ 18:34:49.187 UTC] [init.js:317] (hook.call, command, ./handlers/followHandler.js) JavaException: org.json.JSONException: JSONObject["message"] not found.
+[02-26-2017 @ 18:36:18.873 UTC] [streamInfo.js:137] Failed to get the current game: Channel 'TG' does not exist
+[02-26-2017 @ 18:36:56.828 UTC] [init.js:317] (hook.call, command, ./handlers/followHandler.js) JavaException: org.json.JSONException: JSONObject["message"] not found.
+[02-26-2017 @ 18:44:01.005 UTC] [init.js:317] (hook.call, command, ./handlers/followHandler.js) JavaException: org.json.JSONException: JSONObject["message"] not found.

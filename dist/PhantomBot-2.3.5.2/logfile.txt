@@ -1,0 +1,156 @@
+[02-28-2017 @ 06:05:55.115 GMT] The working directory is: /home/botuser/phantombot-source/dist/PhantomBot-2.3.5.2
+[02-28-2017 @ 06:05:55.120 GMT] 
+[02-28-2017 @ 06:05:55.120 GMT] PhantomBot Version: 2.3.5.2
+[02-28-2017 @ 06:05:55.121 GMT] Build Revision: d32710d
+[02-28-2017 @ 06:05:55.121 GMT] Creator: mast3rplan
+[02-28-2017 @ 06:05:55.121 GMT] Developers: PhantomIndex, Kojitsari, ScaniaTV, Zelakto & IllusionaryOne
+[02-28-2017 @ 06:05:55.122 GMT] https://phantombot.tv/
+[02-28-2017 @ 06:05:55.122 GMT] 
+[02-28-2017 @ 06:05:55.395 GMT] YouTubeSocketServer accepting connections on port: 25003
+[02-28-2017 @ 06:05:55.401 GMT] PanelSocketServer accepting connections on port: 25004
+[02-28-2017 @ 06:05:55.427 GMT] New HTTP server accepting connection on port: 25005
+[02-28-2017 @ 06:05:56.508 GMT] 
+[02-28-2017 @ 06:05:56.657 GMT] Discord API is Ready
+[02-28-2017 @ 06:05:57.347 GMT] Loaded module: core/misc.js (Enabled)
+[02-28-2017 @ 06:05:57.367 GMT] Loaded module: core/jsTimers.js (Enabled)
+[02-28-2017 @ 06:05:57.635 GMT] Loaded module: core/chatModerator.js (Enabled)
+[02-28-2017 @ 06:05:57.703 GMT] Loaded module: core/updates.js (Enabled)
+[02-28-2017 @ 06:05:57.737 GMT] Loaded module: core/fileSystem.js (Enabled)
+[02-28-2017 @ 06:05:58.182 GMT] Loaded module: core/lang.js (Enabled)
+[02-28-2017 @ 06:05:58.198 GMT] Loaded module: core/commandPause.js (Enabled)
+[02-28-2017 @ 06:05:58.241 GMT] Loaded module: core/logging.js (Enabled)
+[02-28-2017 @ 06:05:58.263 GMT] Loaded module: core/commandRegister.js (Enabled)
+[02-28-2017 @ 06:05:58.280 GMT] Loaded module: core/whisper.js (Enabled)
+[02-28-2017 @ 06:05:58.300 GMT] Loaded module: core/commandCoolDown.js (Enabled)
+[02-28-2017 @ 06:05:58.315 GMT] Loaded module: core/keywordCoolDown.js (Enabled)
+[02-28-2017 @ 06:05:58.325 GMT] Loaded module: core/gameMessages.js (Enabled)
+[02-28-2017 @ 06:05:58.354 GMT] Loaded module: core/patternDetector.js (Enabled)
+[02-28-2017 @ 06:05:58.409 GMT] Loaded module: core/permissions.js (Enabled)
+[02-28-2017 @ 06:05:58.442 GMT] Loaded module: core/streamInfo.js (Enabled)
+[02-28-2017 @ 06:05:58.477 GMT] Loaded module: core/timeSystem.js (Enabled)
+[02-28-2017 @ 06:05:58.496 GMT] Loaded module: core/panelCommands.js (Enabled)
+[02-28-2017 @ 06:05:58.524 GMT] Loaded module: customscripts/customRanks.js (Enabled)
+[02-28-2017 @ 06:05:58.541 GMT] Loaded module: commands/dualstreamCommand.js (Enabled)
+[02-28-2017 @ 06:05:58.556 GMT] Loaded module: commands/topCommand.js (Disabled)
+[02-28-2017 @ 06:05:58.568 GMT] Loaded module: commands/lastseenCommand.js (Enabled)
+[02-28-2017 @ 06:05:58.576 GMT] Loaded module: commands/highlightCommand.js (Disabled)
+[02-28-2017 @ 06:05:58.645 GMT] Loaded module: commands/customCommands.js (Enabled)
+[02-28-2017 @ 06:05:58.656 GMT] Loaded module: commands/deathctrCommand.js (Disabled)
+[02-28-2017 @ 06:05:58.668 GMT] Loaded module: commands/streamCommand.js (Enabled)
+[02-28-2017 @ 06:05:58.674 GMT] Loaded module: handlers/wordCounter.js (Disabled)
+[02-28-2017 @ 06:05:58.692 GMT] Loaded module: handlers/tipeeeStreamHandler.js (Disabled)
+[02-28-2017 @ 06:05:58.726 GMT] Loaded module: handlers/subscribeHandler.js (Disabled)
+[02-28-2017 @ 06:05:58.756 GMT] Loaded module: handlers/followHandler.js (Enabled)
+[02-28-2017 @ 06:05:58.783 GMT] Loaded module: handlers/donationHandler.js (Disabled)
+[02-28-2017 @ 06:05:58.804 GMT] Loaded module: handlers/streamTipHandler.js (Disabled)
+[02-28-2017 @ 06:05:58.847 GMT] Loaded module: handlers/gameWispHandler.js (Disabled)
+[02-28-2017 @ 06:05:58.876 GMT] Loaded module: handlers/hostHandler.js (Enabled)
+[02-28-2017 @ 06:05:58.889 GMT] Loaded module: handlers/panelHandler.js (Enabled)
+[02-28-2017 @ 06:05:58.903 GMT] Loaded module: handlers/emotesHandler.js (Enabled)
+[02-28-2017 @ 06:05:58.915 GMT] Loaded module: handlers/keywordHandler.js (Disabled)
+[02-28-2017 @ 06:05:58.945 GMT] Loaded module: handlers/twitterHandler.js (Disabled)
+[02-28-2017 @ 06:05:58.959 GMT] Loaded module: handlers/bitsHandler.js (Enabled)
+[02-28-2017 @ 06:05:58.973 GMT] Loaded module: systems/cleanupSystem.js (Disabled)
+[02-28-2017 @ 06:05:59.009 GMT] Loaded module: systems/raffleSystem.js (Enabled)
+[02-28-2017 @ 06:05:59.035 GMT] Loaded module: systems/ranksSystem.js (Enabled)
+[02-28-2017 @ 06:05:59.053 GMT] Loaded module: systems/audioPanelSystem.js (Disabled)
+[02-28-2017 @ 06:05:59.067 GMT] Loaded module: systems/auctionSystem.js (Enabled)
+[02-28-2017 @ 06:05:59.079 GMT] Loaded module: systems/raidSystem.js (Enabled)
+[02-28-2017 @ 06:05:59.103 GMT] Loaded module: systems/noticeSystem.js (Enabled)
+[02-28-2017 @ 06:05:59.214 GMT] Loaded module: systems/youtubePlayer.js (Disabled)
+[02-28-2017 @ 06:05:59.226 GMT] Loaded module: systems/greetingSystem.js (Disabled)
+[02-28-2017 @ 06:05:59.250 GMT] Loaded module: systems/queueSystem.js (Disabled)
+[02-28-2017 @ 06:05:59.274 GMT] Loaded module: systems/pollSystem.js (Enabled)
+[02-28-2017 @ 06:05:59.292 GMT] Loaded module: systems/ticketraffleSystem.js (Disabled)
+[02-28-2017 @ 06:05:59.341 GMT] Loaded module: systems/pointSystem.js (Enabled)
+[02-28-2017 @ 06:05:59.365 GMT] Loaded module: systems/bettingSystem.js (Disabled)
+[02-28-2017 @ 06:05:59.386 GMT] Loaded module: systems/quoteSystem.js (Enabled)
+[02-28-2017 @ 06:05:59.409 GMT] Loaded module: games/roll.js (Disabled)
+[02-28-2017 @ 06:05:59.430 GMT] Loaded module: games/gambling.js (Disabled)
+[02-28-2017 @ 06:05:59.450 GMT] Loaded module: games/killCommand.js (Disabled)
+[02-28-2017 @ 06:05:59.456 GMT] Loaded module: games/random.js (Disabled)
+[02-28-2017 @ 06:05:59.475 GMT] Loaded module: games/slotMachine.js (Disabled)
+[02-28-2017 @ 06:05:59.504 GMT] Loaded module: games/adventureSystem.js (Disabled)
+[02-28-2017 @ 06:05:59.519 GMT] Loaded module: games/roulette.js (Disabled)
+[02-28-2017 @ 06:05:59.527 GMT] Loaded module: games/8ball.js (Disabled)
+[02-28-2017 @ 06:05:59.549 GMT] Loaded module: discord/core/misc.js (Enabled)
+[02-28-2017 @ 06:05:59.553 GMT] Loaded module: discord/core/patternDetector.js (Enabled)
+[02-28-2017 @ 06:05:59.597 GMT] Loaded module: discord/core/moderation.js (Enabled)
+[02-28-2017 @ 06:05:59.608 GMT] Loaded module: discord/core/registerCommand.js (Enabled)
+[02-28-2017 @ 06:05:59.623 GMT] Loaded module: discord/core/commandCooldown.js (Enabled)
+[02-28-2017 @ 06:05:59.660 GMT] Loaded module: discord/commands/customCommands.js (Enabled)
+[02-28-2017 @ 06:05:59.688 GMT] Loaded module: discord/handlers/gamewispHandler.js (Disabled)
+[02-28-2017 @ 06:05:59.704 GMT] Loaded module: discord/handlers/tipeeeStreamHandler.js (Disabled)
+[02-28-2017 @ 06:05:59.730 GMT] Loaded module: discord/handlers/subscribeHandler.js (Disabled)
+[02-28-2017 @ 06:05:59.746 GMT] Loaded module: discord/handlers/followHandler.js (Disabled)
+[02-28-2017 @ 06:05:59.759 GMT] Loaded module: discord/handlers/streamtipHandler.js (Disabled)
+[02-28-2017 @ 06:05:59.775 GMT] Loaded module: discord/handlers/hostHandler.js (Disabled)
+[02-28-2017 @ 06:05:59.801 GMT] Loaded module: discord/handlers/streamHandler.js (Disabled)
+[02-28-2017 @ 06:05:59.815 GMT] Loaded module: discord/handlers/keywordHandler.js (Disabled)
+[02-28-2017 @ 06:05:59.831 GMT] Loaded module: discord/handlers/twitterHandler.js (Disabled)
+[02-28-2017 @ 06:05:59.838 GMT] Loaded module: discord/handlers/bitsHandler.js (Disabled)
+[02-28-2017 @ 06:05:59.858 GMT] Loaded module: discord/handlers/streamlabsHandler.js (Disabled)
+[02-28-2017 @ 06:05:59.878 GMT] Loaded module: discord/systems/greetingsSystem.js (Disabled)
+[02-28-2017 @ 06:05:59.886 GMT] Loaded module: discord/games/random.js (Disabled)
+[02-28-2017 @ 06:05:59.896 GMT] Loaded module: discord/games/kill.js (Disabled)
+[02-28-2017 @ 06:05:59.904 GMT] Loaded module: discord/games/roulette.js (Disabled)
+[02-28-2017 @ 06:05:59.916 GMT] Loaded module: discord/games/8ball.js (Disabled)
+[02-28-2017 @ 06:06:00.079 GMT] 
+[02-28-2017 @ 06:06:00.965 GMT] For support please visit: https://community.phantombot.tv
+[02-28-2017 @ 06:06:00.965 GMT] 
+[02-28-2017 @ 06:06:00.979 GMT] Connecting to Twitch WS-IRC Server (SSL) [irc-ws.chat.twitch.tv]
+[02-28-2017 @ 06:06:01.636 GMT] Connected to transient_bot@irc-ws.chat.twitch.tv (SSL)
+[02-28-2017 @ 06:06:01.804 GMT] Connected to Twitch Host Data Feed
+[02-28-2017 @ 06:06:01.908 GMT] Channel Joined [#transientgamers]
+[02-28-2017 @ 06:06:02.255 GMT] Transient_Bot ready!
+[02-28-2017 @ 06:06:09.131 GMT] [CHAT] Quote #140: "Lulu, come here, I want to ram you up the ass." ~faceless_gaming, #LULESS [Rocket League] [05/03/2016]
+[02-28-2017 @ 06:06:31.810 GMT] >> Enabling hosts announcements
+[02-28-2017 @ 06:06:33.683 GMT] >> Enabling follower announcements
+[02-28-2017 @ 06:08:59.332 GMT] [DISCORD] [#general] transientgamers: !module list
+[02-28-2017 @ 06:08:59.339 GMT] [DISCORD] [#general] [CHAT] <@104207982421639168>, Discord Module list: 
+ ./discord/commands/customCommands.js [enabled]
+./discord/handlers/gamewispHandler.js [disabled]
+./discord/handlers/tipeeeStreamHandler.js [disabled]
+./discord/handlers/subscribeHandler.js [disabled]
+./discord/handlers/followHandler.js [disabled]
+./discord/handlers/streamtipHandler.js [disabled]
+./discord/handlers/hostHandler.js [disabled]
+./discord/handlers/streamHandler.js [disabled]
+./discord/handlers/keywordHandler.js [disabled]
+./discord/handlers/twitterHandler.js [disabled]
+./discord/handlers/bitsHandler.js [disabled]
+./discord/handlers/streamlabsHandler.js [disabled]
+./discord/systems/greetingsSystem.js [disabled]
+./discord/games/random.js [disabled]
+./discord/games/kill.js [disabled]
+./discord/games/roulette.js [disabled]
+./discord/games/8ball.js [disabled]
+[02-28-2017 @ 06:10:24.789 GMT] invariel: !butts
+[02-28-2017 @ 06:10:24.799 GMT] [CHAT] /w Invariel [Faxanadu World Record] - You've witnessed  155 hours and 14 minutes of mediocre gameplay and accumulated 200 butts.
+[02-28-2017 @ 06:11:19.117 GMT] [CHAT] Bring in your friends! http://ctt.ec/9Ohs_
+[02-28-2017 @ 06:11:34.814 GMT] [DISCORD] [#general] invariel: So, what happens when I type in Discord?
+[02-28-2017 @ 06:14:24.938 GMT] [DISCORD] [#general] transientgamers: !botcommands
+[02-28-2017 @ 06:14:24.940 GMT] [DISCORD] [#general] [CHAT] <@104207982421639168>, Bot Commands: !module, !moderation, !cooldown, !addcom, !delcom, !editcom, !permcom, !coolcom, !channelcom, !commands, !botcommands
+[02-28-2017 @ 06:17:40.928 GMT] invariel: !butts
+[02-28-2017 @ 06:17:40.934 GMT] [CHAT] /w Invariel [Blessing Rains] - You've witnessed  155 hours and 14 minutes of mediocre gameplay and accumulated 200 butts.
+[02-28-2017 @ 06:21:56.080 GMT] invariel: !butts
+[02-28-2017 @ 06:21:56.086 GMT] [CHAT] /w Invariel [Blessing Rains] - You've witnessed  155 hours and 14 minutes of mediocre gameplay and accumulated 200 butts.
+[02-28-2017 @ 06:22:23.650 GMT] invariel: !butts 1
+[02-28-2017 @ 06:22:23.654 GMT] [CHAT] @Invariel, Invalid option passed to !butts command
+[02-28-2017 @ 06:22:27.501 GMT] invariel: !butts
+[02-28-2017 @ 06:22:27.510 GMT] [CHAT] /w Invariel [Blessing Rains] - You've witnessed  155 hours and 14 minutes of mediocre gameplay and accumulated 200 butts.
+[02-28-2017 @ 06:23:34.599 GMT] invariel: !butts
+[02-28-2017 @ 06:23:34.604 GMT] [CHAT] /w Invariel [Faxanadu World Record] - You've witnessed  155 hours and 14 minutes of mediocre gameplay and accumulated 200 butts.
+[02-28-2017 @ 06:24:35.410 GMT] transient_bot is now shutting down...
+[02-28-2017 @ 06:24:35.411 GMT] Stopping all events and message dispatching...
+[02-28-2017 @ 06:24:35.411 GMT] Terminating the Twitch channel user cache...
+[02-28-2017 @ 06:24:35.411 GMT] Terminating the Twitch channel follower cache...
+[02-28-2017 @ 06:24:35.411 GMT] Terminating the Streamlabs cache...
+[02-28-2017 @ 06:24:35.416 GMT] Terminating the StreamTip cache...
+[02-28-2017 @ 06:24:35.417 GMT] Terminating pending timers...
+[02-28-2017 @ 06:24:35.417 GMT] Terminating all script modules...
+[02-28-2017 @ 06:24:35.437 GMT] Saving all data...
+[02-28-2017 @ 06:24:35.438 GMT] Shutting down all web socket servers...
+[02-28-2017 @ 06:24:35.438 GMT] NEW HTTP server closing down on port 25005 with 5 second delay.
+[02-28-2017 @ 06:24:40.450 GMT] NEW HTTP server stopped on port 25005
+Waiting for everthing else to shutdown... 10 Waiting for everthing else to shutdown... 9 Waiting for everthing else to shutdown... 8 Waiting for everthing else to shutdown... 7 Waiting for everthing else to shutdown... 6 Waiting for everthing else to shutdown... 5 Waiting for everthing else to shutdown... 4 Waiting for everthing else to shutdown... 3 Waiting for everthing else to shutdown... 2 Waiting for everthing else to shutdown... 1 [02-28-2017 @ 06:24:50.454 GMT] transient_bot now exiting.
