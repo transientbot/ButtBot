@@ -67,6 +67,7 @@ nbproject/
 .project
 
 dist/PhantomBot-2.3.5.2/botlogin.txt
+dist/*
 dist/PhantomBot-2.3.5.2/scripts/customscripts/customRanks.js
 dist/PhantomBot-2.3.5.2/phantombot.db
 javascript-source/customscripts/customRanks.js
