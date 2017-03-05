@@ -1,0 +1,12 @@
+[03-01-2017 @ 20:06:25.537 UTC] [init.js:771] Core loaded, initializing bot...
+[03-01-2017 @ 20:06:26.733 UTC] [init.js:785] Discord Core loaded, initializing modules...
+[03-01-2017 @ 20:06:27.139 UTC] [init.js:1372] init.js api's loaded.
+[03-01-2017 @ 20:06:27.166 UTC] [logging.js:207] Starting Log Rotation
+[03-01-2017 @ 20:06:27.175 UTC] [logging.js:219] Finished Log Rotation
+[03-01-2017 @ 20:07:00.600 UTC] [followHandler.js:119] Follow announcements enabled
+[03-01-2017 @ 20:07:47.802 UTC] [streamInfo.js:426] transient_bot changed the current status to Click here for click here
+[03-01-2017 @ 21:42:13.932 UTC] [chatModerator.js:932] Matty_Taylor was permited by delphoxglove
+[03-01-2017 @ 21:47:23.130 UTC] [chatModerator.js:932] Matty_Taylor was permited by delphoxglove
+[03-01-2017 @ 21:58:35.062 UTC] [chatModerator.js:932] Matty_Taylor was permited by delphoxglove
+[03-01-2017 @ 22:06:25.532 UTC] [timeSystem.js:380] arcanelumi has finally reached regular status!
+[03-01-2017 @ 23:40:12.697 UTC] [raffleSystem.js:384] A raffle was opened by: transient_bot. Arguments (open booty 3 -followers)

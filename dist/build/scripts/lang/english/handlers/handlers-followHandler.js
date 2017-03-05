@@ -14,9 +14,9 @@ $.lang.register('followhandler.set.followmessage.usage', 'Usage: !followmessage 
 $.lang.register('followhandler.set.followreward.success', 'Follow reward set to $1.');
 $.lang.register('followhandler.set.followreward.usage', 'Usage: !followreward [$1]. (Currently $2)');
 $.lang.register('followhandler.shoutout.usage', 'Usage: !$1 (streamer)');
-$.lang.register('followhandler.shoutout.offline', 'Hey! Go give $1 a follow at $2! They were last seen playing $3!');
-$.lang.register('followhandler.shoutout.online', 'Hey! Go give $1 a follow at $2! They are currently playing $3!');
-$.lang.register('followhandler.shoutout.no.game', 'Hey! Go give $1 a follow at $2!');
+$.lang.register('followhandler.shoutout.offline', 'tgHey Go give $1 a follow at $2! They were last seen playing $3.');
+$.lang.register('followhandler.shoutout.online', 'tgHey Go give $1 a follow at $2! They are currently playing $3.');
+$.lang.register('followhandler.shoutout.no.game', 'tgHey Go give $1 a follow at $2!');
 $.lang.register('followhandler.followtoggle.on', 'Announcements are enabled for new followers.');
 $.lang.register('followhandler.followtoggle.off', 'Announcements are disabled for new followers.');
 $.lang.register('followhandler.followtraintoggle.on', 'Follow train announcements are now enabled.');
@@ -28,14 +28,5 @@ $.lang.register('followhandler.fixfollow.added', 'added $1 to the followed list!
 $.lang.register('followhandler.set.followdelay.usage', 'usage: !followdelay [amount in seconds]');
 $.lang.register('followhandler.set.followdelay.success', 'follow delay set to $1 seconds.');
 $.lang.register('followhandler.follow.age.err.404', '$1 $2 is not following channel $3');
-<<<<<<< HEAD
 $.lang.register('followhandler.follow.age.time.days', '$2 has been a transient gamer since $4. ($5 days)');
 $.lang.register('followhandler.follow.age.time', '$2 has been a transient gamer since $4.');
-=======
-$.lang.register('followhandler.follow.age.time.days', '$1 $2 has been following channel $3 since $4. ($5 days)');
-<<<<<<< HEAD
-$.lang.register('followhandler.follow.age.time', '$1 $2 has been following channel $3 since $4.');
->>>>>>> a96f1e3ff8fbf66836a06f1df5fce6a93e01d823
-=======
-$.lang.register('followhandler.follow.age.time', '$1 $2 has been following channel $3 since $4.');
->>>>>>> d009801dbdb2c950b87f016136dc8ce3f76cb3e7

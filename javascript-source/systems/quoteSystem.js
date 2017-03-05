@@ -31,7 +31,7 @@
 
 	        // Trim the whitespace outside the quote.
 	        quoted = quoted.replace(/^\s+|\s+$/g,"");
-	        quote = quote.replace(/^\s+|\s+$/g,"");
+	        quote = quote.replace(/^\s+|\s{2,}$/g," ");
 
 	        $.inidb.set('quotes', newKey, JSON.stringify([quoted, quote, $.systemTime(), game + '']));
 	        return newKey;
