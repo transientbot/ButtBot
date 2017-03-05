@@ -1,6 +1,0 @@
-[02-27-2017 @ 05:17:36.526 GMT] [<init>()@NEWHTTPServer.java:75] Failed to create a new HTTP server on port: 25005.
-
-[02-27-2017 @ 05:17:36.527 GMT] [<init>()@NEWHTTPServer.java:76] Please make sure nothing is currently using port 25005 on your system.
-
-[02-27-2017 @ 05:17:36.532 GMT] [<init>()@NEWHTTPServer.java:77] You can also change the baseport in the botlogin.txt file if you need port 25005 for something else.
-
