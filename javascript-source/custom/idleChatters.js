@@ -58,6 +58,7 @@
 	function idleUpdate ()
 	{
 		active = $.inidb.get('idleSettings', 'idle_toggle') == "true";
+		idlePoints = $.inidb.get('idleSettings', 'activePointsReceived');
 		idleTime = ($.inidb.get('idleSettings', 'idlehours') * 3600 +
 				    $.inidb.get('idleSettings', 'idleminutes') * 60 +
 				    $.inidb.get('idleSettings', 'idleseconds')) * 1000;
