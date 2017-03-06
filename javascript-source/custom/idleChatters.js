@@ -187,6 +187,8 @@
 	{
 		$.registerChatCommand('./custom/idlechatters.js', 'reportidletimes', 2);
 		$.registerChatCommand('./custom/idlechatters.js', 'reportactiveusers', 2);
+
+		idleUpdate ();
 	});
 
     $.reloadIdle = idleUpdate;

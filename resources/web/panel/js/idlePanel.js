@@ -112,10 +112,10 @@
     {
         $('#chatIdlenessMode').html(spinIcon);
         chatIdlenessToggle = (chatIdlenessToggle == "true" ? "false" : "true");
-        
+
         sendDBUpdate('activity', 'idleSettings', 'idle_toggle', chatIdlenessToggle);
 
-        setTimeout(function () { sendCommand ("reloadIdle") }, TIMEOUT_WAIT_TIME);
+        setTimeout(function () { sendCommand ("reloadidle") }, TIMEOUT_WAIT_TIME);
         setTimeout(function () { doQuery (); }, TIMEOUT_WAIT_TIME);
     }
 

@@ -341,6 +341,16 @@
         }
 
         /*
+         * Reloads the idle settings variables.
+         */
+        if (command.equalsIgnoreCase('reloadidle')) {
+            if (!$.isBot(sender)) {
+                return;
+            }
+            $.reloadIdle();
+        }
+        
+        /*
          * Reloads the points variables.
          */
         if (command.equalsIgnoreCase('reloadpoints')) {
@@ -489,6 +499,7 @@
             $.registerChatCommand('./core/panelCommands.js', 'reloadinit', 30);
             $.registerChatCommand('./core/panelCommands.js', 'reloadbet', 30);
             $.registerChatCommand('./core/panelCommands.js', 'tipeeestreamreload', 30);
+            $.registerChatCommand('./core/panelCommands.js', 'reloadidle', 30);
         }, 10000);
     });
 })();
