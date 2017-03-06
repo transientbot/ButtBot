@@ -57,14 +57,14 @@
 
 	function idleUpdate ()
 	{
-		active = $.inidb.get('idleSettings', 'idle_toggle') == "true";
-		idlePoints = $.inidb.get('idleSettings', 'pointsReceived');
-		idleTime = ($.inidb.get('idleSettings', 'idlehours') * 3600 +
-				    $.inidb.get('idleSettings', 'idleminutes') * 60 +
-				    $.inidb.get('idleSettings', 'idleseconds')) * 1000;
-		randomTime = ($.inidb.get('idleSettings', 'randomhours') * 3600 +
-				      $.inidb.get('idleSettings', 'randomminutes') * 60 +
-				      $.inidb.get('idleSettings', 'randomseconds')) * 1000;
+		active = $.getIniDbString('idleSettings', 'idle_toggle') == "true";
+		idlePoints = $.getIniDbNumber('idleSettings', 'pointsreceived');
+		idleTime = ($.getIniDbNumber('idleSettings', 'idlehours') * 3600 +
+				    $.getIniDbNumber('idleSettings', 'idleminutes') * 60 +
+				    $.getIniDbNumber('idleSettings', 'idleseconds')) * 1000;
+		randomTime = ($.getIniDbNumber('idleSettings', 'randomhours') * 3600 +
+				      $.getIniDbNumber('idleSettings', 'randomminutes') * 60 +
+				      $.getIniDbNumber('idleSettings', 'randomseconds')) * 1000;
 	}
 
 	function idlePoints ()
