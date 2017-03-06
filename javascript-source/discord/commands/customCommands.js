@@ -465,7 +465,7 @@
             $.discord.registerCommand('./discord/commands/customCommands.js', 'permcom', 1);
             $.discord.registerCommand('./discord/commands/customCommands.js', 'coolcom', 1);
             $.discord.registerCommand('./discord/commands/customCommands.js', 'channelcom', 1);
-            $.discord.registerCommand('./discord/commands/customCommands.js', 'commands', 0);
+            //$.discord.registerCommand('./discord/commands/customCommands.js', 'commands', 0);
             //$.discord.registerCommand('./discord/commands/customCommands.js', 'botcommands', 1);
 
             loadCustomCommands();
