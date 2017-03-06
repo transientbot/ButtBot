@@ -179,7 +179,7 @@
                 }
             }
 
-            message = $.replace(message, '(random)', $.username.resolve($.randElement($.users)[0]));        }
+            message = $.replace(message, '(random)', $.username.resolve($.randElement($.users)[0]));
         }
 
         if (message.match(/\(randomrank\)/g)) {
