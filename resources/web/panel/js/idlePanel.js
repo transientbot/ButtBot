@@ -106,6 +106,8 @@
         sendDBKeys('activePoints', 'idleSettings');
         sendDBKeys('activePointsReceived', 'idleSettings');
         sendDBKeys('activeRandom', 'idleSettings');
+
+        setTimeout(function () { sendCommand ("reloadidle") }, TIMEOUT_WAIT_TIME);
     }
 
     function toggleChatIdleness()
@@ -115,7 +117,6 @@
 
         sendDBUpdate('activity', 'idleSettings', 'idle_toggle', chatIdlenessToggle);
 
-        setTimeout(function () { sendCommand ("reloadidle") }, TIMEOUT_WAIT_TIME);
         setTimeout(function () { doQuery (); }, TIMEOUT_WAIT_TIME);
     }
 
@@ -124,11 +125,15 @@
         sendDBUpdate("activePoints", "idleSettings", "idlehours", $(hours).val());
         sendDBUpdate("activePoints", "idleSettings", "idleminutes", $(minutes).val());
         sendDBUpdate("activePoints", "idleSettings", "idleseconds", $(seconds).val());
+
+        setTimeout(function () { doQuery (); }, TIMEOUT_WAIT_TIME);
     }
 
     function updateCurrencyReceivedWhileIdle(number)
     {
         sendDBUpdate("activePointsReceived", "idleSettings", "pointsreceived", $(number).val());
+
+        setTimeout(function () { doQuery (); }, TIMEOUT_WAIT_TIME);
     }
 
     function updateRandomActivityLevel(hours, minutes, seconds)
@@ -136,6 +141,8 @@
         sendDBUpdate("activeRandom", "idleSettings", "randomhours", $(hours).val());
         sendDBUpdate("activeRandom", "idleSettings", "randomminutes", $(minutes).val());
         sendDBUpdate("activeRandom", "idleSettings", "randomseconds", $(seconds).val());
+
+        setTimeout(function () { doQuery (); }, TIMEOUT_WAIT_TIME);
     }
 
     // Import the HTML file for this panel.
