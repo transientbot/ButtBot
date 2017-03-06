@@ -129,6 +129,7 @@
         var now = $.systemTime(),
             uUsers = [],
             username,
+            defaultamount,
             amount,
             i;
 
@@ -147,13 +148,13 @@
 
         if ($.isOnline($.channelName)) {
             if (onlinePayoutInterval > 0 && (lastPayout + (onlinePayoutInterval * 6e4)) <= now) {
-                amount = onlineGain;
+                defaultamount = onlineGain;
             } else {
                 return;
             }
         } else {
             if (offlinePayoutInterval > 0 && (lastPayout + (offlinePayoutInterval * 6e4)) <= now) {
-                amount = offlineGain;
+                defaultamount = offlineGain;
             } else {
                 return;
             }
@@ -161,6 +162,7 @@
 
         $.inidb.setAutoCommit(false);
         for (i in $.users) {
+            amount = defaultamount;
             username = $.users[i][0].toLowerCase();
             if ($.isOnline($.channelName)) {
                 if ($.isMod(username) && $.isSub(username) || $.isAdmin(username) && $.isSub(username)) {
