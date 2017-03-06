@@ -58,7 +58,7 @@
 	function idleUpdate ()
 	{
 		active = $.inidb.get('idleSettings', 'idle_toggle') == "true";
-		idlePoints = $.inidb.get('idleSettings', 'activePointsReceived');
+		idlePoints = $.inidb.get('idleSettings', 'pointsReceived');
 		idleTime = ($.inidb.get('idleSettings', 'idlehours') * 3600 +
 				    $.inidb.get('idleSettings', 'idleminutes') * 60 +
 				    $.inidb.get('idleSettings', 'idleseconds')) * 1000;
@@ -116,7 +116,7 @@
         		}
         		else
         		{
-        			$.say ($.whisperPrefix(sender, true) + "Idle timers are not active.");
+        			$.say ($.whisperPrefix(sender, true) + "Idle timers are not active, but they would be points: " + convertMilliseconds(idleTime) + " and random: " + convertMilliseconds(randomTime) + " .");
         		}
         	}
         }
