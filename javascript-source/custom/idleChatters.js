@@ -85,19 +85,31 @@
 	function convertMilliseconds (duration)
 	{
 		var ret = "";
-		var colons = [ ":", ":", ":", "." ];
-
-		[3600000, 60000, 1000, 1].forEach (function (element, index, array)
+		var n = Math.floor (duration / 3600000);
+		if (n > 0)
 		{
-			var val = Math.floor (duration / element);
+			ret += (n < 10 ? "0" : "") + n + ":";
+			duration -= n * 3600000;
+		}
 
-			if (val > 0 && ret != "")
-			{
-				ret += (val < 10 ? "0" : "") + val + colons[index] + " ";
-			}
-			duration -= val * element;
-		});
-		return ret + " to idle";
+		n = Math.floor (duration / 60000);
+		if (ret != "" || n > 0)
+		{
+			ret += (n < 10 ? "0" : "") + n + ":";
+			duration -= n * 60000;
+		}
+
+		n = Math.floor (duration / 1000);
+		if (ret != "" || n > 0)
+		{
+			ret += (n < 10 ? "0" : "") + n + ".";
+			duration -= n * 1000;
+		}
+
+		n = duration;
+		ret += (n < 10 ? "0" : "") + (n < 100 ? "0" : "") + n;
+
+		return ret;
 	}
 
     $.bind('command', function(event) {
@@ -112,11 +124,11 @@
         	{
         		if (active)
         		{
-        			$.say ($.whisperPrefix(sender, true) + "Points idle duration: " + convertMilliseconds ($.idlePointsDuration ()) + " and random idle duration: " + convertMilliseconds ($.idleRandomDuration()));
+        			$.say ($.whisperPrefix(sender, true) + "Points idle duration: " + convertMilliseconds ($.idlePointsDuration ()) + " and random idle duration: " + convertMilliseconds ($.idleRandomDuration()) + ".");
         		}
         		else
         		{
-        			$.say ($.whisperPrefix(sender, true) + "Idle timers are not active, but they would be points: " + convertMilliseconds(idleTime) + " and random: " + convertMilliseconds(randomTime) + " .");
+        			$.say ($.whisperPrefix(sender, true) + "Idle timers are not active, but they would be points: " + convertMilliseconds(idleTime) + " and random: " + convertMilliseconds(randomTime) + ".");
         		}
         	}
         }
@@ -144,7 +156,7 @@
 
         		retval.forEach(function (element, index, array)
         		{
-        			ret += "" + element + " [" + convertMilliseconds (recentChatters[element][0] + duration - now) + "] ";
+        			ret += "" + element + " [" + convertMilliseconds (recentChatters[element][0] + duration - now) + " to idle] ";
         		});
 
         		if (retval.length == 0)
