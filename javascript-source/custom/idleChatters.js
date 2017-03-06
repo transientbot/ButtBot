@@ -111,7 +111,7 @@
         	{
         		if (active)
         		{
-        			$.say ($.whisperPrefix(sender, true) + "Points idle duration: " + $.idlePointsDuration () + " and random idle duration: " + $.idleRandomDuration());
+        			$.say ($.whisperPrefix(sender, true) + "Points idle duration: " + convertMilliseconds ($.idlePointsDuration ()) + " and random idle duration: " + convertMilliseconds ($.idleRandomDuration()));
         		}
         		else
         		{
