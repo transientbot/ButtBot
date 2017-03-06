@@ -173,6 +173,9 @@
             var users;
             if ($.idleRandomDuration()) {
                 users = $.getRecentChatters($.idleRandomDuration())
+                if (users.length == 0) {
+                    users = $.users;
+                }
             } else {
                 users = $.users;
             }
