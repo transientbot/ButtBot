@@ -87,7 +87,7 @@
 		var ret = "";
 		var colons = [ ":", ":", ":", "." ];
 
-		[3600000, 60000, 1000, 1].forEach (element, index, array)
+		[3600000, 60000, 1000, 1].forEach (function (element, index, array)
 		{
 			var val = Math.floor (duration / element);
 
@@ -96,7 +96,7 @@
 				ret += (val < 10 ? "0" : "") + val + colons[index] + " ";
 			}
 			duration -= val * element;
-		}
+		});
 		return ret + " to idle";
 	}
 
