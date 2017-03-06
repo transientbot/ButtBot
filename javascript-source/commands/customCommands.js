@@ -171,15 +171,16 @@
 
         if (message.match(/\(random\)/g)) {
             var users;
+
             if ($.idleRandomDuration()) {
-                users = $.getRecentChatters($.idleRandomDuration())
-                if (users.length == 0) {
-                    users = $.users;
+                users = $.getRecentChatters($.idleRandomDuration());
+                if (users.length > 0) {
+                    message = $.replace (message, '(random)', $.username.resolve($.randElement(users)));
                 }
-            } else {
-                users = $.users;
             }
-            message = $.replace(message, '(random)', $.username.resolve($.randElement(users)[0]));        }
+
+            message = $.replace(message, '(random)', $.username.resolve($.randElement($.users)[0]));        }
+        }
 
         if (message.match(/\(randomrank\)/g)) {
             message = $.replace(message, '(randomrank)', $.resolveRank($.randElement($.users)[0]));
