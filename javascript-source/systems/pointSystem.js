@@ -139,6 +139,7 @@
 
         var idlePoints = $.idlePoints();
         var activeUsers;
+        var date = new Date();
 
         if ($.idlePointsDuration() != false) {
             activeUsers = getRecentChatters ($.idlePointsDuration());
@@ -158,6 +159,11 @@
             } else {
                 return;
             }
+        }
+
+        if ($.isOnline($.channelName))
+        {
+            $.log.file('pointSystem2', "[" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + "] Default:" + defaultamount + ", Idle: " + idlePoints);
         }
 
         $.inidb.setAutoCommit(false);
@@ -213,7 +219,10 @@
                 // If the channel is online, the channel is giving out a different number of points to idle users, and the user is not active,
                 // assign the different number of points.  This value does not get affected by bonuses.
                 if ($.isOnline($.channelName) && $.idlePointsDuration() && jQuery.inArray(username, activeUsers) == -1) {
-                    amount = idlePoints;
+                    $.log.file('pointSystem2', username + " should be given " + idlePoints + " points.");
+                    //amount = idlePoints;
+                } else {
+                    $.log.file('pointSystem2', username + " should be given " + amount + " points.");
                 }
 
                 $.inidb.incr('points', username, amount);
