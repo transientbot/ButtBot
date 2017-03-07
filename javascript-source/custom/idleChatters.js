@@ -67,7 +67,7 @@
 				      $.getIniDbNumber('idleSettings', 'randomseconds')) * 1000;
 	}
 
-	function idlePoints ()
+	function getIdlePoints ()
 	{
 		return active && idlePoints;
 	}
@@ -198,7 +198,7 @@
 	$.previousChatMessage = previousChatMessage;
 	$.getRecentChatters = getRecentChatters;
 
-	$.idlePoints = idlePoints;
+	$.idlePoints = getIdlePoints;
 	$.idlePointsDuration = idlePointsDuration;
 	$.idleRandomDuration = idleRandomDuration;
 
