@@ -212,7 +212,7 @@
             if (!getUserPenalty(username)) {
                 // If the channel is online, the channel is giving out a different number of points to idle users, and the user is not active,
                 // assign the different number of points.  This value does not get affected by bonuses.
-                if ($.isOnline($.channelName) && $.idlePointsDuration() && jQuery.inArray(username, activeUsers) == -1) {
+                if ($.isOnline($.channelName) && $.idlePointsDuration() && !activeUsers.includes(username)) {
                     amount = idlePoints;
                 }
 
