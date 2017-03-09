@@ -146,6 +146,17 @@
             activeUsers = false;
         }
 
+        if (activeUsers)
+        {
+            var activeNames = [ ];
+            for (var i = 0; i < activeUsers.length; ++ i)
+            {
+                activeNames.push ($.username.resolve(activeUsers[i]));
+            }
+
+            activeUsers = activeNames;
+        }
+
         if ($.isOnline($.channelName)) {
             if (onlinePayoutInterval > 0 && (lastPayout + (onlinePayoutInterval * 6e4)) <= now) {
                 defaultamount = onlineGain;
