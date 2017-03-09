@@ -146,17 +146,6 @@
             activeUsers = false;
         }
 
-        if (activeUsers)
-        {
-            var activeNames = [ ];
-            for (var i = 0; i < activeUsers.length; ++ i)
-            {
-                activeNames.push ($.username.resolve(activeUsers[i]));
-            }
-
-            activeUsers = activeNames;
-        }
-
         if ($.isOnline($.channelName)) {
             if (onlinePayoutInterval > 0 && (lastPayout + (onlinePayoutInterval * 6e4)) <= now) {
                 defaultamount = onlineGain;
@@ -223,7 +212,7 @@
             if (!getUserPenalty(username)) {
                 // If the channel is online, the channel is giving out a different number of points to idle users, and the user is not active,
                 // assign the different number of points.  This value does not get affected by bonuses.
-                if ($.isOnline($.channelName) && $.idlePointsDuration() && activeUsers.indexOf(username) == -1) {
+                if ($.isOnline($.channelName) && $.idlePointsDuration() && activeUsers.indexOf(username + "") == -1) {
                     amount = idlePoints;
                 }
 
