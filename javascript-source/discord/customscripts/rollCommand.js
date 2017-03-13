@@ -8,7 +8,9 @@
       var matches = [];
 
       while (matches = regex.exec(inputStr)) {
-        retVal = retVal.replace(matches[0], RollDice(matches[1],matches[2]));
+        if (matches[1] < 2500) {
+            retVal = retVal.replace(matches[0], RollDice(matches[1],matches[2]));
+        }
       }
 
       return retVal;
