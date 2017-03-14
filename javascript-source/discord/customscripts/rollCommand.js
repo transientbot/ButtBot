@@ -56,7 +56,7 @@
      */
     $.bind('initReady', function() {
         if ($.bot.isModuleEnabled('./discord/customscripts/rollCommand.js')) {
-            $.discord.registerCommand('./discord/customscripts/rollCommand.js', 'roll', 0);
+            $.discord.registerCommand('./discord/customscripts/rollCommand.js', 'roll', 7);
 
             // $.unbind('initReady'); Needed or not?
         }
