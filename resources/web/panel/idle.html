@@ -62,6 +62,28 @@
 
             <br />
 
+            Set the amount of time that someone can be silent in chat and be considered 'active' to receive bonus currency.  Set these to 0 to disable bonus currency due to activity.
+
+            <div class="form-group" onkeypress="return event.keyCode != 13">
+                <label for="idleBonusCurrencyIntervalInputHours">Activity Level for Additional Currency</label>
+                <button type="button" class="btn btn-primary inline pull-right" onClick="$.updateBonusCurrencyActivityLevel('#idleBonusCurrencyIntervalInputHours', '#idleBonusCurrencyIntervalInputMinutes', '#idleBonusCurrencyIntervalInputSeconds')">Update</button>
+                <input type="number" min="0" value="0" class="form-control" id="idleBonusCurrencyIntervalInputHours" placeholder="Hours" data-toggle="tooltip" title="Set the interval (in hours) before a user is considered too idle to receive extra channel currency." />
+                <input type="number" min="0" max="60" value="0" class="form-control" id="idleBonusCurrencyIntervalInputMinutes" placeholder="Minutes" data-toggle="tooltip" title="Set the interval (in minutes) before a user is considered too idle to receive extra channel currency." />
+                <input type="number" min="0" max="60" value="0" class="form-control" id="idleBonusCurrencyIntervalInputSeconds" placeholder="Seconds" data-toggle="tooltip" title="Set the interval (in seconds) before a user is considered too idle to receive extra channel currency." />
+            </div>
+
+            <br />
+
+            Set the number of additional points that a user will receive when they have been active within the above duration.  Setting a value lower than 0 will penalize users for being active in chat.  Points may drop below 0.
+
+            <div class="form-group" onkeypress="return event.keyCode != 13">
+                <label for="idleBonusCurrencyWhileIdle">Bonus Points Received</label>
+                <button type="button" class="btn btn-primary inline pull-right" onClick="$.updateBonusCurrencyReceivedWhileIdle('#idleBonusCurrencyWhileIdle')">Update</button>
+                <input type="number" value="0" class="form-control" id="idleBonusCurrencyWhileIdle" placeholder="Points Received While Idle" data-toggle="tooltip" title="Set the amount of points an idle user will receive every interval." />
+            </div>
+
+            <br />
+
             Set the amount of time that someone can be silent in chat and still be targeted by (random) commands.  Set these to 0 to allow everyone in chat to be targeted by (random) commands regardless of activity.
 
             <div class="form-group" onkeypress="return event.keyCode != 13">

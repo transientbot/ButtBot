@@ -2,6 +2,8 @@
 	var recentChatters = { };	// { "user" : [ last_word, previous_word ] }
 
 	var active = false;
+	var activePoints = 0;
+	var activeTime = 0;
 	var idlePoints = 0;
 	var idleTime = 0;
 	var randomTime = 0;
@@ -58,18 +60,35 @@
 	function idleUpdate ()
 	{
 		active = $.getIniDbString('idleSettings', 'idle_toggle') == "true";
+
+		activePoints = $.getIniDbNumber('idleSettings', 'activebonuspoints');
+		activeTime = ($.getIniDbNumber('idleSettings', 'activeHours') * 3600 +
+					  $.getIniDbNumber('idleSettings', 'activeMinutes') * 60 +
+					  $.getIniDbNumber('idleSettings', 'activeSeconds')) * 1000;
+
 		idlePoints = $.getIniDbNumber('idleSettings', 'pointsreceived');
 		idleTime = ($.getIniDbNumber('idleSettings', 'idlehours') * 3600 +
 				    $.getIniDbNumber('idleSettings', 'idleminutes') * 60 +
 				    $.getIniDbNumber('idleSettings', 'idleseconds')) * 1000;
+
 		randomTime = ($.getIniDbNumber('idleSettings', 'randomhours') * 3600 +
 				      $.getIniDbNumber('idleSettings', 'randomminutes') * 60 +
 				      $.getIniDbNumber('idleSettings', 'randomseconds')) * 1000;
 	}
 
+	function getActivePoints ()
+	{
+		return active && activePoints;
+	}
+
 	function getIdlePoints ()
 	{
 		return active && idlePoints;
+	}
+
+	function activePointsDuration ()
+	{
+		return active && activeTime;
 	}
 
 	function idlePointsDuration ()
@@ -198,8 +217,12 @@
 	$.previousChatMessage = previousChatMessage;
 	$.getRecentChatters = getRecentChatters;
 
+	$.activePoints = getActivePoints;
+	$.activePointsDuration = activePointsDuration;
+
 	$.idlePoints = getIdlePoints;
 	$.idlePointsDuration = idlePointsDuration;
+
 	$.idleRandomDuration = idleRandomDuration;
 
 })();

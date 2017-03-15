@@ -138,10 +138,18 @@
         }
 
         var idlePoints = $.idlePoints();
+        var activePoints = $.activePoints();
         var activeUsers;
+        var notidleUsers;
 
         if ($.idlePointsDuration() != false) {
-            activeUsers = getRecentChatters ($.idlePointsDuration());
+            notidleUsers = getRecentChatters ($.idlePointsDuration());
+        } else {
+            notidleUsers = false;
+        }
+
+        if ($.activePointsDuration() != false) {
+            activeUsers = getRecentChatters ($.activePointsDuration());
         } else {
             activeUsers = false;
         }
@@ -162,7 +170,6 @@
 
         $.inidb.setAutoCommit(false);
         for (i in $.users) {
-            amount = defaultamount;
             username = $.users[i][0].toLowerCase();
             if ($.isOnline($.channelName)) {
                 if ($.isMod(username) && $.isSub(username) || $.isAdmin(username) && $.isSub(username)) {
@@ -212,8 +219,12 @@
             if (!getUserPenalty(username)) {
                 // If the channel is online, the channel is giving out a different number of points to idle users, and the user is not active,
                 // assign the different number of points.  This value does not get affected by bonuses.
-                if ($.isOnline($.channelName) && $.idlePointsDuration() && activeUsers.indexOf(username + "") == -1) {
+                if ($.isOnline($.channelName) && $.idlePointsDuration() && notidleUsers.indexOf(username + "") == -1) {
                     amount = idlePoints;
+                }
+                
+                if ($.activePointsDuration() && activeUsers.indexOf(username + "") > -1) {
+                    amount += activePoints;
                 }
 
                 $.inidb.incr('points', username, amount);

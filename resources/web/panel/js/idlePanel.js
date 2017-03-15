@@ -97,6 +97,42 @@
                     }
                 }
             }
+
+            if (panelCheckQuery(msgObject, 'activeBonusPointsReceived'))
+            {
+                for (var idx in msgObject['results'])
+                {
+                    var key = msgObject['results'][idx]['key'];
+                    var val = msgObject['results'][idx]['value'];
+
+                    if (panelMatch(key, 'activebonuspoints'))
+                    {
+                        $('#idleBonusCurrencyWhileIdle').val(val);
+                    }
+                }
+            }
+
+            if (panelCheckQuery(msgObject, 'activeBonusPoints'))
+            {
+                for (var idx in msgObject['results'])
+                {
+                    var key = msgObject['results'][idx]['key'];
+                    var val = msgObject['results'][idx]['value'];
+
+                    if (panelMatch(key, 'activehours'))
+                    {
+                        $('#idleBonusCurrencyIntervalInputHours').val(val);
+                    }
+                    else if (panelMatch(key, 'activeminutes'))
+                    {
+                        $('#idleBonusCurrencyIntervalInputMinutes').val(val);
+                    }
+                    else if (panelMatch(key, 'activeseconds'))
+                    {
+                        $('#idleBonusCurrencyIntervalInputSeconds').val(val);
+                    }
+                }
+            }
         }
     }
 
@@ -106,6 +142,8 @@
         sendDBKeys('activePoints', 'idleSettings');
         sendDBKeys('activePointsReceived', 'idleSettings');
         sendDBKeys('activeRandom', 'idleSettings');
+        sendDBKeys('activeBonusPoints', 'idleSettings');
+        sendDBKeys('activeBonusPointsReceived', 'idleSettings');
 
         setTimeout(function () { sendCommand ("reloadidle") }, TIMEOUT_WAIT_TIME);
     }
@@ -132,6 +170,22 @@
     function updateCurrencyReceivedWhileIdle(number)
     {
         sendDBUpdate("activePointsReceived", "idleSettings", "pointsreceived", $(number).val());
+
+        setTimeout(function () { doQuery (); }, TIMEOUT_WAIT_TIME);
+    }
+
+    function updateBonusCurrencyActivityLevel(hours, minutes, seconds)
+    {
+        sendDBUpdate("activeBonusPoints", "idleSettings", "activehours", $(hours).val());
+        sendDBUpdate("activeBonusPoints", "idleSettings", "activeminutes", $(minutes).val());
+        sendDBUpdate("activeBonusPoints", "idleSettings", "activeseconds", $(seconds).val());
+
+        setTimeout(function () { doQuery (); }, TIMEOUT_WAIT_TIME);
+    }
+
+    function updateBonusCurrencyReceivedWhileIdle(number)
+    {
+        sendDBUpdate("activeBonusPointsReceived", "idleSettings", "activebonuspoints", $(number).val());
 
         setTimeout(function () { doQuery (); }, TIMEOUT_WAIT_TIME);
     }
@@ -173,6 +227,8 @@
     $.idleOnMessage = onMessage;
 
     $.toggleChatIdleness = toggleChatIdleness;
+    $.updateBonusCurrencyActivityLevel = updateBonusCurrencyActivityLevel;
+    $.updateBonusCurrencyReceivedWhileIdle = updateBonusCurrencyReceivedWhileIdle;
     $.updateCurrencyActivityLevel = updateCurrencyActivityLevel;
     $.updateCurrencyReceivedWhileIdle = updateCurrencyReceivedWhileIdle;
     $.updateRandomActivityLevel = updateRandomActivityLevel;
