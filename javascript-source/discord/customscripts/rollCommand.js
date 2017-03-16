@@ -54,10 +54,7 @@
      * @event initReady
      */
     $.bind('initReady', function() {
-        if ($.bot.isModuleEnabled('./discord/customscripts/rollCommand.js')) {
             $.discord.registerCommand('./discord/customscripts/rollCommand.js', 'roll', 0); // Permissions are 0: everyone, 1: administrators.
-
             // $.unbind('initReady'); Needed or not?
-        }
     });
 })();
