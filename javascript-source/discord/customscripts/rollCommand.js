@@ -40,7 +40,6 @@
             action = args[0];
 
         if (command.equalsIgnoreCase('roll')) {
-          $.discord.say(channel, "Roll command received.  [Testing purposes, remove this once a response happens.]");
           if (action === undefined) {
             $.discord.say(channel, $.discord.userPrefix(mention) + "Usage:  !roll [x]d[y]");
           } else {
