@@ -37,16 +37,17 @@
             command = event.getCommand(),
             mention = event.getMention(),
             args = event.getArgs(),
-            action = args[0],
-            subAction = args[1];
+            action = args[0];
 
-        /**
-         * @discordcommandpath addcom [command] [response] - Adds a custom command to be used in your Discord server.
-         */
         if (command.equalsIgnoreCase('roll')) {
-            var results = ReadDice(args[0]);
+          $.discord.say(channel, "Roll command received.  [Testing purposes, remove this once a response happens.]");
+          if (action === undefined) {
+            $.discord.say(channel, $.discord.userPrefix(mention) + "Usage:  !roll [x]d[y]");
+          } else {
+            var results = ReadDice(args.join(' '));
 
             $.discord.say(channel, $.discord.userPrefix(mention) + ' rolled: ' + results);
+          }
         }
     });
 
@@ -54,7 +55,6 @@
      * @event initReady
      */
     $.bind('initReady', function() {
-            $.discord.registerCommand('./discord/customscripts/rollCommand.js', 'roll', 0); // Permissions are 0: everyone, 1: administrators.
-            // $.unbind('initReady'); Needed or not?
+        $.discord.registerCommand('./discord/customscripts/rollCommand.js', 'roll', 0); // Discord permissions are 0: everyone, 1: administrators.
     });
 })();
