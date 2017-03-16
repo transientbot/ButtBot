@@ -19,8 +19,8 @@
     function RollDice(num, type) {
         var retVal = 0;
         for (i=num; i>0; i--) {
-        retVal += getRandomInt(1,type);
-      }
+          retVal += getRandomInt(1,type);
+        }
       return retVal;
     }
 
@@ -36,7 +36,6 @@
             channel = event.getChannel(),
             command = event.getCommand(),
             mention = event.getMention(),
-            arguments = event.getArguments(),
             args = event.getArgs(),
             action = args[0],
             subAction = args[1];
@@ -56,7 +55,7 @@
      */
     $.bind('initReady', function() {
         if ($.bot.isModuleEnabled('./discord/customscripts/rollCommand.js')) {
-            $.discord.registerCommand('./discord/customscripts/rollCommand.js', 'roll', 7);
+            $.discord.registerCommand('./discord/customscripts/rollCommand.js', 'roll', 0); // Permissions are 0: everyone, 1: administrators.
 
             // $.unbind('initReady'); Needed or not?
         }
