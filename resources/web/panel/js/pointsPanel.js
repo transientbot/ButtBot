@@ -72,7 +72,9 @@
                         $("#setPointsNameInput").val(value);
                     } else if (panelMatch(key, 'pointsMessage')) {
                         $("#pointsMessageInput").val(value);
-                    } 
+                    } else if (panelMatch(key, 'activeBonus')) {
+                        $("#setPointGainInput_setactivebonus").val(value);
+                    }
                 }
             }
 
@@ -327,6 +329,10 @@
             sendDBUpdate("points_settings", "pointSettings", "offlinePayoutInterval", value);
         }
 
+        if (action == "setactivebonus") {
+            sendDBUpdate("points_settings", "pointSettings", "activeBonus", value);
+        }
+
         setTimeout(function() { doLiteQuery(); }, TIMEOUT_WAIT_TIME);
         setTimeout(function() { sendCommand('reloadpoints') }, TIMEOUT_WAIT_TIME);
     }
@@ -354,19 +360,19 @@
 
         if (action == "take") {
             if (username.length > 0 && points.length > 0) {
-                sendDBDecr("points", "points", username, points);
+                sendDBDecr("points", "points", username.toLowerCase(), String(points));
             }
         }
 
         if (action == "add") {
             if (username.length > 0 && points.length > 0) {
-                sendDBIncr("points", "points", username, points);
+                sendDBIncr("points", "points", username.toLowerCase(), String(points));
             }
         }
 
         if (action == "set") {
             if (username.length > 0 && points.length != 0) {
-                sendDBUpdate("points", "points", username, points);
+                sendDBUpdate("points", "points", username.toLowerCase(), String(points));
             }
         }
         $("#adjustUserPointsNameInput").val('');

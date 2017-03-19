@@ -5,7 +5,8 @@
  */
 (function() {
     
-    var quoteMode = $.getSetIniDbBoolean('settings', 'quoteMode', true);
+    var quoteMode = $.getSetIniDbBoolean('settings', 'quoteMode', true),
+        isDeleting = false;
 
     /**
      * @function updateQuote
@@ -14,6 +15,7 @@
      */
     function updateQuote(quoteid, quote) {
         // Specify String() for objects as they were being treated as an object rather than a String on stringify().
+        quote = String(quote).replace(/"/g, '\'\'');
         $.inidb.set('quotes', quoteid, JSON.stringify([String(quote[0]), String(quote[1]), String(quote[2]), String(quote[3])]));
     }
 
@@ -29,9 +31,17 @@
 	            quoted = quote.substring(quote.lastIndexOf("~") + 1);
 	        quote = quote.substring(0, quote.lastIndexOf("~"));
 
+            // Don't clobber existing quotes.
+            while ($.inidb.exists('quotes', newKey)) {
+                ++ newKey;
+            }
+
 	        // Trim the whitespace outside the quote.
 	        quoted = quoted.replace(/^\s+|\s+$/g,"");
 	        quote = quote.replace(/^\s+|\s{2,}$/g," ");
+
+            // And then turn double quotes into double single-quotes so that things don't break horribly when JSONing them.
+            quote = String(quote).replace(/"/g, '\'\'');
 
 	        $.inidb.set('quotes', newKey, JSON.stringify([quoted, quote, $.systemTime(), game + '']));
 	        return newKey;
@@ -47,10 +57,16 @@
             quotes = [],
             i;
 
+        if (isDeleting) {
+            return -1;
+        }
+        
         if ($.inidb.exists('quotes', quoteId)) {
+            isDeleting = true;
             $.inidb.del('quotes', quoteId);
             quoteKeys = $.inidb.GetKeyList('quotes', '');
 
+            $.inidb.setAutoCommit(false);
             for (i in quoteKeys) {
                 quotes.push($.inidb.get('quotes', quoteKeys[i]));
                 $.inidb.del('quotes', quoteKeys[i]);
@@ -59,7 +75,8 @@
             for (i in quotes) {
                 $.inidb.set('quotes', i, quotes[i]);
             }
-
+            $.inidb.setAutoCommit(true);
+            isDeleting = false;
             return (quotes.length ? quotes.length : 0);
         } else {
             return -1;

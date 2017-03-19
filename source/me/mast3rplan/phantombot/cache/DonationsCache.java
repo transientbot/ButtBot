@@ -64,7 +64,7 @@ public class DonationsCache implements Runnable {
         }
 
         this.channel = channel;
-        this.updateThread = new Thread(this);
+        this.updateThread = new Thread(this, "me.mast3rplan.phantombot.cache.DonationsCache");
 
         Thread.setDefaultUncaughtExceptionHandler(com.gmt2001.UncaughtExceptionHandler.instance());
         this.updateThread.setUncaughtExceptionHandler(com.gmt2001.UncaughtExceptionHandler.instance());
@@ -134,7 +134,7 @@ public class DonationsCache implements Runnable {
             if (jsonResult.getInt("_http") == 200) {
                 donations = jsonResult.getJSONArray("data");
                 for (int i = 0; i < donations.length(); i++) {
-                    newCache.put(donations.getJSONObject(i).getString("donation_id"), donations.getJSONObject(i).getString("donation_id"));
+                    newCache.put(donations.getJSONObject(i).get("donation_id").toString(), donations.getJSONObject(i).get("donation_id").toString());
                 }
             } else {
                 try {
@@ -171,7 +171,7 @@ public class DonationsCache implements Runnable {
 
         if (donations != null && !killed) {
             for (int i = 0; i < donations.length(); i++) {
-                if (cache == null || !cache.containsKey(donations.getJSONObject(i).getString("donation_id"))) {
+                if (cache == null || !cache.containsKey(donations.getJSONObject(i).get("donation_id").toString())) {
                     EventBus.instance().post(new TwitchAlertsDonationEvent(donations.getJSONObject(i).toString(), PhantomBot.getChannel(this.channel)));
                 }
             }
