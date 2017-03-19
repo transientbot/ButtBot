@@ -62,9 +62,9 @@
 		active = $.getIniDbString('idleSettings', 'idle_toggle') == "true";
 
 		activePoints = $.getIniDbNumber('idleSettings', 'activebonuspoints');
-		activeTime = ($.getIniDbNumber('idleSettings', 'activeHours') * 3600 +
-					  $.getIniDbNumber('idleSettings', 'activeMinutes') * 60 +
-					  $.getIniDbNumber('idleSettings', 'activeSeconds')) * 1000;
+		activeTime = ($.getIniDbNumber('idleSettings', 'activehours') * 3600 +
+					  $.getIniDbNumber('idleSettings', 'activeminutes') * 60 +
+					  $.getIniDbNumber('idleSettings', 'activeseconds')) * 1000;
 
 		idlePoints = $.getIniDbNumber('idleSettings', 'pointsreceived');
 		idleTime = ($.getIniDbNumber('idleSettings', 'idlehours') * 3600 +
