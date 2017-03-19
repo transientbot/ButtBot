@@ -16,20 +16,14 @@
  */
 package com.gmt2001;
 
-import java.io.File;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.DatabaseMetaData;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import org.apache.commons.io.FileUtils;
-
-import me.mast3rplan.phantombot.PhantomBot;
 
 /**
  *
@@ -110,7 +104,7 @@ public class MySQLStore extends DataStore {
             try (Statement statement = connection.createStatement()) {
                 statement.setQueryTimeout(10);
 
-                statement.executeUpdate("CREATE TABLE phantombot_" + fName + " (section LONGTEXT, variable varchar(255) NOT NULL, value LONGTEXT, PRIMARY KEY (variable));");
+                statement.executeUpdate("CREATE TABLE phantombot_" + fName + " (section LONGTEXT, variable varchar(255) NOT NULL, value LONGTEXT, PRIMARY KEY (variable(191)));");
             } catch (SQLException ex) {
                 com.gmt2001.Console.err.printStackTrace(ex);
             }
@@ -273,6 +267,55 @@ public class MySQLStore extends DataStore {
                 try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " WHERE section=?;")) {
                     statement.setQueryTimeout(10);
                     statement.setString(1, section);
+
+                    try (ResultSet rs = statement.executeQuery()) {
+
+                        ArrayList<String> s = new ArrayList<>();
+
+                        while (rs.next()) {
+                            s.add(rs.getString("variable"));
+                        }
+
+                        return s.toArray(new String[s.size()]);
+                    }
+                } catch (SQLException ex) {
+                    com.gmt2001.Console.err.printStackTrace(ex);
+                }
+            } else {
+                try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + ";")) {
+                    statement.setQueryTimeout(10);
+
+                    try (ResultSet rs = statement.executeQuery()) {
+
+                        ArrayList<String> s = new ArrayList<>();
+
+                        while (rs.next()) {
+                            s.add(rs.getString("variable"));
+                        }
+
+                        return s.toArray(new String[s.size()]);
+                    }
+                } catch (SQLException ex) {
+                    com.gmt2001.Console.err.printStackTrace(ex);
+                }
+            }
+        }
+
+        return new String[] {
+               };
+    }
+
+     @Override
+    public String[] GetKeysByOrder(String fName, String section, String order, String limit, String offset) {
+        CheckConnection();
+
+        fName = validateFname(fName);
+
+        if (FileExists(fName)) {
+            if (section.length() > 0) {
+                try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " WHERE section=? ORDER BY variable " + order + " LIMIT " + limit + ", " + offset + ";")) {
+                    statement.setQueryTimeout(10);
+                    statement.setString(1, section);
     
                     try (ResultSet rs = statement.executeQuery()) {
     
@@ -288,7 +331,7 @@ public class MySQLStore extends DataStore {
                     com.gmt2001.Console.err.printStackTrace(ex);
                 }
             } else {
-                try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + ";")) {
+                try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " ORDER BY variable " + order + " LIMIT " + limit + ", " + offset + ";")) {
                     statement.setQueryTimeout(10);
 
                     try (ResultSet rs = statement.executeQuery()) {
@@ -409,6 +452,55 @@ public class MySQLStore extends DataStore {
                };
     }
 
+     @Override
+    public String[] GetKeysByLikeKeysOrder(String fName, String section, String search, String order, String limit, String offset) {
+        CheckConnection();
+
+        fName = validateFname(fName);
+
+        if (FileExists(fName)) { 
+            if (section.length() > 0) {
+                try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " WHERE section=? AND variable LIKE ? ORDER BY variable " + order + " LIMIT " + limit + ", " + offset + ";")) {
+                    statement.setQueryTimeout(10);
+                    statement.setString(1, section);
+                    statement.setString(2, "%" + search + "%");
+                    
+                    try (ResultSet rs = statement.executeQuery()) {
+                        ArrayList<String> s = new ArrayList<>();
+                        
+                        while(rs.next()) {
+                            s.add(rs.getString("variable"));
+                        }
+                        return s.toArray(new String[s.size()]);
+                    }
+                } catch (SQLException ex) {
+                    com.gmt2001.Console.err.printStackTrace(ex);
+                }
+            } else {
+                try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " WHERE variable LIKE ? ORDER BY variable " + order + " LIMIT " + limit + ", " + offset + ";")) {
+                    statement.setQueryTimeout(10);
+                    statement.setString(1, "%" + search + "%");
+                    
+                    try (ResultSet rs = statement.executeQuery()) {
+                        ArrayList<String> s = new ArrayList<>();
+                        
+                        while(rs.next()) {
+                            s.add(rs.getString("variable"));
+                        }
+                        return s.toArray(new String[s.size()]);
+                    }
+                } catch (SQLException ex) {
+                    com.gmt2001.Console.err.printStackTrace(ex);
+                } catch (Exception ex) {
+                    com.gmt2001.Console.err.printStackTrace(ex);
+                }
+            }
+        }
+
+        return new String[] {
+               };
+    }
+
     @Override
     public boolean HasKey(String fName, String section, String key) {
         CheckConnection();
@@ -424,9 +516,9 @@ public class MySQLStore extends DataStore {
                 statement.setQueryTimeout(10);
                 statement.setString(1, section);
                 statement.setString(2, key);
-    
+
                 try (ResultSet rs = statement.executeQuery()) {
-    
+
                     if (rs.next()) {
                         return true;
                     }
@@ -438,9 +530,9 @@ public class MySQLStore extends DataStore {
             try (PreparedStatement statement = connection.prepareStatement("SELECT value FROM phantombot_" + fName + " WHERE variable=?;")) {
                 statement.setQueryTimeout(10);
                 statement.setString(1, key);
-    
+
                 try (ResultSet rs = statement.executeQuery()) {
-    
+
                     if (rs.next()) {
                         return true;
                     }
@@ -470,9 +562,9 @@ public class MySQLStore extends DataStore {
                 statement.setQueryTimeout(10);
                 statement.setString(1, section);
                 statement.setString(2, key);
-    
+
                 try (ResultSet rs = statement.executeQuery()) {
-    
+
                     if (rs.next()) {
                         result = rs.getString("value");
                     }
@@ -495,7 +587,7 @@ public class MySQLStore extends DataStore {
                 com.gmt2001.Console.err.printStackTrace(ex);
             }
         }
-    
+
         return result;
     }
 

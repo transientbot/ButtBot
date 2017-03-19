@@ -75,7 +75,11 @@
         './discord/games/8ball.js',
         './discord/games/kill.js',
         './discord/games/random.js',
-        './discord/games/roulette.js'
+        './discord/games/roulette.js',
+        './discord/games/gambling.js',
+        './discord/games/roll.js',
+        './discord/games/slotMachine.js',
+        './discord/systems/pointSystem.js'
         ];
 
         $.consoleLn('Disabling default modules...');
@@ -92,7 +96,7 @@
         $.inidb.set('command', 'age', '(age)');
 
         $.consoleLn('Installing old updates...');
-        versions = ['installedv2', 'installedv2.0.5', 'installedv2.0.6', 'installedv2.0.7', 'installedv2.0.7.2', 'installedv2.0.8', 'installedv2.0.9', 'installedv2.1.0', 'installedv2.1.1', 'installedv2.2.1', 'installedv2.3s', 'installedv2.3.3ss', 'installedv2.3.5ss', 'installedv2.3.5.1', 'installedv2.3.5.2'];
+        versions = ['installedv2', 'installedv2.0.5', 'installedv2.0.6', 'installedv2.0.7', 'installedv2.0.7.2', 'installedv2.0.8', 'installedv2.0.9', 'installedv2.1.0', 'installedv2.1.1', 'installedv2.2.1', 'installedv2.3s', 'installedv2.3.3ss', 'installedv2.3.5ss', 'installedv2.3.5.1', 'installedv2.3.5.2', 'installedv2.3.5.3', 'installed2.3.6'];
         for (i in versions) {
             $.inidb.set('updates', versions[i], 'true');
         }
@@ -532,14 +536,42 @@
 
         $.inidb.RemoveFile('quotes');
 
+        $.inidb.setAutoCommit(false);
         for (i in temp) {
             $.inidb.set('quotes', i, temp[i]);
         }
+        $.inidb.setAutoCommit(true);
 
         $.inidb.del('modules', './handlers/discordHandler.js');
 
         $.consoleLn('PhantomBot update 2.3.5.2 completed!');
         $.inidb.set('updates', 'installedv2.3.5.2', 'true');
+    }
+
+    /* version 2.3.5.3 updates */
+    if (!$.inidb.exists('updates', 'installedv2.3.5.3') || $.inidb.get('updates', 'installedv2.3.5.3') != 'true') {
+        $.consoleLn('Starting PhantomBot update 2.3.5.3 updates...');
+
+        if (!$.inidb.exists('settings', 'followDelay') || ($.inidb.exists('settings', 'followDelay') && parseInt($.inidb.get('settings', 'followDelay')) < 5)) {
+            $.inidb.set('settings', 'followDelay', 5);
+        }
+
+        $.consoleLn('PhantomBot update 2.3.5.3 completed!');
+        $.inidb.set('updates', 'installedv2.3.5.3', 'true');
+    }
+
+    /* version 2.3.6 updates */
+    if (!$.inidb.exists('updates', 'installedv2.3.6') || $.inidb.get('updates', 'installedv2.3.6') != 'true') {
+        $.consoleLn('Starting PhantomBot update 2.3.6 updates...');
+
+        $.consoleLn('Disabling default discord modules.');
+        $.inidb.set('modules', './discord/games/roll.js', 'false');
+        $.inidb.set('modules', './discord/games/slotMachine.js', 'false');
+        $.inidb.set('modules', './discord/games/gambling.js', 'false');
+        $.inidb.set('modules', './discord/systems/pointSystem.js', 'false');
+
+        $.consoleLn('PhantomBot update 2.3.6 completed!');
+        $.inidb.set('updates', 'installedv2.3.6', 'true');
     }
 
     /**
@@ -591,8 +623,10 @@
     function restoreTableContents(tableName, contents) {
         var i;
 
+        $.inidb.setAutoCommit(false);
         for (i in contents) {
             $.inidb.set(tableName, i, contents[i]);
         }
+        $.inidb.setAutoCommit(true);
     }
 })();

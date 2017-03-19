@@ -72,9 +72,6 @@
                         greetingToggle = value;
                         $('#globalGreetings').html(settingIcon[value]);
                     }
-                    if (panelMatch(key, 'defaultJoin')) {
-                        $('#greetingDefaultInput').val(value);
-                    }
                     if (panelMatch(key, 'cooldown')) {
                         $('#greetingCooldownInput').val((value / 36e5));
                     }
@@ -247,15 +244,8 @@
                         bitsToggle = value;
                         $('#bitsToggle').html(settingIcon[value]);
                     }
-                    if (panelMatch(key, 'rewardMultToggle')) {
-                        bitsRewardMultToggle = value;
-                        $('#bitsRewardMultToggle').html(settingIcon[value]);
-                    }
                     if (panelMatch(key, 'message')) {
                         $('#bitsMessage').val(value);
-                    }
-                    if (panelMatch(key, 'reward')) {
-                        $('#bitsReward').val(value);
                     }
                     if (panelMatch(key, 'minimum')) {
                         $('#bitsMinimum').val(value);
@@ -479,6 +469,15 @@
                 value = String(value * 36e5);
                 sendDBUpdate('greetings_update', 'greeting', 'cooldown', value);
                 setTimeout(function() { doQuery(); sendCommand('greetingspanelupdate'); }, TIMEOUT_WAIT_TIME);
+                return;
+            }
+        }
+
+        if (key == 'followDelay') {
+            if (parseInt(value) < 5) {
+                document.getElementById(inputId).type = 'text';
+                $('#' + inputId).val('Follow delay cannot be less than 5 seconds!');
+                setTimeout(function() { doQuery(); document.getElementById(inputId).type = 'number'; }, TIMEOUT_WAIT_TIME * 4);
                 return;
             }
         }

@@ -354,7 +354,6 @@
          * @commandpath YourBotName moderate - Trys to detect the bots moderator status. This is useful if you unmod and remod the bot while its on.
          * @commandpath YourBotName connectmessage [message] - Sets a message that will be said when the bot joins the channel.
          * @commandpath YourBotName removeconnectmessage - Removes the connect message if one has been set.
-         * @commandpath YourBotName blacklist [add / remove] [username] - Adds or Removes a user from the bot blacklist.
          * @commandpath YourBotName togglepricecommods - Toggles if mods pay for commands.
          * @commandpath YourBotName togglepermcommessage - Toggles the no permission message.
          * @commandpath YourBotName togglecooldownmessage - Toggles the on command cooldown message.
@@ -415,38 +414,6 @@
                 $.say($.whisperPrefix(sender) + $.lang.get('init.connected.msg.removed'));
                 $.log.event(sender + ' removed the connect message!');
                 return;
-            }
-
-            if (action.equalsIgnoreCase('blacklist')) {
-                if (!subAction) {
-                    $.say($.whisperPrefix(sender) + $.lang.get('init.blacklist.usage', $.botName.toLowerCase()));
-                    return;
-                }
-
-                if (subAction.equalsIgnoreCase('add')) {
-                    if (!actionArgs) {
-                        $.say($.whisperPrefix(sender) + $.lang.get('init.blacklist.add.usage', $.botName.toLowerCase()));
-                        return;
-                    }
-
-                    $.inidb.set('botBlackList', actionArgs.toLowerCase(), 'true');
-                    $.say($.whisperPrefix(sender) + $.lang.get('init.blacklist.added', actionArgs));
-                    $.log.event(sender + ' added ' + actionArgs + ' to the bot blacklist.');
-                }
-
-                if (subAction.equalsIgnoreCase('remove')) {
-                    if (!actionArgs) {
-                        $.say($.whisperPrefix(sender) + $.lang.get('init.blacklist.remove.usage', $.botName.toLowerCase()));
-                        return;
-                    } else if (!$.inidb.exists('botBlackList', actionArgs.toLowerCase())) {
-                        $.say($.whisperPrefix(sender) + $.lang.get('init.blacklist.err'));
-                        return;
-                    }
-
-                    $.inidb.del('botBlackList', actionArgs.toLowerCase());
-                    $.say($.whisperPrefix(sender) + $.lang.get('init.blacklist.removed', actionArgs));
-                    $.log.event(sender + ' removed ' + actionArgs + ' to the bot blacklist.');
-                }
             }
 
             if (action.equalsIgnoreCase('togglepricecommods')) {
@@ -777,9 +744,11 @@
         if (!$.hasDiscordToken) {
             // Load the discord core scripts.
             loadScript('./discord/core/misc.js');
+            loadScript('./discord/core/accountLink.js');
             loadScript('./discord/core/patternDetector.js');
             loadScript('./discord/core/moderation.js');
             loadScript('./discord/core/registerCommand.js');
+            loadScript('./discord/core/accountLink.js');
             loadScript('./discord/core/commandCooldown.js');
 
             $.log.event('Discord Core loaded, initializing modules...');
@@ -856,15 +825,14 @@
          * @event api-command
          */
         $api.on($script, 'command', function(event) {
-            var sender = event.getSender().toLowerCase(),
-                command = event.getCommand().toLowerCase(),
+            var sender = event.getSender(),
+                command = event.getCommand(),
                 args = event.getArgs(),
-                subCommand = (args[0] ? ' ' + args[0] : ''),
-                subCommandAction = (args[1] ? ' ' + args[1] : ''),
+                subCommand = (args[0] !== undefined && $.subCommandExists(command, args[0].toLowerCase()) ? args[0].toLowerCase() : ''),
                 commandCost = 0,
                 isModv3 = $.isModv3(sender, event.getTags());
 
-            if ($.inidb.exists('botBlackList', sender) || ($.commandPause.isPaused() && !isModv3) || !$.commandExists(command)) {
+            if (($.commandPause.isPaused() && !isModv3) || !$.commandExists(command)) {
                 return;
             }
 
@@ -909,21 +877,19 @@
                 return;
             }
 
-            if ($.permCom(sender, command, subCommand.trim()) !== 0) {
+            if ($.permCom(sender, command, subCommand) !== 0) {
                 if (permComMsgEnabled) {
-                    $.say($.whisperPrefix(sender) + $.lang.get('cmd.perm.404', (!$.subCommandExists(command, subCommand.trim()) ? $.getCommandGroupName(command).toLowerCase() : $.getSubCommandGroupName(command, subCommand.trim()).toLowerCase())));
+                    $.say($.whisperPrefix(sender) + $.lang.get('cmd.perm.404', (!$.subCommandExists(command, subCommand) ? $.getCommandGroupName(command).toLowerCase() : $.getSubCommandGroupName(command, subCommand).toLowerCase())));
                 }
                 return;
             }
 
-            if ($.inidb.exists('pricecom', (command + subCommand + subCommandAction))) {
-                if ((((isModv3 && pricecomMods && !$.isBot(sender)) || !isModv3))) {
-                    if (isModuleEnabled('./systems/pointSystem.js')) {
-                        commandCost = $.getCommandPrice(command, subCommand, subCommandAction);
-                        if ($.getUserPoints(sender) < commandCost) {
-                            $.say($.whisperPrefix(sender) + $.lang.get('cmd.needpoints', $.getPointsString(commandCost)));
-                            return;
-                        }
+            if ($.inidb.exists('pricecom', (command + ' ' + subCommand).trim())) {
+                if ((((isModv3 && pricecomMods && !$.isBot(sender)) || !isModv3)) && isModuleEnabled('./systems/pointSystem.js')) {
+                    commandCost = $.getCommandPrice(command, subCommand, '');
+                    if ($.getUserPoints(sender) < commandCost) {
+                        $.say($.whisperPrefix(sender) + $.lang.get('cmd.needpoints', $.getPointsString(commandCost)));
+                        return;
                     }
                 }
             }
@@ -945,13 +911,18 @@
          * @event api-DiscordCommandEvent
          */
         $api.on($script, 'discordCommand', function(event) {
-            var command = event.getCommand(),
+            var username = event.getUsername(),
+                command = event.getCommand(),
                 channel = event.getChannel(),
                 isAdmin = event.isAdmin(),
                 args = event.getArgs();
 
-            if ($.discord.commandExists(command) === false) {
+            if ($.discord.commandExists(command) === false && ($.discord.aliasExists(command) === false || $.discord.aliasExists(command) === true && $.discord.commandExists($.discord.getCommandAlias(command)) === false)) {
                 return;
+            }
+
+            if ($.discord.aliasExists(command) === true) {
+                command = event.setCommand($.discord.getCommandAlias(command));
             }
 
             if (isAdmin == false && $.discord.permCom(command, (args[0] !== undefined && $.discord.subCommandExists(args[0].toLowerCase()) ? args[0].toLowerCase() : '')) !== 0) {
@@ -962,11 +933,20 @@
                 return;
             }
 
+            if ($.discord.getCommandCost(command) > 0 && $.discord.getUserPoints(username) < $.discord.getCommandCost(command)) {
+                return;
+            }
+
             if ($.discord.getCommandChannel(command) !== '' && !$.discord.getCommandChannel(command).equalsIgnoreCase(channel)) {
                 return;
             }
 
             callHook('discordCommand', event, false);
+
+            // Do this last to not slow down the command hook.
+            if ($.discord.getCommandCost(command) > 0) {
+                $.discord.decrUserPoints(username, $.discord.getCommandCost(command));
+            }
         });
 
         /**
@@ -1275,7 +1255,7 @@
          */
         $api.on($script, 'gameWispAnniversary', function(event) {
             callHook('gameWispAnniversary', event, false);
-        }); 
+        });
 
         /**
          * @event api-twitterEvent
@@ -1367,6 +1347,35 @@
          */
         $api.on($script, 'panelWebSocket', function(event) {
             callHook('panelWebSocket', event, false);
+        });
+
+        /**
+         * @event api-TimeoutEvent
+         */
+        $api.on($script, 'Timeout', function(event) {
+            callHook('Timeout', event, false);
+        });
+
+        /**
+         * @event api-UnTimeoutEvent
+         */
+        $api.on($script, 'UnTimeout', function(event) {
+            callHook('UnTimeout', event, false);
+        });
+
+
+        /**
+         * @event api-BannedEvent
+         */
+        $api.on($script, 'Banned', function(event) {
+            callHook('Banned', event, false);
+        });
+
+        /**
+         * @event api-UnBannedEvent
+         */
+        $api.on($script, 'UnBanned', function(event) {
+            callHook('UnBanned', event, false);
         });
 
         $.log.event('init.js api\'s loaded.');

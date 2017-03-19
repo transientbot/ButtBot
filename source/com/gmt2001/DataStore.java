@@ -60,12 +60,22 @@ public class DataStore {
                };
     }
 
+    public String[] GetKeysByOrder(String fName, String section, String order, String limit, String offset) {
+        return new String[] {
+               };
+    }
+
     public String[] GetKeysByLikeValues(String fName, String section, String search) {
         return new String[] {
                };
     }
 
     public String[] GetKeysByLikeKeys(String fName, String section, String search) {
+        return new String[] {
+               };
+    }
+    
+    public String[] GetKeysByLikeKeysOrder(String fName, String section, String search, String order, String limit, String offset) {
         return new String[] {
                };
     }
@@ -250,5 +260,8 @@ public class DataStore {
     }
 
     public void setAutoCommit(boolean mode) {
+    }
+
+    public void backupSQLite3(String filename) {
     }
 }
