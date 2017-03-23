@@ -288,6 +288,16 @@
             }
         }
 
+        if (message.match(/\(title\)/)) {
+            if ($.getStatus($.channelName) == ' ' || $.getStatus($.channelName) == '') {
+                message = $.replace(message, '(title)', $.lang.get('streamcommand.title.no.title'));
+            } else if (!$.isOnline($.channelName)) {
+                message = $.replace(message, '(title)', $.lang.get('streamcommand.title.offline', $.getStatus($.channelName)));
+            } else {
+                message = $.replace(message, '(title)', $.lang.get('streamcommand.title.online', $.getStatus($.channelName), ""));
+            }
+        }
+
         if (message.match(/\(followage\)/g)) {
             var args = event.getArgs(), channel = $.channelName, sender = event.getSender();
             
