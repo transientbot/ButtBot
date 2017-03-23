@@ -294,7 +294,7 @@
             } else if (!$.isOnline($.channelName)) {
                 message = $.replace(message, '(title)', $.lang.get('streamcommand.title.offline', $.getStatus($.channelName)));
             } else {
-                message = $.replace(message, '(title)', $.lang.get('streamcommand.title.online', $.getStatus($.channelName), ""));
+                message = $.replace(message, '(title)', $.lang.get('streamcommand.titleonly', $.getStatus($.channelName)));
             }
         }
 
