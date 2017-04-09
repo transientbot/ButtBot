@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* 
+/*
  * @author IllusionaryOne
  */
 
@@ -46,6 +46,8 @@
 
         settingIcon['false'] = "<i class=\"fa fa-circle-o\" />";
         settingIcon['true'] = "<i class=\"fa fa-circle\" />";
+
+        reloadIcon = "<img src='/panel/images/reload.png' width='23px' height='23px' />"
 
         var spinIcon = '<i style="color: #6136b1" class="fa fa-spinner fa-spin" />';
 
@@ -93,42 +95,56 @@
                         if (module.indexOf('./discord') === -1) {
                             html += "<tr class=\"textList\">" +
                                     "    <td>" + module + "</td>" +
-    
+
                                     "    <td style=\"width: 25px\">" +
                                     "        <div id=\"moduleStatus_" + idx + "\">" + modeIcon[moduleEnabled] + "</div>" +
                                     "    </td>" +
-    
+
                                     "    <td style=\"width: 25px\">" +
                                     "        <div data-toggle=\"tooltip\" title=\"Enable\" class=\"button\"" +
                                     "             onclick=\"$.enableModule('" + module + "', " + idx + ")\">" + settingIcon['true'] +
                                     "        </div>" +
                                     "    </td>" +
-    
+
                                     "    <td style=\"width: 25px\">" +
                                     "        <div data-toggle=\"tooltip\" title=\"Disable\" class=\"button\"" +
                                     "             onclick=\"$.disableModule('" + module + "', " + idx + ")\">" + settingIcon['false'] +
                                     "        </div>" +
                                     "    </td>" +
+
+                                    "    <td style=\"width: 25px\">" +
+                                    "        <div title=\"Reload\" class=\"button\"" +
+                                    "             onclick=\"$.reloadModule('" + module + "', " + idx + ")\">" + reloadIcon +
+                                    "        </div>" +
+                                    "    </td>" +
+
                                     "</tr>";
                         } else {
                             discordHtml += "<tr class=\"textList\">" +
                                     "    <td>" + module + "</td>" +
-    
+
                                     "    <td style=\"width: 25px\">" +
                                     "        <div id=\"moduleStatus_" + idx + "\">" + modeIcon[moduleEnabled] + "</div>" +
                                     "    </td>" +
-    
+
                                     "    <td style=\"width: 25px\">" +
                                     "        <div data-toggle=\"tooltip\" title=\"Enable\" class=\"button\"" +
                                     "             onclick=\"$.enableModule('" + module + "', " + idx + ")\">" + settingIcon['true'] +
                                     "        </div>" +
                                     "    </td>" +
-    
+
                                     "    <td style=\"width: 25px\">" +
                                     "        <div data-toggle=\"tooltip\" title=\"Disable\" class=\"button\"" +
                                     "             onclick=\"$.disableModule('" + module + "', " + idx + ")\">" + settingIcon['false'] +
                                     "        </div>" +
                                     "    </td>" +
+
+                                    "    <td style=\"width: 25px\">" +
+                                    "        <div title=\"Reload\" class=\"button\"" +
+                                    "             onclick=\"$.reloadModule('" + module + "', " + idx + ")\">" + reloadIcon +
+                                    "        </div>" +
+                                    "    </td>" +
+
                                     "</tr>";
                         }
                     }
@@ -245,7 +261,7 @@
                     $("#lastDonator").html("<span class=\"purplePill\" data-toggle=\"tooltip\" title=\"Latest Donator\">Donator: " + msgObject['results']['lastDonator'] + "</span>");
                 }
             }
- 
+
             if (panelCheckQuery(msgObject, 'dashboard_gameTitle')) {
                 gameTitle = msgObject['results']['game'];
                 if (gameTitle === undefined || gameTitle === null) {
@@ -255,7 +271,7 @@
                 $('#gameTitleInput').val(gameTitle);
                 sendDBQuery("dashboard_deathctr", "deaths", gameTitle);
             }
- 
+
             if (panelCheckQuery(msgObject, 'dashboard_loggingModeEvent')) {
                 loggingModeEvent = msgObject['results']['log.event'];
                 $("#logEvent").html(modeIcon[loggingModeEvent]);
@@ -371,7 +387,7 @@
         return panelStrcmp(a.key, b.key);
     }
 
-    /** 
+    /**
      * @function enableModule
      * @param {String} module
      */
@@ -389,6 +405,18 @@
         $("#moduleStatus_" + idx).html("<i style=\"color: #6136b1\" class=\"fa fa-spinner fa-spin\" />");
         sendCommand("module disablesilent " + module);
         setTimeout(function() { doQuery(); }, TIMEOUT_WAIT_TIME);
+    }
+
+    /**
+     * @function reloadModule
+     * @param {String} module
+     */
+    function reloadModule(module, idx) {
+        if (confirm('Are you sure you want to reload this module? In some cases, this is probably likely to break stuff!')) {
+            $("#moduleStatus_" + idx).html("<i style=\"color: #6136b1\" class=\"fa fa-spinner fa-spin\" />");
+            sendCommand("module reload " + module);
+            setTimeout(function() { doQuery(); }, TIMEOUT_WAIT_TIME);
+        }
     }
 
     /**
@@ -510,7 +538,7 @@
             setTimeout(function() { doQuery(); }, TIMEOUT_WAIT_TIME * 2);
         }
     }
-    
+
     /**
      * @function setMultiLinkTimer
      */
@@ -548,7 +576,7 @@
         setTimeout(function() { sendCommand("reloadmulti"); }, TIMEOUT_WAIT_TIME);
         setTimeout(function() { doQuery(); }, TIMEOUT_WAIT_TIME * 2);
     }
- 
+
     /**
      * @function multiLinkTimerOn
      */
@@ -559,7 +587,7 @@
         setTimeout(function() { sendCommand("reloadmulti"); }, TIMEOUT_WAIT_TIME);
         setTimeout(function() { doQuery(); }, TIMEOUT_WAIT_TIME * 2);
     }
- 
+
     /**
      * @function multiLinkTimerOff
      */
@@ -622,7 +650,7 @@
         }
         $('#amountQueue').val('');
     }
- 
+
     // Import the HTML file for this panel.
     $("#dashboardPanel").load("/panel/dashboard.html");
 
@@ -666,6 +694,7 @@
     $.toggleLog = toggleLog;
     $.enableModule = enableModule;
     $.disableModule = disableModule;
+    $.reloadModule = reloadModule;
     $.adjustDeathCounter = adjustDeathCounter;
     $.shoutOut = shoutOut;
     $.disconnect = disconnect;

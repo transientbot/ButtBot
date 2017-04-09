@@ -705,6 +705,31 @@
                 }
             }
 
+            if (action.equalsIgnoreCase("reload")) {
+                temp = args[1];
+
+                if (temp.indexOf('./core/') > -1 || temp.indexOf('./lang/') > -1) {
+                    return;
+                }
+
+                index = getModuleIndex(temp);
+
+                if (index > -1) {
+                    $.log.event(username + ' reloaded module "' + modules[index].scriptFile + '"');
+
+                    loadScript(modules[index].scriptFile, true, false)
+
+                    var hookIdx = getHookIndex(modules[index].scriptFile, 'initReady');
+                    try {
+                        if (hookIdx !== -1) {
+                            hooks[hookIdx].handler(null);
+                        }
+                    } catch (e) {
+                        $.log.error('Unable to call initReady for enabled module (' + modules[index].scriptFile +'): ' + e);
+                    }
+                }
+            }
+
             /**
              * @commandpath module status [./path/module] - Retrieve the current status (enabled/disabled) of the given module
              */
@@ -1275,7 +1300,7 @@
          */
         $api.on($script, 'gameWispAnniversary', function(event) {
             callHook('gameWispAnniversary', event, false);
-        }); 
+        });
 
         /**
          * @event api-twitterEvent
