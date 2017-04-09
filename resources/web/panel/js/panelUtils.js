@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* 
+/*
  * @author IllusionaryOne
  */
 
@@ -125,6 +125,7 @@ connection.onmessage = function(e) {
     if (e.data.indexOf('twitter_') !== -1) $.twitterOnMessage(e);
     if (e.data.indexOf('discord_') !== -1) $.discordOnMessage(e);
     if (e.data.indexOf('idle_') !== -1) $.idleOnMessage(e);
+    if (e.data.indexOf('buttCustom_') !== -1) $.buttCustomOnMessage(e);
 
     if (e.data.indexOf('audio_') !== -1) $.audioOnMessage(e);
     if (e.data.indexOf('help_') !== -1) $.helpOnMessage(e);
@@ -140,7 +141,7 @@ function newPanelAlert(message, type, timeout) {
     debugMsg("newPanelAlert(" + message + ", " + type + ", " + timeout + ")");
     $(".alert").fadeIn(1000);
     $("#newPanelAlert").show().html('<div class="alert alert-' + type + '"><button type="button" '+
-                        'class="close" data-dismiss="alert" aria-hidden="true"></button><span>' + 
+                        'class="close" data-dismiss="alert" aria-hidden="true"></button><span>' +
                          message + '</span></div>');
     if (timeout != 0) {
         $(".alert-" + type).delay(timeout).fadeOut(1000, function () { $(this).remove(); });
@@ -286,7 +287,7 @@ function sendWSEvent(event_id, script, argsString, args) {
  * @param {String} b
  * @return {Number} match == 0; no match != 0
  *
- * Note that the below will not work on interational strings, only 
+ * Note that the below will not work on interational strings, only
  * ASCII compares.  If international strings are in play, then
  * localeCompare should be used instead.
  */
@@ -362,7 +363,7 @@ function handleInputFocus() {
  */
 function setInputFocus(value) {
    inputFieldInFocus = value;
-} 
+}
 
 /**
  * @function isInputFocus
@@ -452,17 +453,21 @@ function performCurrentPanelRefresh() {
              newPanelAlert('Refreshing Data', 'success', 1000);
              $.twitterDoQuery();
              break;
-         case 18 : 
+         case 18 :
              newPanelAlert('Refreshing Data', 'success', 1000);
              $.discordDoQuery();
              break;
-         case 19 : 
+         case 19 :
              newPanelAlert('Refreshing Data', 'success', 1000);
              $.audioDoQuery();
              break;
          case 21 :
              newPanelAlert('Refreshing Data', 'success', 1000);
              $.idleDoQuery();
+             break;
+         case 22 :
+             newPanelAlert('Refreshing Data', 'success', 1000);
+             $.buttCustomDoQuery();
              break;
     }
 }

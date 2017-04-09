@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* 
+/*
  * @author IllusionaryOne
  */
 
@@ -222,7 +222,15 @@
                 handlePanel('./discord/games/customCommands.js', '#_discord_customCommands', moduleEnabled);
             }
 
-        }            
+            //Butt Custom
+            if (panelMatch(module, './custom/idleChatters.js')) {
+                handlePanel('./custom/idleChatters.js', '#_idlePanel', moduleEnabled);
+            }
+            if (panelMatch(module, './custom/welcomeAudio.js')) {
+                handlePanel('./custom/welcomeAudio.js', '#_welcomeSubPanel', moduleEnabled);
+            }
+
+        }
     }
 
     // Export Function
