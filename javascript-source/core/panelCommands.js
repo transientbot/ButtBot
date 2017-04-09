@@ -1,4 +1,4 @@
-/* 
+/*
  * This script is used to reload variables from scripts when you edit stuff on the panel. Only the bot can use these, and you can't disable them
  */
 
@@ -57,28 +57,28 @@
 
             if (args.length == 2) {
                 var group = args[1];
-    
+
                 if (isNaN(parseInt(group))) {
                     group = $.getGroupIdByName(group);
                 }
-    
+
                 var list = $.inidb.GetKeyList('aliases', ''), i;
                 for (i in list) {
                     if (list[i].equalsIgnoreCase(action)) {
                         $.inidb.set('permcom', $.inidb.get('aliases', list[i]), group);
                         $.updateCommandGroup($.inidb.get('aliases', list[i]), group);
-                    } 
+                    }
                 }
                 $.inidb.set('permcom', action, group);
                 $.updateCommandGroup(action, group);
                 return;
             }
-    
+
             var subcommand = args[1], group = args[2];
             if (isNaN(parseInt(group))) {
                 group = $.getGroupIdByName(group);
             }
-    
+
             $.inidb.set('permcom', action + ' ' + subcommand, group);
             $.updateSubcommandGroup(action, subcommand, group);
             return;
@@ -171,7 +171,7 @@
                 return;
             }
             var argsString = args.splice(0).join(' ');
-            $.updateStatus($.channelName, argsString, sender, true); 
+            $.updateStatus($.channelName, argsString, sender, true);
             return;
         }
 
@@ -185,7 +185,7 @@
             var argsString = args.splice(0).join(' ');
             $.updateGame($.channelName, argsString, sender, true);
             return;
-        } 
+        }
 
         /*
          * Reloads the adventure variables.
@@ -349,7 +349,7 @@
             }
             $.reloadIdle();
         }
-        
+
         /*
          * Reloads the points variables.
          */
@@ -377,7 +377,7 @@
         }
 
         /*
-         * Gives points to everyone in the channel 
+         * Gives points to everyone in the channel
          */
         if (command.equalsIgnoreCase('pointsallpanel')) {
             if (!$.isBot(sender)) {
@@ -458,6 +458,30 @@
             $.reloadLogs();
             return;
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        if (command.equalsIgnoreCase('reloadwelcome')) {    //DON'T FORGET TO REGISTER CHAT COMMAND BELOW
+            if (!$.isBot(sender)) {
+                return;
+            }
+            $.reloadwelcome();
+            return;
+        }
     });
 
     $.bind('initReady', function() {
@@ -500,6 +524,7 @@
             $.registerChatCommand('./core/panelCommands.js', 'reloadbet', 30);
             $.registerChatCommand('./core/panelCommands.js', 'tipeeestreamreload', 30);
             $.registerChatCommand('./core/panelCommands.js', 'reloadidle', 30);
+            $.registerChatCommand('./core/panelCommands.js', 'reloadwelcome', 30);
         }, 10000);
     });
 })();
