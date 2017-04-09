@@ -5,6 +5,7 @@
  */
 (function() {
     var messageToggle = $.getSetIniDbBoolean('settings', 'audiohookmessages', false);
+    var customCommandsEnabled = $.getSetIniDbBoolean('settings', 'audiohookcommandsenabled', true);
 
     /**
      * @function updateAudioHookDB
@@ -32,7 +33,7 @@
                 $.inidb.del('audio_hooks', dbAudioHookNames[i]);
             }
         }
-        
+
         $.panelsocketserver.doAudioHooksUpdate();
     };
 
@@ -73,10 +74,10 @@
      * @function loadAudioHookCommands
      */
     function loadAudioHookCommands() {
-        if ($.bot.isModuleEnabled('./systems/audioPanelSystem.js')) {
+        if ($.bot.isModuleEnabled('./systems/audioPanelSystem.js') && customCommandsEnabled) {
             var commands = $.inidb.GetKeyList('audioCommands', ''),
                 i;
-                
+
             for (i in commands) {
                 if (!$.commandExists(commands[i])) {
                     $.registerChatCommand('./systems/audioPanelSystem.js', commands[i], 7);
@@ -86,6 +87,33 @@
             }
         }
     };
+
+    function unloadAudioHookCommands() {
+        var commands = $.inidb.GetKeyList('audioCommands', ''),
+            i;
+
+        for (i in commands) {
+            if ($.commandExists(commands[i])) {
+                $.unregisterChatCommand(commands[i]);
+            }
+        }
+    }
+
+    function enableCustomCommands() {
+        if (!customCommandsEnabled) {
+            customCommandsEnabled = true;
+            $.setIniDbBoolean('settings', 'audiohookcommandsenabled', true)
+            loadAudioHookCommands();
+        }
+    }
+
+    function disableCustomCommands() {
+        if (customCommandsEnabled) {
+            customCommandsEnabled = false;
+            $.setIniDbBoolean('settings', 'audiohookcommandsenabled', false)
+            unloadAudioHookCommands();
+        }
+    }
 
     /**
      * @event command
@@ -110,7 +138,7 @@
         }
 
         /**
-         * Checks if the command is an audio hook 
+         * Checks if the command is an audio hook
          */
         if ($.inidb.exists('audioCommands', command)) {
             if ($.inidb.get('audioCommands', command).match(/\(list\)/g)) {
@@ -126,7 +154,7 @@
 
         /**
          * @commandpath audiohook [play | list] - Base command for audio hooks.
-         * @commandpath audiohook play [audio_hook] - Sends the audio_hook request to the Panel. 
+         * @commandpath audiohook play [audio_hook] - Sends the audio_hook request to the Panel.
          * @commandpath audiohook list - Lists the audio hooks.
          * @commandpath audiohook togglemessages - Enables the success message once a sfx is sent.
          * @commandpath audiohook customcommand [add / remove] [command] [sound] - Adds a custom command that will trigger that sound. Use tag "(list)" to display all the commands.
@@ -195,6 +223,14 @@
                     return;
                 }
 
+                if (action.equalsIgnoreCase('enable')) {
+                    enableCustomCommands();
+                }
+
+                if (action.equalsIgnoreCase('disable')) {
+                    disableCustomCommands();
+                }
+
                 if (action.equalsIgnoreCase('add')) {
                     if (subAction === undefined || actionArgs === undefined) {
                         $.say($.whisperPrefix(sender) + $.lang.get('audiohook.customcommand.add.usage'));
@@ -221,7 +257,7 @@
                     }
 
                     $.inidb.set('audioCommands', subAction.toLowerCase(), actionArgs);
-                    $.registerChatCommand('./systems/audioPanelSystem.js', subAction.toLowerCase(), 7);
+                    if (customCommandsEnabled) $.registerChatCommand('./systems/audioPanelSystem.js', subAction.toLowerCase(), 7);
                     $.say($.whisperPrefix(sender) + $.lang.get('audiohook.customcommand.add.success', subAction, actionArgs));
                     return;
                 }
