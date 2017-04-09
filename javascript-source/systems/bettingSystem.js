@@ -200,7 +200,7 @@
 			message(sender, $.lang.get('bettingsystem.bet.error.min', bet.minimum));
 			return;
 		} else if (bet.maximum < amount && bet.maximum !== 0) {
-			message(sender, $.lang.get('bettingsystem.bet.error.max'));
+			message(sender, $.lang.get('bettingsystem.bet.error.max', bet.maximum));
 			return;
 		} else if ($.getUserPoints(sender) < amount) {
 			message(sender, $.lang.get('bettingsystem.bet.error.points', $.pointNameMultiple));
@@ -316,6 +316,15 @@
 				return;
 
 			/**
+			 * @commandpath bet current - Shows current bet stats.
+			 */
+			} else if (action.equalsIgnoreCase('current')) {
+				if (bet.status === true) {
+					$.say($.lang.get('bettingsystem.results', bet.title, bet.opt.join(', '), bet.total, bet.entries));
+				}
+				return;
+
+			/**
 			 * @commandpath bet [amount] [option] - Bets on the option.
 			 */
 			} else {
@@ -330,7 +339,8 @@
 	$.bind('initReady', function() {
         if ($.bot.isModuleEnabled('./systems/bettingSystem.js')) {
             $.registerChatCommand('./systems/bettingSystem.js', 'bet', 7);
-            $.registerChatSubcommand('bet', 'lookup', 7);
+            $.registerChatSubcommand('bet', 'current', 7);
+            $.registerChatSubcommand('bet', 'results', 7);
             $.registerChatSubcommand('bet', 'open', 2);
             $.registerChatSubcommand('bet', 'close', 2);
             $.registerChatSubcommand('bet', 'save', 1);

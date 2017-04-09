@@ -215,13 +215,24 @@
             if (panelMatch(module, './discord/handlers/gamewispHandler.js')) {
                 handlePanel('./discord/handlers/gamewispHandler.js', '#_discord_gameWispHandler', moduleEnabled);
             }
+            if (panelMatch(module, './discord/handlers/keywordHandler.js')) {
+                handlePanel('./discord/handlers/keywordHandler.js', '#_discord_customkeywords', moduleEnabled);
+            }
             if (panelMatch(module, './discord/systems/greetingsSystem.js')) {
                 handlePanel('./discord/systems/greetingsSystem.js', '#_discord_greetingSystem', moduleEnabled);
             }
             if (panelMatch(module, './discord/commands/customCommands.js')) {
                 handlePanel('./discord/games/customCommands.js', '#_discord_customCommands', moduleEnabled);
             }
-
+            if (panelMatch(module, './discord/games/slotMachine.js')) {
+                handlePanel('./discord/games/slotMachine.js', '#_discord_slotMachine', moduleEnabled);
+            }
+            if (panelMatch(module, './discord/games/gambling.js')) {
+                handlePanel('./discord/games/gambling.js', '#_discord_gambling', moduleEnabled);
+            }
+            if (panelMatch(module, './discord/games/roll.js')) {
+                handlePanel('./discord/games/roll.js', '#_discord_roll', moduleEnabled);
+            }
             //Butt Custom
             if (panelMatch(module, './custom/idleChatters.js')) {
                 handlePanel('./custom/idleChatters.js', '#_idlePanel', moduleEnabled);
@@ -229,8 +240,6 @@
             if (panelMatch(module, './custom/welcomeAudio.js')) {
                 handlePanel('./custom/welcomeAudio.js', '#_welcomeSubPanel', moduleEnabled);
             }
-
-        }
     }
 
     // Export Function
