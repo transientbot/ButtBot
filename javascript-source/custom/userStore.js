@@ -17,9 +17,10 @@
 		}
 	}
 
-	function User(name) {
+	function User(prmName) {
 		var me = this;
 		var dataStore = {};
+		this.Name = prmName;
 
 		this.getData = function(prmItem) {
 			if (dataStore.hasOwnProperty(prmItem)) {

@@ -112,11 +112,11 @@
                                     "        </div>" +
                                     "    </td>" +
 
-                                    "    <td style=\"width: 25px\">" +
-                                    "        <div title=\"Reload\" class=\"button\"" +
-                                    "             onclick=\"$.reloadModule('" + module + "', " + idx + ")\">" + reloadIcon +
-                                    "        </div>" +
-                                    "    </td>" +
+                                    // "    <td style=\"width: 25px\">" +
+                                    // "        <div title=\"Reload\" class=\"button\"" +
+                                    // "             onclick=\"$.reloadModule('" + module + "', " + idx + ")\">" + reloadIcon +
+                                    // "        </div>" +
+                                    // "    </td>" +
 
                                     "</tr>";
                         } else {

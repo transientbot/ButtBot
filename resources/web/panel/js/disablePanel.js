@@ -240,8 +240,9 @@
             if (panelMatch(module, './custom/welcomeAudio.js')) {
                 handlePanel('./custom/welcomeAudio.js', '#_welcomeSubPanel', moduleEnabled);
             }
+        }
     }
 
     // Export Function
-    $.disablePanels = disablePanels
+    $.disablePanels = disablePanels;
 })();

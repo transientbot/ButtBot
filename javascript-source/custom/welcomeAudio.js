@@ -52,7 +52,7 @@
 		var now = new Date().getTime();
 		var difference = now - (user.getData('DateLastWelcome') || 0);
 
-		welcomeDebug(user);
+		welcomeDebug(user.Name);
 		welcomeDebug(cooldown);
 		welcomeDebug(now);
 		welcomeDebug(difference);
@@ -61,14 +61,24 @@
 			var audioHook = sender + ".welcome";
 			if ($.audioHookExists(audioHook)) {
 				$.panelsocketserver.triggerAudioPanel(audioHook);
+				user.setData('DateLastWelcome', now);
 			}
-			user.setData('DateLastWelcome', now);
+		}
+	}
+
+	function welcomePurgeCooldowns() {
+		welcomeDebug("Purging Cooldowns...");
+		var users = $.userStore.getAll();
+		for (var userIndex in users) {
+			var user = users[userIndex];
+			welcomeDebug("User: " + user.Name);
+			user.setData('DateLastWelcome',0);
 		}
 	}
 
 	function welcomeDebug(prmLine) {
 		if (debug) {
-			$.consoleLn(prmLine);
+			$.consoleLn("[Welcome Sounds] " + prmLine);
 		}
 	}
 
@@ -83,16 +93,34 @@
 			args = event.getArgs(),
 			random;
 
-		if (command.equalsIgnoreCase('hello')) {
+		if (command.equalsIgnoreCase('hi')) {
 			welcomeCommand(sender);
+		}
+
+		/*Panel Commands*/
+		if (command.equalsIgnoreCase('reloadwelcome')) {    //DON'T FORGET TO REGISTER CHAT COMMAND BELOW
+			if (!$.isBot(sender)) {
+				return;
+			}
+			ISettings.Load();
+			return;
+		}
+
+		if (command.equalsIgnoreCase('welcomepurgecooldowns')) {
+			if (!$.isBot(sender)) {
+				return;
+			}
+			welcomePurgeCooldowns();
+
+			return;
 		}
 	});
 
 	$.bind('initready', function (event) {
-		$.registerChatCommand('./custom/welcomeAudio.js', 'hello', 6);
+		$.registerChatCommand('./custom/welcomeAudio.js', 'hi', 6);
+		$.registerChatCommand('./custom/welcomeAudio.js', 'reloadwelcome', 30);
+		$.registerChatCommand('./custom/welcomeAudio.js', 'welcomepurgecooldowns', 30);
 
 		ISettings.Load();
 	});
-
-	$.reloadwelcome = ISettings.Load;
 })();

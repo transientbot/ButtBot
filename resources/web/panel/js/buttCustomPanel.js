@@ -73,6 +73,10 @@
 		setTimeout(function () { welcomeQuery (); }, TIMEOUT_WAIT_TIME);
 	}
 
+	function welcomePurgeCooldowns() {
+		setTimeout(function () { sendCommand ("welcomepurgecooldowns") }, TIMEOUT_WAIT_TIME);
+	}
+
 	function welcomeDebug(prmLine) {
 		if (doDebugWelcome) {
 			console.log(prmLine);
@@ -114,4 +118,5 @@
 	$.buttCustomDoQuery = doQuery;
 
 	$.welcomeSave = welcomeSave;
+	$.welcomePurgeCooldowns = welcomePurgeCooldowns;
 })();

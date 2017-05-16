@@ -454,30 +454,6 @@
             $.reloadLogs();
             return;
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        if (command.equalsIgnoreCase('reloadwelcome')) {    //DON'T FORGET TO REGISTER CHAT COMMAND BELOW
-            if (!$.isBot(sender)) {
-                return;
-            }
-            $.reloadwelcome();
-            return;
-        }
     });
 
     $.bind('initReady', function() {
@@ -520,7 +496,6 @@
             $.registerChatCommand('./core/panelCommands.js', 'reloadbet', 30);
             $.registerChatCommand('./core/panelCommands.js', 'tipeeestreamreload', 30);
             $.registerChatCommand('./core/panelCommands.js', 'reloadidle', 30);
-            $.registerChatCommand('./core/panelCommands.js', 'reloadwelcome', 30);
         }, 10000);
     });
 })();
