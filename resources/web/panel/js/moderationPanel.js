@@ -116,7 +116,7 @@
                         html += "<tr class=\"textList\">" +
                             "    <td style=\"width: 3%\">" +
                             "        <div id=\"delete_blackList_" + modSetting.replace(/[^a-z1-9]/ig, '_') + "\" type=\"button\" class=\"btn btn-default btn-xs\" " +
-                            "             onclick=\"$.deleteBlacklist('" + modSetting + "')\"><i class=\"fa fa-trash\" />" +
+                            "             onclick=\"$.deleteBlacklist('" + modSetting.replace(/\\/g, '\\\\') + "')\"><i class=\"fa fa-trash\" />" +
                             "        </div>" +
                             "    </td>" +
                             "    <td>" + modSetting + "</td>" +
@@ -580,10 +580,10 @@
     function deleteBlacklist(key) {
         /* this was giving errors if it contained a symbol other then _ */
         var newkey = key.replace(/[^a-z1-9]/ig, '_');
-        console.log(newkey);
+
         $("#delete_blackList_" + newkey).html("<i style=\"color: #6136b1\" class=\"fa fa-spinner fa-spin\" />");
 
-        sendDBDelete("commands_delblacklist_" + newkey, "blackList", key);
+        sendDBDelete("commands_delblacklist_" + key, "blackList", key);
         setTimeout(function() { doQuery(); }, TIMEOUT_WAIT_TIME);
         setTimeout(function() { sendCommand("reloadmod"); }, TIMEOUT_WAIT_TIME);
     }
@@ -754,8 +754,7 @@
 
         if (newValue.length > 0 && ((typeof newValue === 'number' && newValue > 1) || (typeof newValue === 'string'))) {
             sendDBUpdate("moderation_updateSetting_" + tableKey, "chatModerator", tableKey, newValue);
-            $(tagId).val('');
-            $(tagId).attr("placeholder", newValue);
+            $(tagId).val(newValue);
             setTimeout(function() { sendCommand("reloadmod"); }, TIMEOUT_WAIT_TIME);
         }
     }

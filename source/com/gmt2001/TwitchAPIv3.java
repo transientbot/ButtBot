@@ -16,25 +16,18 @@
  */
 package com.gmt2001;
 
-import com.gmt2001.DataStore;
-import com.gmt2001.HttpRequest;
-import me.mast3rplan.phantombot.PhantomBot;
+import com.gmt2001.datastore.DataStore;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.HashMap;
 import javax.net.ssl.HttpsURLConnection;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONString;
 import org.json.JSONStringer;
 
 /**
@@ -140,24 +133,14 @@ public class TwitchAPIv3 {
 
             j = new JSONObject(content);
             fillJSONObject(j, true, type.name(), post, url, c.getResponseCode(), "", "", content);
-        } catch (JSONException ex) {
-            fillJSONObject(j, false, type.name(), post, url, 0, "JSONException", ex.getMessage(), content);
-            com.gmt2001.Console.err.println("JSONException: " + ex.getMessage());
-        } catch (NullPointerException ex) {
-            fillJSONObject(j, false, type.name(), post, url, 0, "NullPointerException", ex.getMessage(), content);
-            com.gmt2001.Console.err.println("NullPointerException: " + ex.getMessage());
-        } catch (MalformedURLException ex) {
-            fillJSONObject(j, false, type.name(), post, url, 0, "MalformedURLException", ex.getMessage(), content);
-            com.gmt2001.Console.err.println("MalformedURLException: " + ex.getMessage());
-        } catch (SocketTimeoutException ex) {
-            fillJSONObject(j, false, type.name(), post, url, 0, "SocketTimeoutException", ex.getMessage(), content);
-            com.gmt2001.Console.err.println("SocketTimeoutException: " + ex.getMessage());
-        } catch (IOException ex) {
-            fillJSONObject(j, false, type.name(), post, url, 0, "IOException", ex.getMessage(), content);
-            com.gmt2001.Console.err.println("IOException: " + ex.getMessage());
         } catch (Exception ex) {
-            fillJSONObject(j, false, type.name(), post, url, 0, ex.getClass().getName(), ex.getMessage(), content);
-            com.gmt2001.Console.err.println(ex.getClass().getName() + ": " + ex.getMessage());
+            Throwable rootCause = ex;
+            while (rootCause.getCause() != null && rootCause.getCause() != rootCause) {
+                rootCause = rootCause.getCause();
+            }
+
+            fillJSONObject(j, false, type.name(), post, url, 0, ex.getClass().getSimpleName(), ex.getMessage(), content);
+            com.gmt2001.Console.debug.println("Failed to get data [" + ex.getClass().getSimpleName() + "]: " + ex.getMessage());
         } finally {
             if (i != null) {
                 try {
@@ -436,8 +419,8 @@ public class TwitchAPIv3 {
     /**
      * Gets the list of VODs from Twitch
      *
-     * @param   String  The channel requesting data for
-     * @param   String  The type of data: current, highlights, archives
+     * @param   channel  The channel requesting data for
+     * @param   type  The type of data: current, highlights, archives
      * @return  String  List of Twitch VOD URLs (as a JSON String) or empty String in failure.
      */
     public String GetChannelVODs(String channel, String type) {
@@ -460,7 +443,7 @@ public class TwitchAPIv3 {
                         }
                         com.gmt2001.Console.debug.println("TwitchAPIv3::GetChannelVODs: " + jsonOutput.toString());
                         if (jsonOutput.toString() == null) {
-                            return new String("");
+                            return "";
                         }
                         return jsonOutput.toString();
                     }
@@ -484,7 +467,7 @@ public class TwitchAPIv3 {
                     jsonOutput.endArray().endObject();
                     com.gmt2001.Console.debug.println("TwitchAPIv3::GetChannelVODs: " + jsonOutput.toString());
                     if (jsonOutput.toString() == null) {
-                        return new String("");
+                        return "";
                     }
                     return jsonOutput.toString();
                 }
@@ -507,7 +490,7 @@ public class TwitchAPIv3 {
                     jsonOutput.endArray().endObject();
                     com.gmt2001.Console.debug.println("TwitchAPIv3::GetChannelVODs: " + jsonOutput.toString());
                     if (jsonOutput.toString() == null) {
-                        return new String("");
+                        return "";
                     }
                     return jsonOutput.toString();
                 }
@@ -515,13 +498,13 @@ public class TwitchAPIv3 {
         }
 
         /* Just return an empty string. */
-        return new String("");
+        return "";
     }
 
     /**
      * Returns when a Twitch account was created.
      *
-     * @param   String   channel
+     * @param   channel
      * @return  String   date-time representation (2015-05-09T00:08:04Z)
      */
     public String getChannelCreatedDate(String channel) {
@@ -568,10 +551,10 @@ public class TwitchAPIv3 {
      * @param   DataStore   Copy of database object for reading data from
      * @param   int         Total number of followers reported from Twitch API
      */
+    @SuppressWarnings("SleepWhileInLoop")
     private void FixFollowedTableWorker(String channel, DataStore dataStore, int followerCount) {
         int insertCtr = 0;
         JSONObject jsonInput;
-        String tableUpdated;
         String baseLink = base_url + "/channels/" + channel + "/follows";
         String nextLink = baseLink + "?limit=100";
 
@@ -612,9 +595,9 @@ public class TwitchAPIv3 {
      * does not get stuck trying to perform this work, a thread is spawned to perform the
      * work.
      *
-     * @param   String      Name of the channel to lookup data for
-     * @param   DataStore   Copy of database object 
-     * @param   Boolean     Force the run even if the number of followers is too high
+     * @param   channel      Name of the channel to lookup data for
+     * @param   dataStore   Copy of database object
+     * @param   force     Force the run even if the number of followers is too high
      */
     public void FixFollowedTable(String channel, DataStore dataStore, Boolean force) {
 
@@ -642,9 +625,9 @@ public class TwitchAPIv3 {
      * Class for Thread for running the FixFollowedTableWorker job in the background.
      */
     private class FixFollowedTableRunnable implements Runnable {
-        private DataStore dataStore;
-        private String channel;
-        private int followerCount;
+        private final DataStore dataStore;
+        private final String channel;
+        private final int followerCount;
 
         public FixFollowedTableRunnable(String channel, DataStore dataStore, int followerCount) {
             this.channel = channel;
@@ -652,6 +635,7 @@ public class TwitchAPIv3 {
             this.followerCount = followerCount;
         }
 
+        @Override
         public void run() {
             FixFollowedTableWorker(channel, dataStore, followerCount);
         }
@@ -659,6 +643,7 @@ public class TwitchAPIv3 {
 
     /**
      * Tests the Twitch API to ensure that authentication is good.
+     * @return
      */
     public boolean TestAPI() {
         JSONObject jsonObject = GetData(request_type.GET, base_url, false);
@@ -671,7 +656,7 @@ public class TwitchAPIv3 {
     /**
      * Returns a username when given an Oauth.
      *
-     * @param   String      Oauth to check with.
+     * @param   userOauth      Oauth to check with.
      * @return  String      The name of the user or null to indicate that there was an error.
      */
     public String GetUserFromOauth(String userOauth) {
@@ -688,7 +673,7 @@ public class TwitchAPIv3 {
     /**
      * Returns the channel Id
      *
-     * @param   String      channel name
+     * @param   channel      channel name
      * @return  int      the channel id.
      */
     public int getChannelId(String channel) {

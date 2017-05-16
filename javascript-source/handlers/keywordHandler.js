@@ -13,19 +13,27 @@
             key,
             origKey,
             i;
-        
+
         if ($.bot.isModuleEnabled('./handlers/keywordHandler.js')) {
             for (i in keys) {
-                if (message.includes(keys[i].toLowerCase())) {
-                    key = keys[i].toLowerCase();
-                    origKey = keys[i];
-                    break;
+                try {
+                    if (message.match(keys[i].toLowerCase())) {
+                        key = keys[i].toLowerCase();
+                        origKey = keys[i];
+                        break;
+                    }
+                } catch (ex) {
+                    if (message.includes(keys[i].toLowerCase())) {
+                        key = keys[i].toLowerCase();
+                        origKey = keys[i];
+                        break;
+                    }
                 }
             }
 
             // Some users use special symbols that may break regex so this will fix that.
             try {
-                if (!message.match('\\b' + key + '\\b') || message.includes(/!keyword/)) {
+                if (!message.match('\\b' + key + '\\b') || message.includes('!keyword')) {
                     return;
                 }
             } catch (ex) {

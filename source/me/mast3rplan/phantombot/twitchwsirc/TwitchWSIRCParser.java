@@ -47,6 +47,7 @@ import me.mast3rplan.phantombot.event.EventBus;
 import me.mast3rplan.phantombot.event.command.CommandEvent;
 import me.mast3rplan.phantombot.script.ScriptEventManager;
 import me.mast3rplan.phantombot.cache.UsernameCache;
+import me.mast3rplan.phantombot.PhantomBot;
 
 /*
  * Create an interface that is used to create event handling methods.
@@ -66,6 +67,7 @@ public class TwitchWSIRCParser {
     private Channel channel;
     private Session session;
     private EventBus eventBus;
+    private boolean useTwitchNotify;
 
     /**
      * Constructor for TwitchWSIRCParser object.  Performs construction
@@ -83,6 +85,9 @@ public class TwitchWSIRCParser {
         this.channel = channel;
         this.session = session;
         this.eventBus = eventBus;
+
+        // This is only a temp thing.
+        this.useTwitchNotify = PhantomBot.useTwitchNotify;
 
         parserMap.put("001", new TwitchWSIRCCommand() {
             public void exec(String message, String username, Map<String, String> tagsMap) {
@@ -288,16 +293,16 @@ public class TwitchWSIRCParser {
         com.gmt2001.Console.debug.println("IRCv3 Tags: " + tagsMap);
 
         /* Check to see if the user is subscribing to the channel */
-        if (message.endsWith("subscribed!") || message.endsWith("Prime!")) {
-            if (username.equalsIgnoreCase("twitchnotify")) {
+        if (username.equalsIgnoreCase("twitchnotify")) {
+            // This is only a temp thing.
+            if (useTwitchNotify) {
                 if (message.endsWith("Prime!")) {
                     scriptEventManager.runDirect(new NewPrimeSubscriberEvent(this.session, channel, message.substring(0, message.indexOf(" ", 1))));
-                } else {
+                } else if (message.endsWith("subscribed!")) {
                     scriptEventManager.runDirect(new NewSubscriberEvent(this.session, channel, message.substring(0, message.indexOf(" ", 1))));
                 }
-                com.gmt2001.Console.debug.println(message.substring(0, message.indexOf(" ", 1)) + " just subscribed!");
-                return;
             }
+            return;
         }
 
         /* Check to see if the users disaplay name. Used in the scripts. */
@@ -348,7 +353,20 @@ public class TwitchWSIRCParser {
         /* Moderate the incoming message. Have it run in the background on a thread. */
         try {
             ModerationRunnable moderationRunnable = new ModerationRunnable(this.session, username, message, this.channel, tagsMap);
-            new Thread(moderationRunnable, "me.mast3rplan.phantombot.twitchwsirc.TwitchWSIRCParser::ModerationRunnable").start();
+            Thread thread = new Thread(moderationRunnable);
+            thread.start();
+            thread.setName("ModerationRunnable-" + thread.getId());
+            long startThreadT = System.currentTimeMillis();
+
+            while (thread.isAlive()) {
+                thread.join(2000);
+                if (((System.currentTimeMillis() - startThreadT) > 8000) && thread.isAlive()) {
+                    thread.interrupt();
+                    thread.join();
+                }
+            }
+        } catch (InterruptedException ex) {
+            com.gmt2001.Console.debug.println("Interrupted Exception");
         } catch (Exception ex) {
             scriptEventManager.runDirect(new IrcModerationEvent(this.session, username, message, this.channel, tagsMap));
         }
@@ -471,11 +489,22 @@ public class TwitchWSIRCParser {
      * @param String username
      * @param Map<String, String> tagsMap
      */
-    private void userNotice(String message, String username, Map<String, String> tagMaps) {
-        if ((tagMaps.containsKey("display-name") || tagMaps.containsKey("login")) && tagMaps.containsKey("msg-param-months") && (tagMaps.containsKey("msg-id") && tagMaps.get("msg-id").equals("resub"))) {
-            scriptEventManager.runDirect(new NewReSubscriberEvent(this.session, this.channel, (tagMaps.get("display-name").length() == 0 ? tagMaps.get("login") : tagMaps.get("display-name")), tagMaps.get("msg-param-months")));
-            com.gmt2001.Console.debug.println((tagMaps.get("display-name").length() == 0 ? tagMaps.get("login") : tagMaps.get("display-name")) + " just subscribed for " + tagMaps.get("msg-param-months") + " months in a row!");
+    private void userNotice(String message, String username, Map<String, String> tagsMap) {
+        if (tagsMap.containsKey("msg-id")) {
+            if (tagsMap.get("msg-id").equalsIgnoreCase("resub")) {
+                scriptEventManager.runDirect(new NewReSubscriberEvent(this.session, this.channel, tagsMap.get("login"), tagsMap.get("msg-param-months")));
+            } else {
+                if (tagsMap.get("msg-id").equalsIgnoreCase("sub")) {
+                    if (tagsMap.get("msg-param-sub-plan").equalsIgnoreCase("Prime")) {
+                        scriptEventManager.runDirect(new NewPrimeSubscriberEvent(this.session, channel, tagsMap.get("login")));
+                    } else {
+                        scriptEventManager.runDirect(new NewSubscriberEvent(this.session, channel, tagsMap.get("login"), tagsMap.get("msg-param-sub-plan-name")));
+                    }
+                }
+            }
         }
+        
+        com.gmt2001.Console.debug.println("USERNOTICE: " + tagsMap);
     }
 
     /*
@@ -488,31 +517,39 @@ public class TwitchWSIRCParser {
             if (tagMaps.get("user-type").length() > 0) {
                 if (!moderators.contains(this.session.getNick())) {
                     moderators.add(this.session.getNick());
-                    com.gmt2001.Console.debug.println("Bot::" + this.session.getNick() + "::Moderator::true");
                     eventBus.postAsync(new IrcChannelUserModeEvent(this.session, this.channel, session.getNick(), "O", true));
+                    com.gmt2001.Console.debug.println("Bot::" + this.session.getNick() + "::Moderator::true");
                 }
             } else { 
                 if (this.channelName.equalsIgnoreCase(this.session.getNick())) {
                     if (!moderators.contains(this.session.getNick())) {
                         moderators.add(this.session.getNick());
-                        com.gmt2001.Console.debug.println("Caster::Bot::" + this.session.getNick() + "::Moderator::true");
                         eventBus.postAsync(new IrcChannelUserModeEvent(this.session, this.channel, session.getNick(), "O", true));
+                        com.gmt2001.Console.debug.println("Caster::Bot::" + this.session.getNick() + "::Moderator::true");
                     }
+                } else if (tagMaps.containsKey("display-name") && !tagMaps.get("display-name").equalsIgnoreCase(this.session.getNick())) {
+                    com.gmt2001.Console.out.println();
+                    com.gmt2001.Console.out.println("[ERROR] oAuth token doesn't match the bot's Twitch account name.");
+                    com.gmt2001.Console.out.println("[ERROR] Please go to http://twitchapps.com/tmi and generate a new token.");
+                    com.gmt2001.Console.out.println("[ERROR] Be sure to go to twitch.tv and login as the bot before getting the token.");
+                    com.gmt2001.Console.out.println("[ERROR] After, open the botlogin.txt file and replace the oauth= value with the token.");
+                    com.gmt2001.Console.out.println();
                 } else {
                     com.gmt2001.Console.out.println();
                     com.gmt2001.Console.out.println("[ERROR] " + this.session.getNick() + " is not detected as a moderator!");
                     com.gmt2001.Console.out.println("[ERROR] You must add " + this.session.getNick() + " as a channel moderator for it to chat.");
                     com.gmt2001.Console.out.println("[ERROR] Type /mod " + this.session.getNick() + " to add " + this.session.getNick() + " as a channel moderator.");
                     com.gmt2001.Console.out.println();
-                    session.setAllowSendMessages(false);
+                    this.session.setAllowSendMessages(false);
                     if (moderators.contains(this.session.getNick())) {
                         moderators.remove(this.session.getNick());
-                        com.gmt2001.Console.debug.println("Bot::" + this.session.getNick() + "::Moderator::false");
                         eventBus.postAsync(new IrcChannelUserModeEvent(this.session, this.channel, this.session.getNick(), "O", false));
+                        com.gmt2001.Console.debug.println("Bot::" + this.session.getNick() + "::Moderator::false");
                     }
                 }
             }
         }
+        com.gmt2001.Console.debug.println("USERSTATE: " + tagMaps);
     }
 
     /*

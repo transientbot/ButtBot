@@ -17,9 +17,6 @@
 package com.gmt2001.Console;
 
 import com.gmt2001.Logger;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
 import me.mast3rplan.phantombot.PhantomBot;
 
 /**
@@ -50,11 +47,6 @@ public class out {
     }
 
     public static void println(Object o) {
-        if (PhantomBot.enableDebugging) {
-            Logger.instance().log(Logger.LogType.Output, "[" + logTimestamp.log() + "] " + o.toString());
-            Logger.instance().log(Logger.LogType.Output, "");
-        }
-
         System.out.println("[" + logTimestamp.log() + "] " + o);
     }
 }

@@ -39,6 +39,7 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.Channel;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
@@ -61,6 +62,7 @@ import net.dv8tion.jda.core.events.guild.member.GuildMemberNickChangeEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.exceptions.PermissionException;
+import net.dv8tion.jda.core.exceptions.ErrorResponseException;
 import net.dv8tion.jda.core.hooks.EventListener;
 import net.dv8tion.jda.core.utils.PermissionUtil;
 import net.dv8tion.jda.core.utils.SimpleLog;
@@ -307,6 +309,38 @@ public class DiscordAPI {
     }
 
     /*
+     * Sends a message to a specific channel.
+     *
+     * @param {String} channel
+     * @param {MessageEmbed} message
+     */
+    public void sendMessage(String channel, MessageEmbed message) {
+        TextChannel textChannel = resolveChannel(channel);
+
+        if (textChannel != null) {
+            try {
+                com.gmt2001.Console.out.println("[DISCORD] [#" + textChannel.getName() + "] [EMBED] " + message.getDescription());
+                textChannel.sendMessage(message).queue();
+            } catch (NullPointerException ex) {
+                com.gmt2001.Console.err.println("Failed to send a message to Discord [" + ex.getClass().getSimpleName() + "]: " + ex.getMessage());
+                channelMap.clear();
+                userMap.clear();
+                roleMap.clear();
+                users.clear();
+                botId = jdaAPI.getSelfUser().getId();
+                getTextChannels();
+                getUserNames();
+                getRoles();
+
+                textChannel = resolveChannel(channel);
+                if (textChannel != null) {
+                    textChannel.sendMessage(message).queue();
+                }
+            }
+        }
+    }
+
+    /*
      * Sends a private message to a specific user.
      *
      * @param {User} user
@@ -320,7 +354,7 @@ public class DiscordAPI {
 
             com.gmt2001.Console.out.println("[DISCORD] [@" + user.getName() + "#" + user.getDiscriminator() + "] [DM] " + message);
             user.getPrivateChannel().sendMessage(message).queue();
-        } catch (RateLimitedException | NullPointerException ex) {
+        } catch (RateLimitedException | NullPointerException | ErrorResponseException ex) {
             com.gmt2001.Console.err.println("Failed to send a DM to Discord [" + ex.getClass().getSimpleName() + "]: " + ex.getMessage());
         }
     }
@@ -355,6 +389,15 @@ public class DiscordAPI {
                 }
             }
         }
+    }
+
+    /*
+     * Retuns a new embed builder.
+     *
+     * @return {EmbedBuilder}
+     */
+    public EmbedBuilder getMessageEmbedBuilder() {
+        return new EmbedBuilder();
     }
 
     /*

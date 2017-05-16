@@ -18,7 +18,7 @@
  */
 package com.illusionaryone;
 
-import com.gmt2001.DataStore;
+import com.gmt2001.datastore.DataStore;
 import com.gmt2001.UncaughtExceptionHandler;
 
 import me.mast3rplan.phantombot.PhantomBot;
@@ -228,7 +228,8 @@ public class NoticeTimer implements Runnable {
 
         /* Check to see if any notices even exist. */
         String message0 = dataStore.GetString("notices", "notice_0", "message");
-        if (message0 == null && lastNoticeID == 0) {
+        if (message0 == null) {
+            lastNoticeID = -1;
             return;
         }
         if (message0.length() == 0 && lastNoticeID == 0) {

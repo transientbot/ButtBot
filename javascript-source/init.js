@@ -8,18 +8,14 @@
  * use "$.bind('initReady', FUNCTION);" to execute code after loading all scripts (like registering commands)
  */
 (function() {
-    var connected = false,
-        modeO = false,
+    var modeO = false,
         modules = [],
         hooks = [],
         lastRecon = 0,
         pricecomMods = ($.inidb.exists('settings', 'pricecomMods') && $.inidb.get('settings', 'pricecomMods').equals('true') ? true : false),
         coolDownMsgEnabled = ($.inidb.exists('settings', 'coolDownMsgEnabled') && $.inidb.get('settings', 'coolDownMsgEnabled').equals('true') ? true : false),
-        permComMsgEnabled = ($.inidb.exists('settings', 'permComMsgEnabled') && $.inidb.get('settings', 'permComMsgEnabled').equals('true') ? true : false);
-
-    /* Make these null to start */
-    $.session = null;
-    $.channel = null;
+        permComMsgEnabled = ($.inidb.exists('settings', 'permComMsgEnabled') && $.inidb.get('settings', 'permComMsgEnabled').equals('true') ? true : false),
+        lastMsg = 0;
 
     /* Reloads the init vars */
     function reloadInit() {
@@ -140,8 +136,6 @@
                 var script = null,
                     enabled;
 
-                /* Checks if the script was already loaded, if so force reload it. This is used for the lang system. */
-                // $.consoleLn('$api.getScript()::' + $api.getScript($script, scriptFile));
                 if ($api.getScript($script, scriptFile) != null) {
                     script = $api.reloadScriptR($script, scriptFile);
                 } else {
@@ -811,37 +805,20 @@
         });
 
         /**
-         * @event api-ircJoinComplete
-         */
-        $api.on($script, 'ircJoinComplete', function(event) {
-            connected = true;
-            $.channel = event.getChannel();
-            $.session = event.getSession();
-            connectedMsg = false;
-        });
-
-        /**
          * @event api-ircChannelUserMode
          */
         $api.on($script, 'ircChannelUserMode', function(event) {
             callHook('ircChannelUserMode', event, true);
-            if (!connected) {
-                return;
-            }
-
-            if (event.getChannel().getName().equalsIgnoreCase($.channel.getName())) {
-                if (event.getUser().equalsIgnoreCase($.botName) && event.getMode().equalsIgnoreCase('o')) {
-                    if (event.getAdd().toString().equals('true')) {
-                        if (!modeO && !$.inidb.exists('settings', 'connectedMsg')) {
-                            consoleLn($.username.resolve($.botName) + ' ready!');
+            if (event.getUser().equalsIgnoreCase($.botName) && event.getMode().equalsIgnoreCase('o')) {
+                if (event.getAdd().toString().equals('true')) {
+                    if (modeO == false) {
+                        if (!$.inidb.exists('settings', 'connectedMsg')) {
+                            consoleLn($.botName + ' ready!'); 
                         } else {
-                            if (!modeO && !connectedMsg && $.inidb.exists('settings', 'connectedMsg')) {
-                                $.say($.inidb.get('settings', 'connectedMsg'));
-                                connectedMsg = true;
-                            }
+                            $.say($.inidb.get('settings', 'connectedMsg'));
                         }
-                        modeO = true;
                     }
+                    modeO = true;
                 }
             }
         });
@@ -857,7 +834,7 @@
                 commandCost = 0,
                 isModv3 = $.isModv3(sender, event.getTags());
 
-            if (($.commandPause.isPaused() && !isModv3) || !$.commandExists(command)) {
+            if (!$.commandExists(command) || ($.commandPause.isPaused() && !isModv3)) {
                 return;
             }
 
@@ -895,16 +872,18 @@
                 return;
             }
 
-            if ($.coolDown.get(command, sender, isModv3) > 1000) {
-                if (coolDownMsgEnabled) {
-                    $.say($.whisperPrefix(sender) + $.lang.get('init.cooldown.msg', command, Math.floor($.coolDown.get(command, sender) / 1000)));
+            if ($.coolDown.get(command, sender, isModv3) !== 0) {
+                if (coolDownMsgEnabled && lastMsg < $.systemTime()) {
+                    $.say($.whisperPrefix(sender) + $.lang.get('init.cooldown.msg', command, Math.floor(($.coolDown.get(command, sender, isModv3) - $.systemTime()) / 1000)));
+                    lastMsg = ($.systemTime() + 5000);
                 }
                 return;
             }
 
             if ($.permCom(sender, command, subCommand) !== 0) {
-                if (permComMsgEnabled) {
+                if (permComMsgEnabled && lastMsg < $.systemTime()) {
                     $.say($.whisperPrefix(sender) + $.lang.get('cmd.perm.404', (!$.subCommandExists(command, subCommand) ? $.getCommandGroupName(command).toLowerCase() : $.getSubCommandGroupName(command, subCommand).toLowerCase())));
+                    lastMsg = ($.systemTime() + 5000);
                 }
                 return;
             }
@@ -913,7 +892,10 @@
                 if ((((isModv3 && pricecomMods && !$.isBot(sender)) || !isModv3)) && isModuleEnabled('./systems/pointSystem.js')) {
                     commandCost = $.getCommandPrice(command, subCommand, '');
                     if ($.getUserPoints(sender) < commandCost) {
-                        $.say($.whisperPrefix(sender) + $.lang.get('cmd.needpoints', $.getPointsString(commandCost)));
+                        if (lastMsg < $.systemTime()) {
+                            $.say($.whisperPrefix(sender) + $.lang.get('cmd.needpoints', $.getPointsString(commandCost)));
+                            lastMsg = ($.systemTime() + 5000);
+                        }
                         return;
                     }
                 }
@@ -940,6 +922,7 @@
                 command = event.getCommand(),
                 channel = event.getChannel(),
                 isAdmin = event.isAdmin(),
+                sender = event.getSenderId(),
                 args = event.getArgs();
 
             if ($.discord.commandExists(command) === false && ($.discord.aliasExists(command) === false || $.discord.aliasExists(command) === true && $.discord.commandExists($.discord.getCommandAlias(command)) === false)) {
@@ -954,23 +937,26 @@
                 return;
             }
 
-            if (isAdmin == false && $.discord.command.coolDown(command) !== 0) {
+            if (isAdmin == false && $.discord.cooldown.get(command, sender) !== 0) {
                 return;
             }
 
-            if ($.discord.getCommandCost(command) > 0 && $.discord.getUserPoints(username) < $.discord.getCommandCost(command)) {
+            if ($.discord.getCommandCost(command) > 0 && $.discord.getUserPoints(username) > $.discord.getCommandCost(command)) {
                 return;
             }
 
-            if ($.discord.getCommandChannel(command) !== '' && !$.discord.getCommandChannel(command).equalsIgnoreCase(channel)) {
+            if ($.discord.getCommandChannel(command, channel) === undefined && $.discord.getCommandChannel(command, '_default_global_') === undefined) {
                 return;
+            } else {
+                if (($.discord.getCommandChannel(command, channel) !== undefined && !$.discord.getCommandChannel(command, channel).equalsIgnoreCase(channel)) && $.discord.getCommandChannel(command, '_default_global_') != '') {
+                    return;
+                }
             }
 
             callHook('discordCommand', event, false);
 
-            // Do this last to not slow down the command hook.
             if ($.discord.getCommandCost(command) > 0) {
-                $.discord.decrUserPoints(username, $.discord.getCommandCost(command));
+                $.discord.decrUserPoints(sender, $.discord.getCommandCost(command));
             }
         });
 
@@ -985,70 +971,70 @@
          * @event api-twitchFollow
          */
         $api.on($script, 'twitchFollow', function(event) {
-            callHook('twitchFollow', event, true);
+            callHook('twitchFollow', event, false);
         });
 
         /**
          * @event api-twitchUnFollow
          */
         $api.on($script, 'twitchUnfollow', function(event) {
-            callHook('twitchUnfollow', event, true);
+            callHook('twitchUnfollow', event, false);
         });
 
         /**
          * @event api-twitchFollowsInitialized
          */
         $api.on($script, 'twitchFollowsInitialized', function(event) {
-            callHook('twitchFollowsInitialized', event, true);
+            callHook('twitchFollowsInitialized', event, false);
         });
 
         /**
          * @event api-twitchHosted
          */
         $api.on($script, 'twitchHosted', function(event) {
-            callHook('twitchHosted', event, true);
+            callHook('twitchHosted', event, false);
         });
 
         /**
          * @event api-twitchAutoHosted
          */
         $api.on($script, 'twitchAutoHosted', function(event) {
-            callHook('twitchAutoHosted', event, true);
+            callHook('twitchAutoHosted', event, false);
         });
 
         /**
          * @event api-twitchHostsInitialized
          */
         $api.on($script, 'twitchHostsInitialized', function(event) {
-            callHook('twitchHostsInitialized', event, true);
+            callHook('twitchHostsInitialized', event, false);
         });
 
         /**
          * @event api-ircChannelJoin
          */
         $api.on($script, 'ircChannelJoin', function(event) {
-            callHook('ircChannelJoin', event, true);
+            callHook('ircChannelJoin', event, false);
         });
 
         /**
          * @event api-ircChannelLeave
          */
         $api.on($script, 'ircChannelLeave', function(event) {
-            callHook('ircChannelLeave', event, true);
+            callHook('ircChannelLeave', event, false);
         });
 
         /**
          * @event api-ircConnectComplete
          */
         $api.on($script, 'ircConnectComplete', function(event) {
-            callHook('ircConnectComplete', event, true);
+            callHook('ircConnectComplete', event, false);
         });
 
         /**
          * @event api-ircJoinComplete
          */
         $api.on($script, 'ircJoinComplete', function(event) {
-            callHook('ircJoinComplete', event, true);
+            callHook('ircJoinComplete', event, false);
         });
 
         /**
@@ -1104,42 +1090,42 @@
          * @event api-twitchAlertsDonation
          */
         $api.on($script, 'twitchAlertsDonation', function(event) {
-            callHook('twitchAlertsDonation', event, true);
+            callHook('twitchAlertsDonation', event, false);
         });
 
         /**
          * @event api-twitchAlertsDonationInitialized
          */
         $api.on($script, 'twitchAlertsDonationInitialized', function(event) {
-            callHook('twitchAlertsDonationInitialized', event, true);
+            callHook('twitchAlertsDonationInitialized', event, false);
         });
 
         /**
          * @event api-streamTipDonation
          */
         $api.on($script, 'streamTipDonation', function(event) {
-            callHook('streamTipDonation', event, true);
+            callHook('streamTipDonation', event, false);
         });
 
         /**
          * @event api-streamTipDonationInitialized
          */
         $api.on($script, 'streamTipDonationInitialized', function(event) {
-            callHook('streamTipDonationInitialized', event, true);
+            callHook('streamTipDonationInitialized', event, false);
         });
 
         /**
          * @event api-tipeeeStreamDonationInitialized
          */
         $api.on($script, 'tipeeeStreamDonationInitialized', function(event) {
-            callHook('tipeeeStreamDonationInitialized', event, true);
+            callHook('tipeeeStreamDonationInitialized', event, false);
         });
 
         /**
          * @event api-tipeeeStreamDonation
          */
         $api.on($script, 'tipeeeStreamDonation', function(event) {
-            callHook('tipeeeStreamDonation', event, true);
+            callHook('tipeeeStreamDonation', event, false);
         });
 
         /**
@@ -1147,13 +1133,6 @@
          */
         $api.on($script, 'emotesGet', function(event) {
             callHook('emotesGet', event, true);
-        });
-
-        /**
-         * @event api-ircChannelJoinUpdate
-         */
-        $api.on($script, 'ircChannelJoinUpdate', function(event) {
-            callHook('ircChannelJoinUpdate', event, true);
         });
 
         /**
@@ -1388,7 +1367,6 @@
             callHook('UnTimeout', event, false);
         });
 
-
         /**
          * @event api-BannedEvent
          */
@@ -1415,13 +1393,13 @@
         $.registerChatCommand('./init.js', 'echo', 1);
         $.registerChatCommand('./init.js', 'reconnect', 1);
         $.registerChatCommand('./init.js', 'disconnect', 1);
-        $.registerChatCommand('./init.js', $.botName.toLowerCase(), 1);
+        $.registerChatCommand('./init.js', $.botName.toLowerCase(), 2);
         $.registerChatSubcommand($.botName.toLowerCase(), 'disconnect', 1);
         $.registerChatSubcommand($.botName.toLowerCase(), 'reconnect', 1);
         $.registerChatSubcommand($.botName.toLowerCase(), 'moderate', 2);
 
         // emit initReady event
-        callHook('initReady', null, true);
+        callHook('initReady', null, false);
 
         if ($.isNightly) {
             consoleLn('PhantomBot Nightly Build - No Support is Provided');
