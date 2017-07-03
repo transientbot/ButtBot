@@ -1,6 +1,6 @@
 (function() {
     $.bind('command', function(event) {
-        var sender = event.getSender().toLowerCase(),
+        var sender = event.getSender(),
             command = event.getCommand(),
             args = event.getArgs(),
             random;
@@ -9,7 +9,14 @@
         {
         	if (args[0] && args[0].startsWith("https://clips.twitch.tv/"))
         	{
-        		$.discord.say('tg-clips', args[0])
+                var message = args[0];
+                if (args[1])
+                {
+                    message += " \"" + args[1] + "\"";
+                }
+                message += " - clipped by " + sender;
+
+        		$.discord.say('tg-clips', message);
         	}
         }
     });
