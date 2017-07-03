@@ -17,6 +17,7 @@
         voteCount = $.getSetIniDbNumber('ytSettings', 'voteCount', 0),
         voteArray = [],
         skipCount,
+        lastSkipTime = 0,
         playlistDJname = $.getSetIniDbString('ytSettings', 'playlistDJname', $.botName),
 
         /* enum for player status */
@@ -301,7 +302,7 @@
                             $.log.error("importPlaylistFile::skipped [" + importedList[i] + "]: " + ex);
                             failCount++;
                         }
-                        if (importCount >= 150) {
+                        if (importCount == $.youtube.max() && !$.youtube.checkapi()) {
                             break;
                         }
                     }
@@ -973,8 +974,8 @@
      * @event yTPlayerRandomize
      */
     $.bind('yTPlayerRandomize', function(event) {
-        var EventBus = Packages.me.mast3rplan.phantombot.event.EventBus,
-            CommandEvent = Packages.me.mast3rplan.phantombot.event.command.CommandEvent;
+        var EventBus = Packages.tv.phantombot.event.EventBus,
+            CommandEvent = Packages.tv.phantombot.event.command.CommandEvent;
 
         EventBus.instance().post(new CommandEvent($.botName, 'ytp', 'togglerandom'));
     });
@@ -1096,6 +1097,7 @@
         loadDefaultPl();
         connectedPlayerClient.pushPlayList();
         $.youtubePlayerConnected = true;
+        $.ytplayer.setClientConnected(true);
     });
 
     /**
@@ -1104,6 +1106,7 @@
     $.bind('yTPlayerDisconnect', function(event) {
         connectedPlayerClient = null;
 
+        $.ytplayer.setClientConnected(false);
         $.consoleLn($.lang.get('ytplayer.console.client.disconnected'));
         if (!songRequestsEnabled) {
             $.say($.lang.get('ytplayer.songrequests.disabled'));
@@ -1193,18 +1196,30 @@
 
             /**
              * @commandpath ytp volume [0-100] - Set volume in player. No value to display current volume.
+             * @commandpath ytp volume [0-100] [+/-] - Set volume in player. +/- raises/lowers by 2. No value to display current volume.
              */
             if (action.equalsIgnoreCase('volume')) {
                 if (!connectedPlayerClient) {
                     $.say($.whisperPrefix(sender) + $.lang.get('ytplayer.client.404'));
                     return;
                 } 
-                if (actionArgs[0] && !isNaN(parseInt(actionArgs[0]))) {
-                    connectedPlayerClient.setVolume(actionArgs[0]);
-                    $.say($.whisperPrefix(sender) + $.lang.get('ytplayer.command.volume.set', actionArgs[0]));
-                } else {
-                    $.say($.whisperPrefix(sender) + $.lang.get('ytplayer.command.volume.get', connectedPlayerClient.getVolume()));
+
+                if (actionArgs[0]) {
+                    if (!isNaN(parseInt(actionArgs[0]))) {
+                        connectedPlayerClient.setVolume(actionArgs[0]);
+                        $.say($.whisperPrefix(sender) + $.lang.get('ytplayer.command.volume.set', actionArgs[0]));
+                        return;
+                    } if (actionArgs[0].equals('+')) {
+                        connectedPlayerClient.setVolume($.getIniDbNumber('ytSettings', 'volume') + 2);
+                        $.say($.whisperPrefix(sender) + $.lang.get('ytplayer.command.volume.set', $.getIniDbNumber('ytSettings', 'volume')));
+                        return;
+                    } if (actionArgs[0].equals('-')) {
+                        connectedPlayerClient.setVolume($.getIniDbNumber('ytSettings', 'volume') - 2);
+                        $.say($.whisperPrefix(sender) + $.lang.get('ytplayer.command.volume.set', $.getIniDbNumber('ytSettings', 'volume')));
+                        return;
+                    } 
                 }
+                $.say($.whisperPrefix(sender) + $.lang.get('ytplayer.command.volume.get', connectedPlayerClient.getVolume()));
                 return;
             }
 
@@ -1604,9 +1619,16 @@
             action = args[0];
             
             if (!action) {
-                currentPlaylist.nextVideo();
-                connectedPlayerClient.pushSongList();
-                return;
+                if ($.systemTime() - lastSkipTime > 1000) {
+                    lastSkipTime = $.systemTime + 10000; // Make sure that no one can skip while we wait to reset the value.
+                    currentPlaylist.nextVideo();
+                    connectedPlayerClient.pushSongList();
+                    lastSkipTime = $.systemTime();
+                    return;
+                } else {
+                    $.say($.whisperPrefix(sender) + $.lang.get('ytplayer.command.skip.delay'));
+                    return;
+                }
             } else {
                 
                 /**

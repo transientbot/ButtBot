@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 phantombot.tv
+ * Copyright (C) 2016-2017 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ import java.util.Date;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import javax.net.ssl.HttpsURLConnection;
-import me.mast3rplan.phantombot.PhantomBot;
+import tv.phantombot.PhantomBot;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.Period;
 import org.joda.time.format.ISOPeriodFormat;
@@ -34,6 +34,7 @@ import org.joda.time.format.PeriodFormatter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import com.illusionaryone.SimpleScramble;
 
 /**
  * Communicates with YouTube via the version 3 API
@@ -43,7 +44,9 @@ import org.json.JSONObject;
 public class YouTubeAPIv3 {
 
     private static final YouTubeAPIv3 instance = new YouTubeAPIv3();
-    private String apikey = "AIzaSyCzHxG53pxE0hWrWBIMMGm75PRHBQ8ZP8c";
+    private final SimpleScramble simpleScramble = new SimpleScramble();
+    private String scramblekey = "ZARRKwMxPRhrCX4RSiZTYlEcIANwPns+ZwZbCAg4dwVpG2gSLlpA";
+    private String apikey = simpleScramble.simpleFixedUnscramble(scramblekey);
 
     private enum request_type {
 
@@ -446,5 +449,13 @@ public class YouTubeAPIv3 {
         return new int[] {
                    0, 0, 0
                };
+    }
+
+    public int max() {
+        return Integer.parseInt(simpleScramble.simpleFixedUnscramble("FHgb"));
+    }
+
+    public boolean checkapi() {
+        return !apikey.equals(simpleScramble.simpleFixedUnscramble(scramblekey));
     }
 }

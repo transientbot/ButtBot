@@ -131,10 +131,11 @@
      * @function resolveRank
      * @export $
      * @param {string} username
+     * @param {boolean} resolveName
      * @returns {string}
      */
     function resolveRank(username) {
-        return (getRank(username.toLowerCase()) + ' ' + $.username.resolve(username)).trim();
+        return (getRank(username.toLowerCase()) + ' ' + ($.username.hasUser(username) == true ? $.username.get(username) : username)).trim();
     }
 
     /**
@@ -337,6 +338,11 @@
                 }
             }
 
+            if ($.inidb.exists('viewerRanks', username.toLowerCase())) {
+                $.say($.lang.get('ranks.rank.customsuccess', username, $.inidb.get('viewerRanks', username.toLowerCase())));
+                return;
+            }
+
             if (ranksTimeTable === undefined) {
                 loadRanksTimeTable();
             }
@@ -352,11 +358,6 @@
                 } else {
                     i = ranksTimeTable.length;
                 }
-            }
-
-            if ($.inidb.exists('viewerRanks', username.toLowerCase())) {
-                $.say($.lang.get('ranks.rank.customsuccess', username, $.inidb.get('viewerRanks', username.toLowerCase())));
-                return;
             }
 
             if (userLevel <= ranksTimeTable.length - 2) {

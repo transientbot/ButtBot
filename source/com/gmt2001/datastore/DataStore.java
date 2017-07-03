@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 phantombot.tv
+ * Copyright (C) 2016-2017 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,6 +63,14 @@ public class DataStore {
     public String[] GetKeysByOrder(String fName, String section, String order, String limit, String offset) {
         return new String[] {
                };
+    }
+    public String[] GetKeysByOrderValue(String fName, String section, String order, String limit, String offset) {
+        return new String[] {
+               };
+    }
+
+    public String GetKeyByValue(String fName, String section, String value) {
+        return "";
     }
 
     public String[] GetKeysByLikeValues(String fName, String section, String search) {

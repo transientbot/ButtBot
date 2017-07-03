@@ -52,7 +52,8 @@
             nonAlphaSeq: /([^a-z0-9 ])(\1+)/ig,
             nonAlphaCount: /([^a-z0-9 ])/ig,
             capsCount: /([A-Z])/g,
-            fakePurge: /(^<message \w+>$)/i
+            meCheck: /^\/me/,
+            fakePurge: new RegExp(/^<message \w+>|^<\w+ deleted>/i)
         };
 
     /**
@@ -119,9 +120,11 @@
      * @info this gets the emote count from the ircv3 tags and the emotes cache if enabled.
      */
     function getEmotesCount(event) {
-        var emotes = event.getTags().get('emotes');
+        var emotes = event.getTags().get('emotes'),
+            matched = emotes.match(patterns.emotes),
+            extraEmotes = $.emotesHandler.getEmotesMatchCount(event.getMessage());
 
-        return ((emotes === null || emotes.match(patterns.emotes) === null ? 0 : (emotes.match(patterns.emotes).length) + $.emotesHandler.getEmotesMatchCount(event.getMessage())));
+        return (matched === null ? extraEmotes : (matched.length + extraEmotes));
     }
 
     /**
@@ -135,7 +138,7 @@
             str = message,
             i;
 
-        if (emotes !== null && emotes.length() > 0) {
+        if (emotes.length() > 0) {
             emotes = emotes.replaceAll('[0-9]+:', '').split('/');
             for (i in emotes) {
                 str = str.replace(getWordAt(message, parseInt(emotes[i].split('-')[0])), '');
@@ -194,7 +197,7 @@
      * @returns {boolean}
      */
     function getFakePurge(event) {
-        return patterns.fakePurge.test(event.getMessage());
+        return patterns.fakePurge.test(event.getMessage().replace(patterns.meCheck, ''));
     }
 
     /** Export functions to API */

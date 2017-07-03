@@ -8,7 +8,8 @@
  * use "$.bind('initReady', FUNCTION);" to execute code after loading all scripts (like registering commands)
  */
 (function() {
-    var modeO = false,
+    var connected = false,
+        modeO = false,
         modules = [],
         hooks = [],
         lastRecon = 0,
@@ -16,6 +17,10 @@
         coolDownMsgEnabled = ($.inidb.exists('settings', 'coolDownMsgEnabled') && $.inidb.get('settings', 'coolDownMsgEnabled').equals('true') ? true : false),
         permComMsgEnabled = ($.inidb.exists('settings', 'permComMsgEnabled') && $.inidb.get('settings', 'permComMsgEnabled').equals('true') ? true : false),
         lastMsg = 0;
+
+    /* Make these null to start */
+    $.session = null;
+    $.channel = null;
 
     /* Reloads the init vars */
     function reloadInit() {
@@ -71,7 +76,7 @@
      * @param {string} message
      */
     function consoleDebug(message) {
-        if (Packages.me.mast3rplan.phantombot.PhantomBot.enableDebugging) {
+        if (Packages.tv.phantombot.PhantomBot.enableDebugging) {
             try {
                 throw new Error('debug');
             } catch (e) {
@@ -136,6 +141,8 @@
                 var script = null,
                     enabled;
 
+                /* Checks if the script was already loaded, if so force reload it. This is used for the lang system. */
+                // $.consoleLn('$api.getScript()::' + $api.getScript($script, scriptFile));
                 if ($api.getScript($script, scriptFile) != null) {
                     script = $api.reloadScriptR($script, scriptFile);
                 } else {
@@ -737,8 +744,8 @@
         // Load core scripts
         loadScript('./core/misc.js');
         loadScript('./core/jsTimers.js');
-        loadScript('./core/chatModerator.js');
         loadScript('./core/updates.js');
+        loadScript('./core/chatModerator.js');
         loadScript('./core/fileSystem.js');
         loadScript('./core/lang.js');
         loadScript('./core/commandPause.js');
@@ -839,8 +846,8 @@
             }
 
             if ($.aliasExists(command) !== undefined) {
-                var ScriptEventManager = Packages.me.mast3rplan.phantombot.script.ScriptEventManager,
-                    CommandEvent = Packages.me.mast3rplan.phantombot.event.command.CommandEvent,
+                var ScriptEventManager = Packages.tv.phantombot.script.ScriptEventManager,
+                    CommandEvent = Packages.tv.phantombot.event.command.CommandEvent,
                     alias = $.getIniDbString('aliases', command),
                     aliasCmd,
                     aliasParams;
@@ -955,6 +962,7 @@
 
             callHook('discordCommand', event, false);
 
+            // Do this last to not slow down the command hook.
             if ($.discord.getCommandCost(command) > 0) {
                 $.discord.decrUserPoints(sender, $.discord.getCommandCost(command));
             }
@@ -1049,41 +1057,6 @@
          */
         $api.on($script, 'ircClearchat', function(event) {
             callHook('ircClearchat', event, false);
-        });
-
-        /**
-         * @event api-musicPlayerConnect
-         */
-        $api.on($script, 'musicPlayerConnect', function(event) {
-            callHook('musicPlayerConnect', event, false);
-        });
-
-        /**
-         * @event api-musicPlayerCurrentId
-         */
-        $api.on($script, 'musicPlayerCurrentId', function(event) {
-            callHook('musicPlayerCurrentId', event, false);
-        });
-
-        /**
-         * @event api-musicPlayerCurrentVolume
-         */
-        $api.on($script, 'musicPlayerCurrentVolume', function(event) {
-            callHook('musicPlayerCurrentVolume', event, false);
-        });
-
-        /**
-         * @event api-musicPlayerDisconnect
-         */
-        $api.on($script, 'musicPlayerDisconnect', function(event) {
-            callHook('musicPlayerDisconnect', event, false);
-        });
-
-        /**
-         * @event api-musicPlayerState
-         */
-        $api.on($script, 'musicPlayerState', function(event) {
-            callHook('musicPlayerState', event, false);
         });
 
         /**
@@ -1269,6 +1242,13 @@
         });
 
         /**
+         * @event api-twitterRetweetEvent
+         */
+        $api.on($script, 'twitterRetweet', function(event) {
+            callHook('twitterRetweet', event, false);
+        });
+
+        /**
          * @event api-twitchOnlineEvent
          */
         $api.on($script, 'twitchOnline', function(event) {
@@ -1430,6 +1410,6 @@
         getHookIndex: getHookIndex
     };
 
-    // Start init
+    // Start init.
     startInit();
 })();

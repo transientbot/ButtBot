@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 phantombot.tv
+ * Copyright (C) 2016-2017 phantombot.tv
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -370,6 +370,25 @@ public class IniStore extends DataStore implements ActionListener {
         String[] retVal = new String[i];
         System.arraycopy(s, 0, retVal, 0, i);
         return retVal;
+    }
+
+    @Override
+    public String GetKeyByValue(String fName, String section, String value) {
+        if (!LoadFile(fName, false)) {
+            return null;
+        }
+
+        section = validateSection(section);
+        Set<String> o = files.get(fName).data.get(section).keySet();
+
+        Iterator<String> it = o.iterator();
+        while (it.hasNext()) {
+            String key = it.next();
+            if (files.get(fName).data.get(section).get(key).toLowerCase().equals(value.toLowerCase())) {
+                return key;
+            }
+        }
+        return null;
     }
 
     @Override

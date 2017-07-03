@@ -1,7 +1,7 @@
 (function() {
     // Pre-build regular expressions.
-    var reCustomAPI = new RegExp(/\(customapi\s([\w\W:\/\$\=\?\&]+)\)/), // URL[1]
-        reCustomAPIJson = new RegExp(/\(customapijson ([\w\.:\/\$=\?\&]+)\s([\w\W]+)\)/), // URL[1], JSONmatch[2..n]
+    var reCustomAPI = new RegExp(/\(customapi\s([\w\W:\/\$\=\?\&\-]+)\)/), // URL[1]
+        reCustomAPIJson = new RegExp(/\(customapijson ([\w\.:\/\$=\?\&\-]+)\s([\w\W]+)\)/), // URL[1], JSONmatch[2..n]
         reCustomAPITextTag = new RegExp(/{([\w\W]+)}/),
         reCommandTag = new RegExp(/\(command\s([\w]+)\)/),
         tagCheck = new RegExp(/\(age\)|\(sender\)|\(@sender\)|\(baresender\)|\(random\)|\(1\)|\(count\)|\(pointname\)|\(currenttime|\(price\)|\(#|\(uptime\)|\(follows\)|\(game\)|\(status\)|\(touser\)|\(echo\)|\(alert [,.\w]+\)|\(readfile|\(1=|\(countdown=|\(downtime\)|\(paycom\)|\(onlineonly\)|\(offlineonly\)|\(code=|\(followage\)|\(gameinfo\)|\(titleinfo\)|\(gameonly=|\(playtime\)|\(gamesplayed\)|\(pointtouser\)|\(lasttip\)|\(writefile .+\)|\(readfilerand|\(commandcostlist\)|\(playsound |\(customapi |\(customapijson /),
@@ -391,6 +391,7 @@
      */
     function apiTags(event, message) {
         var JSONObject = Packages.org.json.JSONObject,
+            JSONArray = Packages.org.json.JSONArray,
             command = event.getCommand(),
             args = event.getArgs(),
             origCustomAPIResponse = '',
@@ -470,15 +471,31 @@
                     } else {
                         for (var i = 0; i < jsonCheckList.length - 1; i++) {
                             if (i == 0) {
-                                jsonObject = new JSONObject(origCustomAPIResponse).getJSONObject(jsonCheckList[i]);
+                                try {
+                                    jsonObject = new JSONObject(origCustomAPIResponse).getJSONObject(jsonCheckList[i]);
+                                } catch (ex) {
+                                    try {
+                                        jsonObject = new JSONArray(origCustomAPIResponse).get(jsonCheckList[i]);
+                                    } catch (ex) {
+                                        return $.lang.get('customcommands.customapijson.err', command);
+                                    }
+                                }
                             } else if (!isNaN(jsonCheckList[i + 1])) {
                                 try {
                                     jsonObject = jsonObject.getJSONArray(jsonCheckList[i]);
                                 } catch (ex) {
-                                    jsonObject = jsonObject.getJSONObject(jsonCheckList[i]);
+                                    try {
+                                        jsonObject = jsonObject.getJSONObject(jsonCheckList[i]);
+                                    } catch (ex) {
+                                        return $.lang.get('customcommands.customapijson.err', command);
+                                    }
                                 }
                             } else {
-                                jsonObject = jsonObject.getJSONObject(jsonCheckList[i]);
+                                try {
+                                    jsonObject = jsonObject.getJSONObject(jsonCheckList[i]);
+                                } catch (ex) {
+                                    return $.lang.get('customcommands.customapijson.err', command);
+                                }
                             }
                         }
                         try {
@@ -503,8 +520,8 @@
         if (message.match(reCommandTag)) {
             commandToExec = message.match(reCommandTag)[1];
             if (commandToExec.length > 0) {
-                var EventBus = Packages.me.mast3rplan.phantombot.event.EventBus;
-                var CommandEvent = Packages.me.mast3rplan.phantombot.event.command.CommandEvent;
+                var EventBus = Packages.tv.phantombot.event.EventBus;
+                var CommandEvent = Packages.tv.phantombot.event.command.CommandEvent;
                 EventBus.instance().post(new CommandEvent(event.getSender(), commandToExec, message.replace(reCommandTag, '')));
                 return null;
             }
