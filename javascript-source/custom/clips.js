@@ -17,6 +17,7 @@
                 message += " - clipped by " + sender;
 
         		$.discord.say('tg-clips', message);
+                $.say ("Yeah, sure, I guess I can add that clip.");
         	}
         }
     });
