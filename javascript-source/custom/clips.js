@@ -18,7 +18,7 @@
 
         		$.discord.say('tg-clips', message);
 
-                var result = Math.floor (Math.random () * 100 + 1);
+                var result = Math.floor (Math.random () * 50 + 1);
                 message = "";
                 switch (result)
                 {
