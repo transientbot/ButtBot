@@ -1,4 +1,4 @@
-$.lang.register('ytplayer.client.404', 'The YouTube Player is not connected!');
+$.lang.register('ytplayer.client.404', 'Song requests are currently disabled!');
 $.lang.register('ytplayer.playlist.404', 'Cannot find playlist [$1]');
 $.lang.register('ytplayer.announce.nextsong', '[\u266B] Now Playing [$1] Requester: $2');
 $.lang.register('ytplayer.console.client.connected', '[\u266B] YouTube Player is connected! [\u266B]');
@@ -34,6 +34,9 @@ $.lang.register('ytplayer.command.stealsong.other.success', '$1 copied the curre
 $.lang.register('ytplayer.command.stealsong.refund', '$1 received a refund of $2 $3 on their song request!');
 $.lang.register('ytplayer.command.stealsong.duplicate', 'Song is already in the playlist!');
 $.lang.register('ytplayer.command.jumptosong.failed', 'Cannot find song at position $1 in playlist.');
+$.lang.register('ytplayer.command.jumptosong.usage', 'usage: !$1 [position number]');
+$.lang.register('ytplayer.command.findsong.failed', 'Cannot find song with a title that contains $1');
+$.lang.register('ytplayer.command.findsong.usage', 'usage: !$1 [search string]. Searches song requests if any exist, else current playlist, for first match.');
 $.lang.register('ytplayer.command.songrequest.usage', 'Usage: !songrequest [YouTube ID | YouTube link | search string]');
 $.lang.register('ytplayer.command.songrequest.success', 'Your song "$1" has been added to the queue (Position: $2 ID: $3)');
 $.lang.register('ytplayer.command.songrequest.failed', 'Failed adding song to queue: $1');

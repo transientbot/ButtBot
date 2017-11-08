@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ScheduledExecutorService;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -52,9 +53,12 @@ import org.java_websocket.drafts.Draft_17;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
+import tv.phantombot.PhantomBot;
+
 public class TwitchWSIRC extends WebSocketClient {
 
     private static final Map<String, TwitchWSIRC> instances = Maps.newHashMap();
+    private final ThreadPoolExecutor threads = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
     private final String channelName;
     private final String login;
     private final String oAuth;
@@ -67,8 +71,8 @@ public class TwitchWSIRC extends WebSocketClient {
     private boolean sentPing = false;
     private boolean pingRequest = false;
 
-    private int sendPingWaitTime = Integer.parseInt(System.getProperty("ircsendpingwait", "480000"));
-    private int pingWaitTime = Integer.parseInt(System.getProperty("ircpingwait", "600000"));
+    private int sendPingWaitTime = Integer.parseInt(System.getProperty("ircsendpingwait", "240000"));
+    private int pingWaitTime = Integer.parseInt(System.getProperty("ircpingwait", "300000"));
 
     /*
      * Creates an instance for a channel.
@@ -163,6 +167,7 @@ public class TwitchWSIRC extends WebSocketClient {
             sslContext.init(null, null, null);
             SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
             this.setSocket(sslSocketFactory.createSocket());
+            this.setTcpNoDelay(PhantomBot.twitch_tcp_nodelay);
             this.twitchWSIRCParser = new TwitchWSIRCParser(this.getConnection(), channelName, channel, session, eventBus);
             this.connect();
             return true;
@@ -209,8 +214,6 @@ public class TwitchWSIRC extends WebSocketClient {
         com.gmt2001.Console.out.println("Lost connection to Twitch WS-IRC. Reconnecting...");
         com.gmt2001.Console.debug.println("Code [" + code + "] Reason [" + reason + "] Remote Hangup [" + remote + "]");
 
-        // Log the reason and code for future debugging.
-        Logger.instance().log(Logger.LogType.Error, "[" + Logger.instance().logTimestamp() + "] [SOCKET] Code [" + code + "] Reason [" + reason + "] Remote Hangup [" + remote + "]");
         this.session.reconnect();
     }
 
@@ -234,21 +237,7 @@ public class TwitchWSIRC extends WebSocketClient {
             return;
         } else {
             try {
-                MessageRunnable messageRunnable = new MessageRunnable(message);
-                Thread thread = new Thread(messageRunnable);
-                thread.start();
-                thread.setName("MessageRunnable-" + thread.getId());
-                long startThreadT = System.currentTimeMillis();
-    
-                while (thread.isAlive()) {
-                    thread.join(2000);
-                    if (((System.currentTimeMillis() - startThreadT) > 10000) && thread.isAlive()) {
-                        thread.interrupt();
-                        thread.join();
-                    }
-                }
-            } catch (InterruptedException ex) {
-                com.gmt2001.Console.debug.println("Interrupted Exception");
+                threads.execute(new MessageRunnable(message));
             } catch (Exception ex) {
                 twitchWSIRCParser.parseData(message);
             }

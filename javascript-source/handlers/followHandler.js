@@ -187,16 +187,14 @@
      * @event initReady
      */
     $.bind('initReady', function() {
-        if ($.bot.isModuleEnabled('./handlers/followHandler.js')) {
-            $.registerChatCommand('./handlers/followHandler.js', 'followreward', 1);
-            $.registerChatCommand('./handlers/followHandler.js', 'followtoggle', 1);
-            $.registerChatCommand('./handlers/followHandler.js', 'followdelay', 1);
-            $.registerChatCommand('./handlers/followHandler.js', 'followmessage', 1);
-            $.registerChatCommand('./handlers/followHandler.js', 'checkfollow', 2);
-            $.registerChatCommand('./handlers/followHandler.js', 'follow', 2);
+        $.registerChatCommand('./handlers/followHandler.js', 'followreward', 1);
+        $.registerChatCommand('./handlers/followHandler.js', 'followtoggle', 1);
+        $.registerChatCommand('./handlers/followHandler.js', 'followdelay', 1);
+        $.registerChatCommand('./handlers/followHandler.js', 'followmessage', 1);
+        $.registerChatCommand('./handlers/followHandler.js', 'checkfollow', 2);
+        $.registerChatCommand('./handlers/followHandler.js', 'follow', 2);
 
-            setInterval(function() { runFollows(); }, 2e3);
-        }
+        setInterval(function() { runFollows(); }, 2e3, 'scripts::handlers::followHandler.js');
     });
 
     $.updateFollowConfig = updateFollowConfig;

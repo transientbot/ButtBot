@@ -4,8 +4,7 @@
  */
 
 (function() {
-    var alreadyStarted = false,
-        interval,
+    var interval,
         follower = false;
 
     /*
@@ -45,6 +44,15 @@
      */
     function updateFollowerCount() {
         $.inidb.set('panelstats', 'followerCount', $.getFollows($.channelName));
+    }
+
+    /*
+     * @function updateCommunities
+     */
+    function updateCommunities() {
+        if ($.twitchCacheReady.equals('true')) {
+            $.inidb.set('streamInfo', 'communities', $.twitchcache.getCommunities().join(', '));
+        }
     }
 
     /*
@@ -122,6 +130,7 @@
         getGamePanel();
         updateChatterCount();
         updateFollowerCount();
+        updateCommunities();
         if ($.twitchCacheReady.equals('true')) { 
             $.setIniDbNumber('panelstats', 'viewCount', $.twitchcache.getViews()); 
         }
@@ -151,16 +160,9 @@
      * set the table as such.
      */
     $.bind('initReady', function() {
-        if (!alreadyStarted) {
-            if ($.bot.isModuleEnabled('./handlers/panelHandler.js')) {
-                alreadyStarted = true;
-                $.inidb.set('panelstats', 'enabled', 'true');
-                 $.getSetIniDbNumber('panelstats', 'timeoutCount', 1);
-                interval = setInterval(function() {  updateAll(); }, 3e4);
-            } else {
-                $.inidb.set('panelstats', 'enabled', 'false');
-            }
-        }
+        $.inidb.set('panelstats', 'enabled', 'true');
+        $.getSetIniDbNumber('panelstats', 'timeoutCount', 1);
+        interval = setInterval(function() {  updateAll(); }, 3e4, 'scripts::handlers::panelHandler.js');
     });
 
     /*

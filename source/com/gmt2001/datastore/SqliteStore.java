@@ -34,7 +34,7 @@ import org.sqlite.SQLiteConfig;
  */
 public class SqliteStore extends DataStore {
 
-    private String dbname = "phantombot.db";
+    private String dbname = "config/phantombot.db";
     private int cache_size = -50000;
     private boolean safe_write = false;
     private boolean journal = true;
@@ -64,6 +64,39 @@ public class SqliteStore extends DataStore {
         connection = (Connection) o[5];
     }
 
+    private String sanitizeOrder(String order) {
+        if (order.equalsIgnoreCase("ASC")) {
+            return "ASC";
+        }
+        return "DESC";
+    }
+
+    private String sanitizeLimit(String limit) {
+        try {
+            int intValue = Integer.parseInt(limit);
+            return String.valueOf(intValue);
+        } catch (NumberFormatException ex) {
+            return String.valueOf(Integer.MAX_VALUE);
+        } catch (NullPointerException ex) {
+            return String.valueOf(Integer.MAX_VALUE);
+        } catch (Exception ex) {
+            return String.valueOf(Integer.MAX_VALUE);
+        }
+    }
+
+     private String sanitizeOffset(String offset) {
+        try {
+            int intValue = Integer.parseInt(offset);
+            return String.valueOf(intValue);
+        } catch (NumberFormatException ex) {
+            return "0";
+        } catch (NullPointerException ex) {
+            return "0";
+        } catch (Exception ex) {
+            return "0";
+        }
+    }
+
     @Override
     public void LoadConfig(String configStr) {
         Object o[] = LoadConfigReal(configStr);
@@ -81,7 +114,7 @@ public class SqliteStore extends DataStore {
             configStr = "sqlite3config.txt";
         }
 
-        String dbname = "phantombot.db";
+        String dbname = "config/phantombot.db";
         int cache_size = -50000;
         boolean safe_write = false;
         boolean journal = true;
@@ -180,7 +213,8 @@ public class SqliteStore extends DataStore {
 
     @Override
     public void AddFile(String fName) {
-        CheckConnection();
+        // "FileExists" already checks the connections.
+        // CheckConnection();
 
         fName = validateFname(fName);
 
@@ -205,7 +239,8 @@ public class SqliteStore extends DataStore {
 
     @Override
     public void RemoveKey(String fName, String section, String key) {
-        CheckConnection();
+        // "FileExists" already checks the connections.
+        // CheckConnection();
 
         fName = validateFname(fName);
 
@@ -223,7 +258,8 @@ public class SqliteStore extends DataStore {
 
     @Override
     public void RemoveSection(String fName, String section) {
-        CheckConnection();
+        // "FileExists" already checks the connections.
+        // CheckConnection();
 
         fName = validateFname(fName);
 
@@ -240,7 +276,8 @@ public class SqliteStore extends DataStore {
 
     @Override
     public void RemoveFile(String fName) {
-        CheckConnection();
+        // "FileExists" already checks the connections.
+        // CheckConnection();
 
         fName = validateFname(fName);
 
@@ -257,7 +294,8 @@ public class SqliteStore extends DataStore {
 
     @Override
     public void RenameFile(String fNameSource, String fNameDest) {
-        CheckConnection();
+        // "FileExists" already checks the connections.
+        // CheckConnection();
 
         fNameSource = validateFname(fNameSource);
         fNameDest = validateFname(fNameDest);
@@ -323,7 +361,8 @@ public class SqliteStore extends DataStore {
 
     @Override
     public String[] GetCategoryList(String fName) {
-        CheckConnection();
+        // "FileExists" already checks the connections.
+        // CheckConnection();
 
         fName = validateFname(fName);
 
@@ -352,7 +391,8 @@ public class SqliteStore extends DataStore {
 
     @Override
     public String[] GetKeyList(String fName, String section) {
-        CheckConnection();
+        // "FileExists" already checks the connections.
+        // CheckConnection();
 
         fName = validateFname(fName);
 
@@ -401,13 +441,29 @@ public class SqliteStore extends DataStore {
 
     @Override
     public String[] GetKeysByOrder(String fName, String section, String order, String limit, String offset) {
-        CheckConnection();
+        return GetKeysByOrderInternal(fName, section, order, limit, offset, false);
+    }
 
+    @Override
+    public String[] GetKeysByNumberOrder(String fName, String section, String order, String limit, String offset) {
+        return GetKeysByOrderInternal(fName, section, order, limit, offset, true);
+    }
+
+    private String[] GetKeysByOrderInternal(String fName, String section, String order, String limit, String offset, boolean isNumber) {
+        String statementStr;
         fName = validateFname(fName);
+        order = sanitizeOrder(order);
+        limit = sanitizeLimit(limit);
+        offset = sanitizeOffset(offset);
 
         if (FileExists(fName)) {
             if (section.length() > 0) {
-                try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " WHERE section=? ORDER BY variable " + order + " LIMIT " + limit + ", " + offset + ";")) {
+                if (isNumber) {
+                    statementStr = "SELECT variable FROM phantombot_" + fName + " WHERE section=? ORDER BY CAST(variable as INTEGER) " + order + " LIMIT " + limit + " OFFSET " + offset + ";";
+                } else {
+                    statementStr = "SELECT variable FROM phantombot_" + fName + " WHERE section=? ORDER BY variable " + order + " LIMIT " + limit + " OFFSET " + offset + ";";
+                }
+                try (PreparedStatement statement = connection.prepareStatement(statementStr)) {
                     statement.setQueryTimeout(10);
                     statement.setString(1, section);
     
@@ -425,7 +481,12 @@ public class SqliteStore extends DataStore {
                     com.gmt2001.Console.err.printStackTrace(ex);
                 }
             } else {
-                try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " ORDER BY variable " + order + " LIMIT " + limit + ", " + offset + ";")) {
+                if (isNumber) {
+                    statementStr = "SELECT variable FROM phantombot_" + fName + " ORDER BY CAST(variable as INTEGER) " + order + " LIMIT " + limit + " OFFSET " + offset + ";";
+                } else {
+                    statementStr = "SELECT variable FROM phantombot_" + fName + " ORDER BY variable " + order + " LIMIT " + limit + " OFFSET " + offset + ";";
+                }
+                try (PreparedStatement statement = connection.prepareStatement(statementStr)) {
                     statement.setQueryTimeout(10);
 
                     try (ResultSet rs = statement.executeQuery()) {
@@ -450,16 +511,33 @@ public class SqliteStore extends DataStore {
 
     @Override
     public String[] GetKeysByOrderValue(String fName, String section, String order, String limit, String offset) {
-        CheckConnection();
+        return GetKeysByOrderValueInternal(fName, section, order, limit, offset, false);
+    }
 
+    @Override
+    public String[] GetKeysByNumberOrderValue(String fName, String section, String order, String limit, String offset) {
+        return GetKeysByOrderValueInternal(fName, section, order, limit, offset, true);
+    }
+
+    private String[] GetKeysByOrderValueInternal(String fName, String section, String order, String limit, String offset, boolean isNumber) {
+        String statementStr;
         fName = validateFname(fName);
+        order = sanitizeOrder(order);
+        limit = sanitizeLimit(limit);
+        offset = sanitizeOffset(offset);
 
         if (FileExists(fName)) {
             if (section.length() > 0) {
-                try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " WHERE section=? ORDER BY value " + order + " LIMIT " + limit + ", " + offset + ";")) {
+                if (isNumber) {
+                    statementStr = "SELECT variable FROM phantombot_" + fName + " WHERE section=? ORDER BY CAST(value as INTEGER) " + order + " LIMIT " + limit + " OFFSET " + offset + ";";
+                } else {
+                    statementStr = "SELECT variable FROM phantombot_" + fName + " WHERE section=? ORDER BY value " + order + " LIMIT " + limit + " OFFSET " + offset + ";";
+                }
+
+                try (PreparedStatement statement = connection.prepareStatement(statementStr)) {
                     statement.setQueryTimeout(10);
                     statement.setString(1, section);
-    
+
                     try (ResultSet rs = statement.executeQuery()) {
     
                         ArrayList<String> s = new ArrayList<>();
@@ -474,7 +552,12 @@ public class SqliteStore extends DataStore {
                     com.gmt2001.Console.err.printStackTrace(ex);
                 }
             } else {
-                try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " ORDER BY value " + order + " LIMIT " + limit + ", " + offset + ";")) {
+                if (isNumber) {
+                    statementStr = "SELECT variable FROM phantombot_" + fName + " ORDER BY CAST(value as INTEGER) " + order + " LIMIT " + limit + " OFFSET " + offset + ";";
+                } else {
+                    statementStr = "SELECT variable FROM phantombot_" + fName + " ORDER BY value " + order + " LIMIT " + limit + " OFFSET " + offset + ";";
+                }
+                try (PreparedStatement statement = connection.prepareStatement(statementStr)) {
                     statement.setQueryTimeout(10);
 
                     try (ResultSet rs = statement.executeQuery()) {
@@ -499,7 +582,8 @@ public class SqliteStore extends DataStore {
 
     @Override
     public String[] GetKeysByLikeValues(String fName, String section, String search) {
-        CheckConnection();
+        // "FileExists" already checks the connections.
+        // CheckConnection();
 
         fName = validateFname(fName);
 
@@ -548,7 +632,8 @@ public class SqliteStore extends DataStore {
 
     @Override
     public String[] GetKeysByLikeKeys(String fName, String section, String search) {
-        CheckConnection();
+        // "FileExists" already checks the connections.
+        // CheckConnection();
 
         fName = validateFname(fName);
 
@@ -597,17 +682,21 @@ public class SqliteStore extends DataStore {
 
     @Override
     public String[] GetKeysByLikeKeysOrder(String fName, String section, String search, String order, String limit, String offset) {
-        CheckConnection();
+        // "FileExists" already checks the connections.
+        // CheckConnection();
 
         fName = validateFname(fName);
+        order = sanitizeOrder(order);
+        limit = sanitizeLimit(limit);
+        offset = sanitizeOffset(offset);
 
         if (FileExists(fName)) { 
             if (section.length() > 0) {
-                try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " WHERE section=? AND variable LIKE ? ORDER BY variable " + order + " LIMIT " + limit + ", " + offset + ";")) {
+                try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " WHERE section=? AND variable LIKE ? ORDER BY variable " + order + " LIMIT " + limit + " OFFSET " + offset + ";")) {
                     statement.setQueryTimeout(10);
                     statement.setString(1, section);
                     statement.setString(2, "%" + search + "%");
-                    
+
                     try (ResultSet rs = statement.executeQuery()) {
                         ArrayList<String> s = new ArrayList<>();
                         
@@ -620,7 +709,7 @@ public class SqliteStore extends DataStore {
                     com.gmt2001.Console.err.printStackTrace(ex);
                 }
             } else {
-                try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " WHERE variable LIKE ? ORDER BY variable " + order + " LIMIT " + limit + ", " + offset + ";")) {
+                try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " WHERE variable LIKE ? ORDER BY variable " + order + " LIMIT " + limit + " OFFSET " + offset + ";")) {
                     statement.setQueryTimeout(10);
                     statement.setString(1, "%" + search + "%");
                     
@@ -646,7 +735,8 @@ public class SqliteStore extends DataStore {
 
     @Override
     public boolean HasKey(String fName, String section, String key) {
-        CheckConnection();
+        // "FileExists" already checks the connections.
+        // CheckConnection();
 
         fName = validateFname(fName);
 
@@ -690,7 +780,8 @@ public class SqliteStore extends DataStore {
 
     @Override
     public String GetKeyByValue(String fName, String section, String value) {
-        CheckConnection();
+        // "FileExists" already checks the connections.
+        // CheckConnection();
 
         String result = null;
 
@@ -737,7 +828,8 @@ public class SqliteStore extends DataStore {
 
     @Override
     public String GetString(String fName, String section, String key) {
-        CheckConnection();
+        // "FileExists" already checks the connections.
+        // CheckConnection();
 
         String result = null;
 
@@ -783,7 +875,8 @@ public class SqliteStore extends DataStore {
 
     @Override
     public void SetBatchString(String fName, String section, String[] keys, String[] values) {
-        CheckConnection();
+        // "AddFile" already checks the connections.
+        // CheckConnection();
 
         fName = validateFname(fName);
         AddFile(fName);
@@ -818,7 +911,8 @@ public class SqliteStore extends DataStore {
 
     @Override
     public void SetString(String fName, String section, String key, String value) {
-        CheckConnection();
+        // "AddFile" already checks the connections.
+        // CheckConnection();
 
         fName = validateFname(fName);
 
@@ -849,7 +943,8 @@ public class SqliteStore extends DataStore {
 
     @Override
     public void InsertString(String fName, String section, String key, String value) {
-        CheckConnection();
+        // "AddFile" already checks the connections.
+        // CheckConnection();
 
         fName = validateFname(fName);
 

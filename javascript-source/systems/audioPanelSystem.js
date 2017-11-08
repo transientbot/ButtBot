@@ -11,7 +11,7 @@
      * @function updateAudioHookDB
      */
     function updateAudioHookDB() {
-        var audioHookFiles = $.findFiles('./web/panel/js/ion-sound/sounds', ''),
+        var audioHookFiles = $.findFiles('./config/audio-hooks/', ''),
             audioHookNames = {},
             dbAudioHookNames,
             reFileExt = new RegExp(/\.mp3$|\.ogg$|\.aac$/);
@@ -301,16 +301,15 @@
      * @event initReady
      */
     $.bind('initReady', function() {
-        if ($.bot.isModuleEnabled('./systems/audioPanelSystem.js')) {
-            $.registerChatCommand('./systems/audioPanelSystem.js', 'reloadaudiopanelhooks', 30);
-            $.registerChatCommand('./systems/audioPanelSystem.js', 'audiohook', 1);
-            $.registerChatSubcommand('audiohook', 'play', 1);
-            $.registerChatSubcommand('audiohook', 'list', 1);
-            $.registerChatSubcommand('audiohook', 'togglemessages', 1);
-            $.registerChatSubcommand('audiohook', 'customcommand', 1);
-            loadAudioHookCommands();
-            updateAudioHookDB();
-        }
+        $.registerChatCommand('./systems/audioPanelSystem.js', 'reloadaudiopanelhooks', 30);
+        $.registerChatCommand('./systems/audioPanelSystem.js', 'audiohook', 1);
+        $.registerChatSubcommand('audiohook', 'play', 1);
+        $.registerChatSubcommand('audiohook', 'list', 1);
+        $.registerChatSubcommand('audiohook', 'togglemessages', 1);
+        $.registerChatSubcommand('audiohook', 'customcommand', 1);
+        
+        loadAudioHookCommands();
+        updateAudioHookDB();
     });
 
     $.loadAudioHookCommands = loadAudioHookCommands;

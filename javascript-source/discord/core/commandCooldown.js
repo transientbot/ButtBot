@@ -141,9 +141,9 @@
     }
 
     /*
-     * @event discordCommand
+     * @event discordChannelCommand
      */
-    $.bind('discordCommand', function(event) {
+    $.bind('discordChannelCommand', function(event) {
         var sender = event.getSender(),
             command = event.getCommand(),
             channel = event.getChannel(),
@@ -211,9 +211,9 @@
     });
 
     /*
-     * @event panelWebSocket
+     * @event webPanelSocketUpdate
      */
-    $.bind('panelWebSocket', function(event) {
+    $.bind('webPanelSocketUpdate', function(event) {
         if (event.getScript().equalsIgnoreCase('./discord/core/commandCoolDown.js')) {
             if (event.getArgs()[0] == 'add') {
                 add(event.getArgs()[1], event.getArgs()[2], event.getArgs()[3].equals('true'));

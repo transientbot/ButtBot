@@ -46,27 +46,79 @@ public class DataStore {
     }
 
     public String[] GetFileList() {
-        return new String[] {
-               };
+        return new String[] { };
     }
 
     public String[] GetCategoryList(String fName) {
-        return new String[] {
-               };
+        return new String[] { };
     }
 
     public String[] GetKeyList(String fName, String section) {
-        return new String[] {
-               };
+        return new String[] { };
+    }
+
+    public String[] GetKeysByOrder(String fName) {
+        return this.GetKeysByOrder(fName, "", "DESC", String.valueOf(Integer.MAX_VALUE), "0");
+    }
+
+    public String[] GetKeysByOrder(String fName, String section) {
+        return this.GetKeysByOrder(fName, section, "DESC", String.valueOf(Integer.MAX_VALUE), "0");
+    }
+
+    public String[] GetKeysByOrder(String fName, String section, String order) {
+        return this.GetKeysByOrder(fName, section, order, String.valueOf(Integer.MAX_VALUE), "0");
     }
 
     public String[] GetKeysByOrder(String fName, String section, String order, String limit, String offset) {
-        return new String[] {
-               };
+        return new String[] { };
     }
+
+    public String[] GetKeysByNumberOrder(String fName) {
+        return this.GetKeysByNumberOrder(fName, "", "DESC", String.valueOf(Integer.MAX_VALUE), "0");
+    }
+
+    public String[] GetKeysByNumberOrder(String fName, String section) {
+        return this.GetKeysByNumberOrder(fName, section, "DESC", String.valueOf(Integer.MAX_VALUE), "0");
+    }
+
+    public String[] GetKeysByNumberOrder(String fName, String section, String order) {
+        return this.GetKeysByNumberOrder(fName, section, order, String.valueOf(Integer.MAX_VALUE), "0");
+    }
+
+    public String[] GetKeysByNumberOrder(String fName, String section, String order, String limit, String offset) {
+        return new String[] { };
+    }
+
+    public String[] GetKeysByOrderValue(String fName) {
+        return this.GetKeysByOrderValue(fName, "", "DESC", String.valueOf(Integer.MAX_VALUE), "0");
+    }
+
+    public String[] GetKeysByOrderValue(String fName, String section) {
+        return this.GetKeysByOrderValue(fName, section, "DESC", String.valueOf(Integer.MAX_VALUE), "0");
+    }
+
+    public String[] GetKeysByOrderValue(String fName, String section, String order) {
+        return this.GetKeysByOrderValue(fName, section, order, String.valueOf(Integer.MAX_VALUE), "0");
+    }
+
     public String[] GetKeysByOrderValue(String fName, String section, String order, String limit, String offset) {
-        return new String[] {
-               };
+        return new String[] { };
+    }
+
+    public String[] GetKeysByNumberOrderValue(String fName) {
+        return this.GetKeysByNumberOrderValue(fName, "", "DESC", String.valueOf(Integer.MAX_VALUE), "0");
+    }
+
+    public String[] GetKeysByNumberOrderValue(String fName, String section) {
+        return this.GetKeysByNumberOrderValue(fName, section, "DESC", String.valueOf(Integer.MAX_VALUE), "0");
+    }
+
+    public String[] GetKeysByNumberOrderValue(String fName, String section, String order) {
+        return this.GetKeysByNumberOrderValue(fName, section, order, String.valueOf(Integer.MAX_VALUE), "0");
+    }
+
+    public String[] GetKeysByNumberOrderValue(String fName, String section, String order, String limit, String offset) {
+        return new String[] { };
     }
 
     public String GetKeyByValue(String fName, String section, String value) {
@@ -74,18 +126,27 @@ public class DataStore {
     }
 
     public String[] GetKeysByLikeValues(String fName, String section, String search) {
-        return new String[] {
-               };
+        return new String[] { };
     }
 
     public String[] GetKeysByLikeKeys(String fName, String section, String search) {
-        return new String[] {
-               };
+        return new String[] { };
+    }
+
+    public String[] GetKeysByLikeKeysOrder(String fName, String search) {
+        return this.GetKeysByLikeKeysOrder(fName, "", search, "DESC", "0", String.valueOf(Integer.MAX_VALUE));
+    }
+
+    public String[] GetKeysByLikeKeysOrder(String fName, String section, String search) {
+        return this.GetKeysByLikeKeysOrder(fName, section, search, "DESC", "0", String.valueOf(Integer.MAX_VALUE));
+    }
+
+    public String[] GetKeysByLikeKeysOrder(String fName, String section, String search, String order) {
+        return this.GetKeysByLikeKeysOrder(fName, "", search, "DESC", "0", String.valueOf(Integer.MAX_VALUE));
     }
 
     public String[] GetKeysByLikeKeysOrder(String fName, String section, String search, String order, String limit, String offset) {
-        return new String[] {
-               };
+        return new String[] { };
     }
 
     public String GetString(String fName, String section, String key) {
@@ -254,6 +315,26 @@ public class DataStore {
 
     public void decr(String fName, String key, int amount) {
         decr(fName, "", key, amount);
+    }
+
+    public void decr(String fName, String key, long amount) {
+        decr(fName, "", key, amount);
+    }
+
+    public void incr(String fName, String section, String key, long amount) {
+        long ival = GetLong(fName, section, key);
+        ival += amount;
+        SetLong(fName, section, key, ival);
+    }
+
+    public void incr(String fName, String key, long amount) {
+        incr(fName, "", key, amount);
+    }
+
+    public void decr(String fName, String section, String key, long amount) {
+        long ival = GetLong(fName, section, key);
+        ival -= amount;
+        SetLong(fName, section, key, ival);
     }
 
     public String[] searchByValue(String fName, String search) {

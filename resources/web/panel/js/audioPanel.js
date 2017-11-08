@@ -117,7 +117,7 @@
                     $(document).ready(function() {
                         ion.sound({
                             sounds: sounds,
-                            path: "/panel/js/ion-sound/sounds/",
+                            path: "/config/audio-hooks/",
                             preload: true,
                             volume: 1.0,
                             ready_callback: ionSoundLoaded,
@@ -140,7 +140,7 @@
             } else {
                 ion.sound({
                     sounds: sounds,
-                    path: "/panel/js/ion-sound/sounds/",
+                    path: "/config/audio-hooks/",
                     preload: true,
                     volume: 1.0,
                     ready_callback: ionSoundLoaded,
@@ -258,7 +258,7 @@
      * @param {String} song
      */
     function deleteBSong(song) {
-        $("#deleteBSong_" + song).html("<i style=\"color: #6136b1\" class=\"fa fa-spinner fa-spin\" />");
+        $("#deleteBSong_" + song).html("<i style=\"color: var(--main-color)\" class=\"fa fa-spinner fa-spin\" />");
         sendDBDelete("audio_bsong_" + song, "ytpBlacklistedSong", song);
         setTimeout(function() { doQuery(); }, TIMEOUT_WAIT_TIME);
     };
@@ -280,7 +280,7 @@
      * @param {String} user
      */
     function deleteUser(user) {
-        $("#deleteBUser_" + user).html("<i style=\"color: #6136b1\" class=\"fa fa-spinner fa-spin\" />");
+        $("#deleteBUser_" + user).html("<i style=\"color: var(--main-color)\" class=\"fa fa-spinner fa-spin\" />");
         sendDBDelete("audio_user_" + user, "ytpBlacklist", user);
         setTimeout(function() { doQuery(); }, TIMEOUT_WAIT_TIME);
     };

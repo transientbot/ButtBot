@@ -33,35 +33,31 @@ public class Script {
     @SuppressWarnings("rawtypes")
     private final List<ScriptDestroyable> destroyables = Lists.newArrayList();
     private final NativeObject vars = new NativeObject();
-    private final ScriptFileWatcher fileWatcher;
     private final File file;
+    private long lastModified;
     private Context context;
     private boolean killed = false;
     private int fileNotFoundCount = 0;
+    private static ScriptableObject scope;
 
     @SuppressWarnings("CallToThreadStartDuringObjectConstruction")
     public Script(File file) {
+        this.file = file;
+        this.lastModified = file.lastModified();
 
         if (PhantomBot.reloadScripts) {
-            this.fileWatcher = new ScriptFileWatcher(this);
+            ScriptFileWatcher.instance().addScript(this);
         } else {
             if (file.getPath().indexOf(System.getProperty("file.separator") + "lang" + System.getProperty("file.separator")) != -1) {
-                this.fileWatcher = new ScriptFileWatcher(this);
-            } else {
-                this.fileWatcher = null;
+                ScriptFileWatcher.instance().addScript(this);
             }
         }
-        this.file = file;
+    }
 
-        if (!file.getName().endsWith(".js") || file.getName().startsWith(".")) {
-            return;
-        }
+    public static String callMethod(String method, String arg) {
+        Object[] obj = new Object[] {arg};
 
-        Thread.setDefaultUncaughtExceptionHandler(com.gmt2001.UncaughtExceptionHandler.instance());
-
-        if (this.fileWatcher != null) {
-            new Thread(fileWatcher, "tv.phantombot.script.ScriptFileWatcher").start();
-        }
+        return scope.callMethod(global, method, obj).toString();
     }
 
     @SuppressWarnings("rawtypes")
@@ -173,7 +169,7 @@ public class Script {
             context.setOptimizationLevel(9);
         }
 
-        ScriptableObject scope = context.initStandardObjects(global, false);
+        scope = context.initStandardObjects(global, false);
         scope.defineProperty("$", global, 0);
         scope.defineProperty("$api", ScriptApi.instance(), 0);
         scope.defineProperty("$script", this, 0);
@@ -216,6 +212,14 @@ public class Script {
 
     public File getFile() {
         return file;
+    }
+
+    public long getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(long lastModified) {
+        this.lastModified = lastModified;
     }
 
     public String getPath() {

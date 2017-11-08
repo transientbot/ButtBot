@@ -13,9 +13,11 @@ var showChat = false;
 var loadedChat = false;
 var volumeSlider = null;
 var progressSlider = null;
+var lastSkipButtonPress = 0;
+var initTimeout = Date.now();
 
 var url = window.location.host.split(":");
-var addr = 'ws://' + url[0] + ':' + getPlayerPort();
+var addr = (getProtocol() == 'https://' ? 'wss://' : 'ws://') + url[0] + ':' + getPlayerPort();
 var connection = new WebSocket(addr, []);
 var currentVolume = 0;
 
@@ -159,21 +161,25 @@ connection.onmessage = function(e) {
 function handlePlayList(d) {
     debugMsg("handlePlayList(" + d + ")");
     $("#playlistTableTitle").html("Current Playlist: " + d['playlistname']);
-    var tableData = "<tr><th /><th>Song Title</th><th>Duration</th><th>YouTube ID</th></tr>";
+    var tableData = "<tr><th /><th>#</th><th>Song Title</th><th>Duration</th><th>YouTube ID</th></tr>";
     for (var i in d['playlist']) {
         var id = d['playlist'][i]['song'];
         var title = d['playlist'][i]['title'];
         var duration = d['playlist'][i]['duration'];
         tableData += "<tr>" +
-                     "<td width=\"15\"><divclass=\"button\" onclick=\"deletePLSong('" + id + "')\"><i class=\"fa fa-trash-o\" /></div></td>" +
-                     "<td>" + title + "</td><td>" + duration + "</td><td>" + id + "</td></tr>";
+                     "    <td width=\"15\"><divclass=\"button\" onclick=\"deletePLSong('" + id + "')\"><i class=\"fa fa-trash-o\" /></div></td>" +
+                     "    <td> " + (parseInt(i) + 1) + "</td>" +
+                     "    <td>" + title + "</td>" +
+                     "    <td>" + duration + "</td>" +
+                     "    <td>" + id + "</td>" +
+                     "</tr>";
     }
     $("#playlistTable").html(tableData);
 }
 
 function handleSongList(d) {
     debugMsg("handleSongList(" + d + ")");
-    var tableData = "<tr><th /><th /><th>Song Title</th><th>Requester</th><th>Duration</th><th>YouTube ID</th></tr>";
+    var tableData = "<tr><th /><th /><th>#</th><th>Song Title</th><th>Requester</th><th>Duration</th><th>YouTube ID</th></tr>";
     for (var i in d['songlist']) {
         var id = d['songlist'][i]['song'];
         var title = d['songlist'][i]['title'];
@@ -181,7 +187,8 @@ function handleSongList(d) {
         var requester = d['songlist'][i]['requester'];
         tableData += "<tr>" +
                      "    <td width=\"15\"><divclass=\"button\" onclick=\"deleteSong('" + id + "')\"><i class=\"fa fa-trash-o\" /></div></td>" +
-                     "    <td width=\"15\"><divclass=\"button\" onclick=\"stealSong('" + id + "')\"><i class=\"fa fa-bookmark\" /></div></td>" +
+                     "    <td width=\"15\"><divclass=\"button\" onclick=\"stealSong('" + id + "', '" + requester + "')\"><i class=\"fa fa-bookmark\" /></div></td>" +
+                     "    <td> " + (parseInt(i) + 1) + "</td>" +
                      "    <td>" + title + "</td>" +
                      "    <td>" + requester + "</td>" +
                      "    <td>" + duration + "</td>" +
@@ -275,12 +282,13 @@ function deletePLSong(id) {
     debugMsg("deleteSong::connection.send(" + JSON.stringify(jsonObject) + ")");
 }
 
-function stealSong(id) {
+function stealSong(id, requester) {
     debugMsg("stealSong()");
     var jsonObject = {};
     jsonObject["command"] = 'stealsong';
     if (id) {
         jsonObject["youTubeID"] = id;
+        jsonObject["requester"] = requester;
     }
     connection.send(JSON.stringify(jsonObject));
     debugMsg("deleteSong::connection.send(" + JSON.stringify(jsonObject) + ")");
@@ -311,10 +319,22 @@ function randomizePlaylist(d) {
 
 function skipSong(d) {
     debugMsg("skipSong()");
+
+    // This is to stop people from spamming the button and cause a loop.
+    if (Date.now() - lastSkipButtonPress < 2500) {
+        newSongAlert('Skipping error', 'You\'re skipping songs too fast!', 'danger', 3000);
+        return;
+    } else if (Date.now() - initTimeout < 5000) { // Skipping before the first songs starts causes a loop.
+        newSongAlert('Skipping error', 'You cannot skip songs right now.', 'danger', 3000);
+        return;
+    }
+
+    lastSkipButtonPress = Date.now();
+
     var jsonObject = {};
     jsonObject["command"] = "skipsong";
     connection.send(JSON.stringify(jsonObject));
-    debugMsg("deleteSong::connection.send(" + JSON.stringify(jsonObject) + ")");
+    debugMsg("deleteSong::connection.send(" + JSON.stringify(jsonObject) + ")"); 
 }
 
 function handlePause(d) {

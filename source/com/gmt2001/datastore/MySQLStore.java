@@ -53,6 +53,39 @@ public class MySQLStore extends DataStore {
         }
     }
 
+    private String sanitizeOrder(String order) {
+        if (order.equalsIgnoreCase("ASC")) {
+            return "ASC";
+        }
+        return "DESC";
+    }
+
+    private String sanitizeLimit(String limit) {
+        try {
+            int intValue = Integer.parseInt(limit);
+            return String.valueOf(intValue);
+        } catch (NumberFormatException ex) {
+            return String.valueOf(Integer.MAX_VALUE);
+        } catch (NullPointerException ex) {
+            return String.valueOf(Integer.MAX_VALUE);
+        } catch (Exception ex) {
+            return String.valueOf(Integer.MAX_VALUE);
+        }
+    }
+
+     private String sanitizeOffset(String offset) {
+        try {
+            int intValue = Integer.parseInt(offset);
+            return String.valueOf(intValue);
+        } catch (NumberFormatException ex) {
+            return "0";
+        } catch (NullPointerException ex) {
+            return "0";
+        } catch (Exception ex) {
+            return "0";
+        }
+    }
+
     @Override
     public Connection CreateConnection(String db, String user, String pass) {
         this.db = db;
@@ -305,15 +338,32 @@ public class MySQLStore extends DataStore {
                };
     }
 
-     @Override
+    @Override
     public String[] GetKeysByOrder(String fName, String section, String order, String limit, String offset) {
-        CheckConnection();
+        return GetKeysByOrderInternal(fName, section, order, limit, offset, false);
+    }
+    @Override
+    public String[] GetKeysByNumberOrder(String fName, String section, String order, String limit, String offset) {
+        return GetKeysByOrderInternal(fName, section, order, limit, offset, true);
+    }
 
+    private String[] GetKeysByOrderInternal(String fName, String section, String order, String limit, String offset, boolean isNumber) {
+        String statementStr;
+
+        CheckConnection();
         fName = validateFname(fName);
+        order = sanitizeOrder(order);
+        limit = sanitizeLimit(limit);
+        offset = sanitizeOffset(offset);
 
         if (FileExists(fName)) {
             if (section.length() > 0) {
-                try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " WHERE section=? ORDER BY variable " + order + " LIMIT " + limit + ", " + offset + ";")) {
+                if (isNumber) {
+                    statementStr = "SELECT variable FROM phantombot_" + fName + " WHERE section=? ORDER BY CAST(variable as UNSIGNED) " + order + "  LIMIT " + limit + " OFFSET " + offset + ";";
+                } else {
+                    statementStr = "SELECT variable FROM phantombot_" + fName + " WHERE section=? ORDER BY variable " + order + "  LIMIT " + limit + " OFFSET " + offset + ";";
+                }
+                try (PreparedStatement statement = connection.prepareStatement(statementStr)) {
                     statement.setQueryTimeout(10);
                     statement.setString(1, section);
     
@@ -331,7 +381,12 @@ public class MySQLStore extends DataStore {
                     com.gmt2001.Console.err.printStackTrace(ex);
                 }
             } else {
-                try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " ORDER BY variable " + order + " LIMIT " + limit + ", " + offset + ";")) {
+                if (isNumber) {
+                    statementStr = "SELECT variable FROM phantombot_" + fName + " ORDER BY CASE(variable as UNSIGNED) " + order + " LIMIT " + limit + " OFFSET " + offset + ";";
+                } else {
+                    statementStr = "SELECT variable FROM phantombot_" + fName + " ORDER BY variable " + order + " LIMIT " + limit + " OFFSET " + offset + ";";
+                }
+                try (PreparedStatement statement = connection.prepareStatement(statementStr)) {
                     statement.setQueryTimeout(10);
 
                     try (ResultSet rs = statement.executeQuery()) {
@@ -356,13 +411,31 @@ public class MySQLStore extends DataStore {
 
     @Override
     public String[] GetKeysByOrderValue(String fName, String section, String order, String limit, String offset) {
-        CheckConnection();
+        return GetKeysByOrderValueInternal(fName, section, order, limit, offset, false);
+    }
 
+    @Override
+    public String[] GetKeysByNumberOrderValue(String fName, String section, String order, String limit, String offset) {
+        return GetKeysByOrderValueInternal(fName, section, order, limit, offset, true);
+    }
+
+    private String[] GetKeysByOrderValueInternal(String fName, String section, String order, String limit, String offset, boolean isNumber) {
+        String statementStr;
+
+        CheckConnection();
         fName = validateFname(fName);
+        order = sanitizeOrder(order);
+        limit = sanitizeLimit(limit);
+        offset = sanitizeOffset(offset);
 
         if (FileExists(fName)) {
             if (section.length() > 0) {
-                try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " WHERE section=? ORDER BY value " + order + " LIMIT " + limit + ", " + offset + ";")) {
+                if (isNumber) {
+                    statementStr = "SELECT variable FROM phantombot_" + fName + " WHERE section=? ORDER BY CAST(value as UNSIGNED) " + order + " LIMIT " + limit + " OFFSET " + offset + ";";
+                } else {
+                    statementStr = "SELECT variable FROM phantombot_" + fName + " WHERE section=? ORDER BY value " + order + " LIMIT " + limit + " OFFSET " + offset + ";";
+                }
+                try (PreparedStatement statement = connection.prepareStatement(statementStr)) {
                     statement.setQueryTimeout(10);
                     statement.setString(1, section);
     
@@ -380,7 +453,12 @@ public class MySQLStore extends DataStore {
                     com.gmt2001.Console.err.printStackTrace(ex);
                 }
             } else {
-                try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " ORDER BY value " + order + " LIMIT " + limit + ", " + offset + ";")) {
+                if (isNumber) {
+                    statementStr = "SELECT variable FROM phantombot_" + fName + " ORDER BY CAST(value as UNSIGNED) " + order + " LIMIT " + limit + " OFFSET " + offset + ";";
+                } else {
+                    statementStr = "SELECT variable FROM phantombot_" + fName + " ORDER BY value " + order + " LIMIT " + limit + " OFFSET " + offset + ";";
+                }
+                try (PreparedStatement statement = connection.prepareStatement(statementStr)) {
                     statement.setQueryTimeout(10);
 
                     try (ResultSet rs = statement.executeQuery()) {
@@ -506,10 +584,13 @@ public class MySQLStore extends DataStore {
         CheckConnection();
 
         fName = validateFname(fName);
+        order = sanitizeOrder(order);
+        limit = sanitizeLimit(limit);
+        offset = sanitizeOffset(offset);
 
         if (FileExists(fName)) { 
             if (section.length() > 0) {
-                try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " WHERE section=? AND variable LIKE ? ORDER BY variable " + order + " LIMIT " + limit + ", " + offset + ";")) {
+                try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " WHERE section=? AND variable LIKE ? ORDER BY variable " + order + " LIMIT " + limit + " OFFSET " + offset + ";")) {
                     statement.setQueryTimeout(10);
                     statement.setString(1, section);
                     statement.setString(2, "%" + search + "%");
@@ -526,7 +607,7 @@ public class MySQLStore extends DataStore {
                     com.gmt2001.Console.err.printStackTrace(ex);
                 }
             } else {
-                try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " WHERE variable LIKE ? ORDER BY variable " + order + " LIMIT " + limit + ", " + offset + ";")) {
+                try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " WHERE variable LIKE ? ORDER BY variable " + order + " LIMIT " + limit + " OFFSET " + offset + ";")) {
                     statement.setQueryTimeout(10);
                     statement.setString(1, "%" + search + "%");
                     

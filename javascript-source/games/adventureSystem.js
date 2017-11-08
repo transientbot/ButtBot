@@ -25,7 +25,7 @@
         tgFunIncr = 1,
         tgExpIncr = 0.5,
         tgFoodDecr = 0.25,
-        currentAdventure = 1,
+        currentAdventure = {},
         stories = [],
         moduleLoaded = false,
         lastStory;
@@ -49,6 +49,11 @@
             chapterId,
             lines;
 
+        currentAdventure.users = [];
+        currentAdventure.survivors = [];
+        currentAdventure.caught = [];
+        currentAdventure.gameState = 0;
+
         stories = [];
 
         for (storyId; $.lang.exists('adventuresystem.stories.' + storyId + '.title'); storyId++) {
@@ -65,6 +70,15 @@
         }
 
         $.consoleDebug($.lang.get('adventuresystem.loaded', storyId - 1));
+
+        for (var i in stories) {
+            if (stories[i].game === null) {
+                return;
+            }
+        }  
+
+        $.log.warn('You must have at least one adventure that doesn\'t require a game to be set.');
+        currentAdventure.gameState = 2;
     };
 
     /**
@@ -223,6 +237,11 @@
      * @returns {boolean}
      */
     function joinHeist(username, bet) {
+        if (stories.length < 1) {
+            $.log.error('No adventures found; cannot start an adventure.');
+            return;
+        }
+
         if (currentAdventure.gameState > 1) {
             if (!warningMessage) return;
             $.say($.whisperPrefix(username) + $.lang.get('adventuresystem.join.notpossible'));
@@ -284,9 +303,11 @@
         currentAdventure.gameState = 2;
         calculateResult();
 
+        var game = $.getGame($.channelName);
+
         for (var i in stories) {
             if (stories[i].game != null) {
-                if (($.twitchcache.getGameTitle() + '').toLowerCase() == stories[i].game.toLowerCase()) {
+                if (game.equalsIgnoreCase(stories[i].game)) {
                     //$.consoleLn('gamespec::' + stories[i].title);
                     temp.push({title: stories[i].title, lines: stories[i].lines});
                 }
@@ -298,7 +319,7 @@
 
         do {
             story = $.randElement(temp);
-        } while (story == lastStory);
+        } while (story == lastStory && stories.length != 1);
 
         $.say($.lang.get('adventuresystem.runstory', story.title, currentAdventure.users.length));
 
@@ -313,7 +334,7 @@
                 clearInterval(t);
             }
             progress++;
-        }, 5e3);
+        }, 7e3);
     };
 
     /**
@@ -495,23 +516,12 @@
      * @event initReady
      */
     $.bind('initReady', function() {
-        if ($.bot.isModuleEnabled('./games/adventureSystem.js')) {
-            clearCurrentAdventure();
-            if (!moduleLoaded) {
-                loadStories();
-                moduleLoaded = true;
-            }
-            $.registerChatCommand('./games/adventureSystem.js', 'adventure', 7);
-            $.registerChatSubcommand('adventure', 'set', 1);
-        }
-    });
+        $.registerChatCommand('./games/adventureSystem.js', 'adventure', 7);
+        $.registerChatSubcommand('adventure', 'set', 1);
+        $.registerChatSubcommand('adventure', 'top5', 3);
 
-    /**
-     * Warn the user if the points system is disabled and this is enabled.
-     */
-    if ($.bot.isModuleEnabled('./games/adventureSystem.js') && !$.bot.isModuleEnabled('./systems/pointSystem.js')) {
-        $.log.warn("Disabled. ./systems/pointSystem.js is not enabled.");
-    }
+        loadStories();
+    });
 
     $.reloadAdventure = reloadAdventure;
 })();

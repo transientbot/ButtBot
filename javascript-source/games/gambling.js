@@ -46,9 +46,8 @@
 			$.say($.lang.get('gambling.lost', $.resolveRank(sender), range, $.getPointsString(amount), $.getPointsString($.getUserPoints(sender) - amount), $.gameMessages.getLose(sender, 'gamble')));
 			$.inidb.decr('points', sender, amount);
 		} else {
-			winSpot = (range - winRange + 1); 
-            winnings = Math.floor(amount + ((amount + winSpot) * gain));
-			$.say($.lang.get('gambling.won', $.resolveRank(sender), range, $.getPointsString(winnings), $.getPointsString($.getUserPoints(sender) + (winnings - amount)), $.gameMessages.getWin(sender, 'gamble')));
+            winnings = Math.floor(amount + (amount * gain));
+			$.say($.lang.get('gambling.won', $.resolveRank(sender), range, $.getPointsString(winnings - amount), $.getPointsString($.getUserPoints(sender) + (winnings - amount)), $.gameMessages.getWin(sender, 'gamble')));
 			$.inidb.decr('points', sender, amount);
 			$.inidb.incr('points', sender, winnings);
 		}
@@ -126,13 +125,11 @@
 	});
 
 	$.bind('initReady', function() {
-        if ($.bot.isModuleEnabled('./games/gambling.js')) {
-        	$.registerChatCommand('./games/gambling.js', 'gamble', 7);
-        	$.registerChatCommand('./games/gambling.js', 'gamblesetmax', 1);
-        	$.registerChatCommand('./games/gambling.js', 'gamblesetmin', 1);
-        	$.registerChatCommand('./games/gambling.js', 'gamblesetwinningrange', 1);
-        	$.registerChatCommand('./games/gambling.js', 'gamblesetgainpercent', 1);
-        }
+        $.registerChatCommand('./games/gambling.js', 'gamble', 7);
+        $.registerChatCommand('./games/gambling.js', 'gamblesetmax', 1);
+        $.registerChatCommand('./games/gambling.js', 'gamblesetmin', 1);
+        $.registerChatCommand('./games/gambling.js', 'gamblesetwinningrange', 1);
+        $.registerChatCommand('./games/gambling.js', 'gamblesetgainpercent', 1);
     });
 
     $.reloadGamble = reloadGamble;

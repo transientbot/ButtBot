@@ -9,8 +9,8 @@
 (function() {
     var defaultCooldownTime = $.getSetIniDbNumber('cooldownSettings', 'defaultCooldownTime', 5),
         modCooldown = $.getSetIniDbBoolean('cooldownSettings', 'modCooldown', false),
-        defaultCooldowns = [],
-        cooldowns = [];
+        defaultCooldowns = {},
+        cooldowns = {};
 
     $.raffleCommand = null;
 
@@ -40,7 +40,7 @@
         for (i in commands) {
             json = JSON.parse($.inidb.get('cooldown', commands[i]));
 
-            cooldowns[commands[i]] = new Cooldown(json.command, json.seconds, (json.isGlobal == true));
+            cooldowns[commands[i]] = new Cooldown(json.command, json.seconds, json.isGlobal.toString().equals('true'));
         }
     }
 
@@ -106,6 +106,40 @@
                 }
             }
         }
+    }
+
+    /*
+     * @function getSecs 
+     *
+     * @export $.coolDown
+     * @param  {String}  command
+     * @param  {String}  username
+     * @return {Number}
+     */
+    function getSecs(username, command) {
+        var cooldown = cooldowns[command];
+
+        if (cooldown !== undefined) {
+            if (cooldown.isGlobal) {
+                if (cooldown.time > $.systemTime()) {
+                    return (cooldown.time - $.systemTime() > 1000 ? Math.floor(((cooldown.time - $.systemTime()) / 1000)) : 1);
+                } else {
+                    return set(command, true, cooldown.seconds, isMod);
+                }
+            } else {
+                if (cooldown.cooldowns[username] !== undefined && cooldown.cooldowns[username] > $.systemTime()) {
+                    return (cooldown.cooldowns[username] - $.systemTime() > 1000 ? Math.floor(((cooldown.cooldowns[username] - $.systemTime()) / 1000)) : 1);
+                } 
+            }
+        } else {
+            if (defaultCooldowns[command] !== undefined && defaultCooldowns[command] > $.systemTime()) {
+                return (defaultCooldowns[command] - $.systemTime() > 1000 ? Math.floor(((defaultCooldowns[command] - $.systemTime()) / 1000)) : 1);
+            } else {
+                return set(command, false, defaultCooldownTime, isMod);
+            }
+        }
+
+        return 0;
     }
 
     /*
@@ -258,9 +292,9 @@
     });
 
     /*
-     * @event panelWebSocket
+     * @event webPanelSocketUpdate
      */
-    $.bind('panelWebSocket', function(event) {
+    $.bind('webPanelSocketUpdate', function(event) {
         if (event.getScript().equalsIgnoreCase('./core/commandCoolDown.js')) {
             if (event.getArgs()[0] == 'add') {
                 add(event.getArgs()[1], event.getArgs()[2], event.getArgs()[3].equals('true'));
@@ -276,6 +310,7 @@
         clear: clear,
         get: get,
         set: set,
-        add: add
+        add: add,
+        getSecs: getSecs
     };
 })();

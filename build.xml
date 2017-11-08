@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="PhantomBot" basedir="." default="dist">
 
-    <!-- To specify a Nightly Build run as ant -Dnightly=nightly_build -->
+    <!-- To specify a Nightly Build run as ant -Dbuildtype=nightly_build -->
+    <!-- To specify a Pre-Release Build run as ant -Dbuildtype=prerelease_build -->
 
     <property environment="env" />
-    <property name="version" value="2.3.7.1" />
+    <property name="version" value="2.3.9.1" />
     <property name="webpanel.version" value="1.1" />
     <property name="src" location="source" />
     <property name="reference" location="libraries" />
@@ -31,22 +32,10 @@
         </fileset>
     </path>
 
-    <condition property="nightly_build" value="true" else="false">
+    <condition property="build_type" value="${buildtype}" else="stable">
         <and>
-            <isset property="nightly" />
-            <length string="${nightly}" trim="yes" length="0" when="greater" />
-            <equals arg1="${nightly}" arg2="nightly_build" />
-        </and>
-    </condition>
-    <condition property="nightly" value="not_nightly">
-        <and>
-            <not>
-                <and>
-                    <isset property="nightly" />
-                    <equals arg1="${nightly}" arg2="nightly_build" />
-                </and>
-            </not>
-            <isfalse value="${nightly_build}" />
+            <isset property="buildtype" />
+            <length string="${buildtype}" trim="yes" length="0" when="greater" />
         </and>
     </condition>
     
@@ -84,13 +73,24 @@
     </target>
 
     <target depends="init,git.revision" name="pre.compile">
-        <echo>${ant.project.name} Version ${version} (${repository.version}) (${nightly})</echo>
+        <echo>${ant.project.name} Version ${version} (${repository.version}) (${build_type})</echo>
         <echo>${ant.project.name} Control Panel Version ${webpanel.version}</echo>
-
         <replaceregexp
             file="source/tv/phantombot/RepoVersion.java"
-            match="nightlyBuild = (.*);"
-            replace="nightlyBuild = ${nightly_build};" />
+            match="repoVersion = &quot;(.*)&quot;;"
+            replace="repoVersion = &quot;${repository.version}&quot;;" />
+        <replaceregexp
+            file="source/tv/phantombot/RepoVersion.java"
+            match="buildType = &quot;(.*)&quot;;"
+            replace="buildType = &quot;${build_type}&quot;;" />
+        <replaceregexp
+            file="source/tv/phantombot/RepoVersion.java"
+            match="phantomBotVersion = &quot;(.*)&quot;;"
+            replace="phantomBotVersion = &quot;${version}&quot;;" />
+            <replaceregexp
+            file="source/tv/phantombot/RepoVersion.java"
+            match="panelVersion = &quot;(.*)&quot;;"
+            replace="panelVersion = &quot;${webpanel.version}&quot;;" />
     </target>
 
     <target depends="pre.compile" name="compile.src">
@@ -119,8 +119,20 @@
     <target name="post.compile">
         <replaceregexp
             file="source/tv/phantombot/RepoVersion.java"
-            match="nightlyBuild = (.*);"
-            replace="nightlyBuild = false;" />
+            match="repoVersion = &quot;(.*)&quot;;"
+            replace="repoVersion = &quot;@repository.version@&quot;;" />
+        <replaceregexp
+            file="source/tv/phantombot/RepoVersion.java"
+            match="buildType = &quot;(.*)&quot;;"
+            replace="buildType = &quot;@buildtype@&quot;;" />
+        <replaceregexp
+            file="source/tv/phantombot/RepoVersion.java"
+            match="phantomBotVersion = &quot;(.*)&quot;;"
+            replace="phantomBotVersion = &quot;@phantombot.version@&quot;;" />
+            <replaceregexp
+            file="source/tv/phantombot/RepoVersion.java"
+            match="panelVersion = &quot;(.*)&quot;;"
+            replace="panelVersion = &quot;@webpanel.version@&quot;;" />
     </target>
 
     <target depends="compile.src,post.compile,git.revision" name="jar">

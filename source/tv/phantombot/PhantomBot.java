@@ -17,6 +17,8 @@
 
 package tv.phantombot;
 
+import com.google.common.eventbus.Subscribe;
+
 import com.gmt2001.Logger;
 import com.gmt2001.datastore.DataStore;
 import com.gmt2001.datastore.IniStore;
@@ -25,8 +27,7 @@ import com.gmt2001.datastore.SqliteStore;
 import com.gmt2001.datastore.H2Store;
 import com.gmt2001.TwitchAPIv5;
 import com.gmt2001.YouTubeAPIv3;
-import com.google.common.eventbus.Subscribe;
-import com.illusionaryone.DiscordAPI;
+
 import com.illusionaryone.GameWispAPIv1;
 import com.illusionaryone.GitHubAPIv3;
 import com.illusionaryone.GoogleURLShortenerAPIv1;
@@ -35,10 +36,13 @@ import com.illusionaryone.SingularityAPI;
 import com.illusionaryone.StreamTipAPI;
 import com.illusionaryone.TwitchAlertsAPIv1;
 import com.illusionaryone.TwitterAPI;
-import com.scaniatv.AnkhConverter;
+import com.illusionaryone.DataRenderServiceAPIv1;
+
 import com.scaniatv.CustomAPI;
 import com.scaniatv.TipeeeStreamAPIv1;
-import com.scaniatv.RevloConverter;
+import com.scaniatv.StreamElementsAPIv1;
+import com.scaniatv.BotImporter;
+import com.scaniatv.GenerateLogs;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -49,6 +53,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.charset.Charset;
 import java.nio.file.StandardOpenOption;
 
 import java.net.BindException;
@@ -60,9 +65,11 @@ import java.text.SimpleDateFormat;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.TimeZone;
@@ -76,16 +83,17 @@ import tv.phantombot.cache.EmotesCache;
 import tv.phantombot.cache.FollowersCache;
 import tv.phantombot.cache.StreamTipCache;
 import tv.phantombot.cache.TipeeeStreamCache;
+import tv.phantombot.cache.StreamElementsCache;
 import tv.phantombot.cache.TwitchCache;
 import tv.phantombot.cache.TwitterCache;
 import tv.phantombot.cache.UsernameCache;
+import tv.phantombot.cache.ViewerListCache;
 import tv.phantombot.console.ConsoleInputListener;
 import tv.phantombot.event.EventBus;
 import tv.phantombot.event.Listener;
-import tv.phantombot.event.bits.BitsEvent;
+import tv.phantombot.event.twitch.bits.BitsEvent;
 import tv.phantombot.event.command.CommandEvent;
 import tv.phantombot.event.console.ConsoleInputEvent;
-import tv.phantombot.event.devcommand.DeveloperCommandEvent;
 import tv.phantombot.event.gamewisp.GameWispAnniversaryEvent;
 import tv.phantombot.event.gamewisp.GameWispSubscribeEvent;
 import tv.phantombot.event.irc.channel.IrcChannelJoinEvent;
@@ -93,28 +101,32 @@ import tv.phantombot.event.irc.channel.IrcChannelUserModeEvent;
 import tv.phantombot.event.irc.complete.IrcJoinCompleteEvent;
 import tv.phantombot.event.irc.message.IrcChannelMessageEvent;
 import tv.phantombot.event.irc.message.IrcPrivateMessageEvent;
-import tv.phantombot.event.subscribers.NewPrimeSubscriberEvent;
-import tv.phantombot.event.subscribers.NewReSubscriberEvent;
-import tv.phantombot.event.subscribers.NewSubscriberEvent;
+import tv.phantombot.event.twitch.subscriber.PrimeSubscriberEvent;
+import tv.phantombot.event.twitch.subscriber.ReSubscriberEvent;
+import tv.phantombot.event.twitch.subscriber.SubscriberEvent;
 import tv.phantombot.event.twitch.follower.TwitchFollowEvent;
 import tv.phantombot.event.twitch.host.TwitchHostedEvent;
 import tv.phantombot.event.twitch.offline.TwitchOfflineEvent;
 import tv.phantombot.event.twitch.online.TwitchOnlineEvent;
+import tv.phantombot.event.twitch.clip.TwitchClipEvent;
 import tv.phantombot.event.twitter.TwitterRetweetEvent;
 import tv.phantombot.httpserver.HTTPServer;
 import tv.phantombot.httpserver.HTTPSServer;
 import tv.phantombot.panel.PanelSocketSecureServer;
 import tv.phantombot.panel.PanelSocketServer;
+import tv.phantombot.panel.NewPanelSocketServer;
 import tv.phantombot.script.Script;
 import tv.phantombot.script.ScriptApi;
 import tv.phantombot.script.ScriptEventManager;
 import tv.phantombot.script.ScriptManager;
+import tv.phantombot.script.ScriptFileWatcher;
 import tv.phantombot.twitchwsirc.Channel;
 import tv.phantombot.twitchwsirc.Session;
 import tv.phantombot.twitchwsirc.TwitchPubSub;
 import tv.phantombot.twitchwsirc.TwitchWSHostIRC;
 import tv.phantombot.ytplayer.YTWebSocketServer;
 import tv.phantombot.ytplayer.YTWebSocketSecureServer;
+import tv.phantombot.discord.DiscordAPI;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
@@ -142,7 +154,10 @@ public final class PhantomBot implements Listener {
     private Boolean webEnabled;
     private Boolean musicEnabled;
     private Boolean useHttps;
+    private Boolean testPanelServer;
     private int basePort;
+    private int ytSocketPort;
+    private int panelSocketPort;
 
     /* SSL information */
     private String httpsPassword = "password";
@@ -182,6 +197,10 @@ public final class PhantomBot implements Listener {
     private String tipeeeStreamOAuth = "";
     private int tipeeeStreamLimit = 5;
 
+    /* StreamElements Information */
+    private String streamElementsJWT = "";
+    private int streamElementsLimit = 5;
+
     /* GameWisp Information */
     private String gameWispOAuth;
     private String gameWispRefresh;
@@ -192,6 +211,10 @@ public final class PhantomBot implements Listener {
     /* Discord Configuration */
     private String discordToken = "";
 
+    /* PhantomBot Commands API Configuration */
+    private String dataRenderServiceAPIToken = "";
+    private String dataRenderServiceAPIURL = "";
+
     /* Caches */
     private FollowersCache followersCache;
     private DonationsCache twitchAlertsCache;
@@ -201,15 +224,19 @@ public final class PhantomBot implements Listener {
     private TwitchCache twitchCache;
     private UsernameCache usernameCache;
     private TipeeeStreamCache tipeeeStreamCache;
+    private ViewerListCache viewerListCache;
+    private StreamElementsCache streamElementCache;
     public static String twitchCacheReady = "false";
 
     /* Socket Servers */
     private YTWebSocketServer youtubeSocketServer;
     private YTWebSocketSecureServer youtubeSocketSecureServer;
     private PanelSocketServer panelSocketServer;
+    private NewPanelSocketServer newPanelSocketServer;
     private PanelSocketSecureServer panelSocketSecureServer;
     private HTTPServer httpServer;
     private HTTPSServer httpsServer;
+    private int socketServerTasksSize;
 
     /* PhantomBot Information */
     private static PhantomBot instance;
@@ -219,6 +246,8 @@ public final class PhantomBot implements Listener {
     public static Boolean enableRhinoDebugger = false;
     public static String timeZone = "GMT";
     public static Boolean useMessageQueue = true;
+    public static Boolean twitch_tcp_nodelay = true;
+    public static Boolean betap = false;
     public Boolean isExiting = false;
     private Boolean interactive;
     private Boolean resetLogin = false;
@@ -267,9 +296,6 @@ public final class PhantomBot implements Listener {
      * @return  String  Display version of PhantomBot.
      */
     public String botVersion() {
-        if (isNightly()) {
-            return "PhantomBot Version: " + RepoVersion.getPhantomBotVersion() + " - Nightly Build";
-        }
         return "PhantomBot Version: " + RepoVersion.getPhantomBotVersion();
     }
 
@@ -340,7 +366,7 @@ public final class PhantomBot implements Listener {
         } catch (IOException e) {
             com.gmt2001.Console.err.println("Port is already in use: " + port);
             com.gmt2001.Console.err.println("Ensure that another copy of PhantomBot is not running.");
-            com.gmt2001.Console.err.println("If another copy is not running, try to change baseport in botlogin.txt");
+            com.gmt2001.Console.err.println("If another copy is not running, try to change baseport in ./config/botlogin.txt");
             com.gmt2001.Console.err.println("PhantomBot will now exit.");
             System.exit(0);
         } finally {
@@ -393,11 +419,15 @@ public final class PhantomBot implements Listener {
         this.youtubeOAuthThro = this.pbProperties.getProperty("ytauthro");
         this.youtubeKey = this.pbProperties.getProperty("youtubekey", "");
         this.basePort = Integer.parseInt(this.pbProperties.getProperty("baseport", "25000"));
+        this.ytSocketPort = Integer.parseInt(this.pbProperties.getProperty("ytsocketport", String.valueOf((this.basePort + 3))));
+        this.panelSocketPort = Integer.parseInt(this.pbProperties.getProperty("panelsocketport", String.valueOf((this.basePort + 4))));
         this.webOAuth = this.pbProperties.getProperty("webauth");
         this.webOAuthThro = this.pbProperties.getProperty("webauthro");
         this.webEnabled = this.pbProperties.getProperty("webenable", "true").equalsIgnoreCase("true");
         this.musicEnabled = this.pbProperties.getProperty("musicenable", "true").equalsIgnoreCase("true");
         this.useHttps = this.pbProperties.getProperty("usehttps", "false").equalsIgnoreCase("true");
+        this.socketServerTasksSize = Integer.parseInt(this.pbProperties.getProperty("wstasksize", "200"));
+        this.testPanelServer = this.pbProperties.getProperty("testpanelserver", "false").equalsIgnoreCase("true");
 
         /* Set the datastore variables */
         this.dataStoreType = this.pbProperties.getProperty("datastore", "");
@@ -430,6 +460,14 @@ public final class PhantomBot implements Listener {
         /* Set the TipeeeStream variables */
         this.tipeeeStreamOAuth = this.pbProperties.getProperty("tipeeestreamkey", "");
         this.tipeeeStreamLimit = Integer.parseInt(this.pbProperties.getProperty("tipeeestreamlimit", "5"));
+
+        /* Set the StreamElements variables */
+        this.streamElementsJWT = this.pbProperties.getProperty("streamelementsjwt", "");
+        this.streamElementsLimit = Integer.parseInt(this.pbProperties.getProperty("streamelementslimit", "5"));
+
+        /* Set the PhantomBot Commands API variables */
+        this.dataRenderServiceAPIToken = this.pbProperties.getProperty("datarenderservicetoken", "");
+        this.dataRenderServiceAPIURL = this.pbProperties.getProperty("datarenderserviceurl", "https://phantombot.illusionaryone.tv");
 
         /* Set the MySql variables */
         this.mySqlName = this.pbProperties.getProperty("mysqlname", "");
@@ -474,6 +512,12 @@ public final class PhantomBot implements Listener {
 
         /* Toggle for the old servers. */
         this.legacyServers = this.pbProperties.getProperty("legacyservers", "false").equalsIgnoreCase("true");
+
+        /* Set the tcp delay toggle. Having this set to true uses a bit more bandwidth but sends messages to Twitch faster. */
+        PhantomBot.twitch_tcp_nodelay = this.pbProperties.getProperty("twitch_tcp_nodelay", "true").equalsIgnoreCase("true");
+
+        /* Setting for scania */
+        PhantomBot.betap = this.pbProperties.getProperty("betap", "false").equalsIgnoreCase("true");
 
         /*
          * Set the message limit for session.java to use, note that Twitch rate limits at 100 messages in 30 seconds
@@ -592,6 +636,18 @@ public final class PhantomBot implements Listener {
             TipeeeStreamAPIv1.instance().SetLimit(tipeeeStreamLimit);
         }
 
+        /* Set the StreamElements JWT token. */
+        if (!streamElementsJWT.isEmpty()) {
+            StreamElementsAPIv1.instance().SetJWT(streamElementsJWT);
+            StreamElementsAPIv1.instance().SetLimit(streamElementsLimit);
+        }
+
+        /* Set the PhantomBot Commands authentication key. */
+        if (!dataRenderServiceAPIToken.isEmpty()) {
+            DataRenderServiceAPIv1.instance().setAPIURL(dataRenderServiceAPIURL);
+            DataRenderServiceAPIv1.instance().setAPIKey(dataRenderServiceAPIToken);
+        }
+
         /* Start things and start loading the scripts. */
         this.init();
 
@@ -609,7 +665,7 @@ public final class PhantomBot implements Listener {
                 java.lang.management.RuntimeMXBean runtime = java.lang.management.ManagementFactory.getRuntimeMXBean();
                 int pid = Integer.parseInt(runtime.getName().split("@")[0]);
 
-                File file = new File("PhantomBot." + this.botName.toLowerCase() + ".pid");
+                File file = new File("PhantomBot." + this.botName + ".pid");
 
                 try (FileOutputStream fs = new FileOutputStream(file, false)) {
                     PrintStream ps = new PrintStream(fs);
@@ -629,6 +685,15 @@ public final class PhantomBot implements Listener {
      */
     public Boolean isNightly() {
         return RepoVersion.getNightlyBuild();
+    }
+
+    /*
+     * Tells you if the build is a pre-release.
+     *
+     * @return {boolean}
+     */
+    public Boolean isPrerelease() {
+        return RepoVersion.getPrereleaseBuild();
     }
 
     /*
@@ -824,56 +889,76 @@ public final class PhantomBot implements Listener {
     }
 
     /*
+     * Method that returns the basic bot info.
+     *
+     * @return {String}
+     */
+    public String getBotInformation() {
+        return "\r\nJava Version: " + System.getProperty("java.runtime.version") + "\r\nOS Version: " + System.getProperty("os.name") + " "
+                + System.getProperty("os.version") + " (" + System.getProperty("os.arch") + ")\r\nPanel Version: " + RepoVersion.getPanelVersion() + "\r\n" + getBotInfo() + "\r\n\r\n";
+    }
+
+    /*
      * Loads everything up.
      */
     private void init() {
         /* Is the web toggle enabled? */
         if (webEnabled) {
             try {
+                checkPortAvailabity(basePort);
+                checkPortAvailabity(panelSocketPort);
+
                 /* Is the music toggled on? */
                 if (musicEnabled) {
-                    checkPortAvailabity(basePort + 3);
+                    checkPortAvailabity(ytSocketPort);
                     if (useHttps) {
                         /* Set the music player server */
-                        youtubeSocketSecureServer = new YTWebSocketSecureServer((basePort + 3), youtubeOAuth, youtubeOAuthThro, httpsFileName, httpsPassword);
+                        youtubeSocketSecureServer = new YTWebSocketSecureServer(ytSocketPort, youtubeOAuth, youtubeOAuthThro, httpsFileName, httpsPassword, socketServerTasksSize);
                         /* Start this youtube socket server */
                         youtubeSocketSecureServer.start();
-                        print("YouTubeSocketSecureServer accepting connections on port: " + (basePort + 3) + " (SSL)");
+                        print("YouTubeSocketSecureServer accepting connections on port: " + ytSocketPort + " (SSL)");
                     } else {
                         /* Set the music player server */
-                        youtubeSocketServer = new YTWebSocketServer((basePort + 3), youtubeOAuth, youtubeOAuthThro);
+                        youtubeSocketServer = new YTWebSocketServer(ytSocketPort, youtubeOAuth, youtubeOAuthThro);
                         /* Start this youtube socket server */
                         youtubeSocketServer.start();
-                        print("YouTubeSocketServer accepting connections on port: " + (basePort + 3));
+                        print("YouTubeSocketServer accepting connections on port: " + ytSocketPort);
                     }
                 }
 
                 if (useHttps) {
-                    checkPortAvailabity(basePort + 4);
-                    checkPortAvailabity(basePort + 5);
-
-                    /* Set up the panel socket server */
-                    panelSocketSecureServer = new PanelSocketSecureServer((basePort + 4), webOAuth, webOAuthThro, httpsFileName, httpsPassword);
-                    /* Start the panel socket server */
-                    panelSocketSecureServer.start();
-                    print("PanelSocketSecureServer accepting connections on port: " + (basePort + 4) + " (SSL)");
+                    if (testPanelServer) {
+                        newPanelSocketServer = new NewPanelSocketServer(panelSocketPort, webOAuth, webOAuthThro, httpsFileName, httpsPassword);
+                        newPanelSocketServer.start();
+                        print("TEST PanelSocketSecureServer accepting connections on port: " + panelSocketPort + " (SSL)");
+                    } else {
+                        /* Set up the panel socket server */
+                        panelSocketSecureServer = new PanelSocketSecureServer(panelSocketPort, webOAuth, webOAuthThro, httpsFileName, httpsPassword, socketServerTasksSize);
+                        /* Start the panel socket server */
+                        panelSocketSecureServer.start();
+                        print("PanelSocketSecureServer accepting connections on port: " + panelSocketPort + " (SSL)");
+                    }
 
                     /* Set up a new https server */
                     httpsServer = new HTTPSServer((basePort), oauth, webOAuth, panelUsername, panelPassword, httpsFileName, httpsPassword);
-                    print("HTTPS server accepting connection on ports: " + basePort + " " + (basePort + 5) + " (SSL)");
+                    print("HTTPS server accepting connection on port: " + basePort + " (SSL)");
                 } else {
-                    checkPortAvailabity(basePort + 4);
-                    checkPortAvailabity(basePort + 5);
-
-                    /* Set up the panel socket server */
-                    panelSocketServer = new PanelSocketServer((basePort + 4), webOAuth, webOAuthThro);
-                    /* Start the panel socket server */
-                    panelSocketServer.start();
-                    print("PanelSocketServer accepting connections on port: " + (basePort + 4));
+                    if (testPanelServer) {
+                        newPanelSocketServer = new NewPanelSocketServer(panelSocketPort, webOAuth, webOAuthThro);
+                        newPanelSocketServer.start();
+                        print("TEST PanelSocketServer accepting connections on port: " + panelSocketPort);
+                    } else {
+                        /* Set up the panel socket server */
+                        panelSocketServer = new PanelSocketServer(panelSocketPort, webOAuth, webOAuthThro);
+                        /* Set up the NEW panel socket server */
+                        /* Start the panel socket server */
+                        panelSocketServer.start();
+                        print("PanelSocketServer accepting connections on port: " + panelSocketPort);
+                    }
 
                     /* Set up a new http server */
                     httpServer = new HTTPServer((basePort), oauth, webOAuth, panelUsername, panelPassword);
-                    print("HTTP server accepting connection on ports: " + basePort + " " + (basePort + 5));
+                    print("HTTP server accepting connection on port: " + basePort);
                 }
             } catch (Exception ex) {
                 print("Exception occurred in one of the socket based services, PhantomBot will now exit.");
@@ -922,10 +1007,10 @@ public final class PhantomBot implements Listener {
         String http = (useHttps ? "https://" : "http://");
 
         try {
-            data += "//Configuration for YTPlayer\r\n";
-            data += "//Automatically Generated by PhantomBot at Startup\r\n";
-            data += "//Do NOT Modify! Overwritten when PhantomBot is restarted!\r\n";
-            data += "var playerPort = " + (basePort + 3) + ";\r\n";
+            data += "// Configuration for YTPlayer\r\n";
+            data += "// Automatically Generated by PhantomBot at Startup\r\n";
+            data += "// Do NOT Modify! Overwritten when PhantomBot is restarted!\r\n";
+            data += "var playerPort = " + ytSocketPort + ";\r\n";
             data += "var channelName = \"" + channelName + "\";\r\n";
             data += "var auth=\"" + youtubeOAuth + "\";\r\n";
             data += "var http=\"" + http + "\";\r\n";
@@ -944,13 +1029,13 @@ public final class PhantomBot implements Listener {
             com.gmt2001.Console.err.printStackTrace(ex);
         }
 
-        /* Create configuration for YTPlayer v2.0 for the WS port. */
+        /* Create configuration for YTPlayer Playlist v2.0 for the WS port. */
         data = "";
         try {
             data += "//Configuration for YTPlayer\r\n";
             data += "//Automatically Generated by PhantomBot at Startup\r\n";
             data += "//Do NOT Modify! Overwritten when PhantomBot is restarted!\r\n";
-            data += "var playerPort = " + (basePort + 3) + ";\r\n";
+            data += "var playerPort = " + ytSocketPort + ";\r\n";
             data += "var channelName = \"" + channelName + "\";\r\n";
             data += "var auth=\"" + youtubeOAuthThro + "\";\r\n";
             data += "var http=\"" + http + "\";\r\n";
@@ -972,11 +1057,11 @@ public final class PhantomBot implements Listener {
         /* Create configuration for WebPanel for the WS port. */
         data = "";
         try {
-            data += "//Configuration for Control Panel\r\n";
-            data += "//Automatically Generated by PhantomBot at Startup\r\n";
-            data += "//Do NOT Modify! Overwritten when PhantomBot is restarted!\r\n";
+            data += "// Configuration for Control Panel\r\n";
+            data += "// Automatically Generated by PhantomBot at Startup\r\n";
+            data += "// Do NOT Modify! Overwritten when PhantomBot is restarted!\r\n";
             data += "var panelSettings = {\r\n";
-            data += "    panelPort   : " + (basePort + 4) + ",\r\n";
+            data += "    panelPort   : " + panelSocketPort + ",\r\n";
             data += "    channelName : \"" + channelName + "\",\r\n";
             data += "    auth        : \"" + webOAuth + "\",\r\n";
             data += "    http        : \"" + http + "\"\r\n";
@@ -999,11 +1084,11 @@ public final class PhantomBot implements Listener {
         /* Create configuration for Read-Only Access to WS port. */
         data = "";
         try {
-            data += "//Configuration for Control Panel\r\n";
-            data += "//Automatically Generated by PhantomBot at Startup\r\n";
-            data += "//Do NOT Modify! Overwritten when PhantomBot is restarted!\r\n";
+            data += "// Configuration for Control Panel\r\n";
+            data += "// Automatically Generated by PhantomBot at Startup\r\n";
+            data += "// Do NOT Modify! Overwritten when PhantomBot is restarted!\r\n";
             data += "var panelSettings = {\r\n";
-            data += "    panelPort   : " + (basePort + 4) + ",\r\n";
+            data += "    panelPort   : " + panelSocketPort + ",\r\n";
             data += "    channelName : \"" + channelName + "\",\r\n";
             data += "    auth        : \"" + webOAuthThro + "\",\r\n";
             data += "    http        : \"" + http + "\"\r\n";
@@ -1042,11 +1127,15 @@ public final class PhantomBot implements Listener {
         Script.global.defineProperty("inidb", dataStore, 0);
         Script.global.defineProperty("username", UsernameCache.instance(), 0);
         Script.global.defineProperty("twitch", TwitchAPIv5.instance(), 0);
-        Script.global.defineProperty("botName", botName, 0);
-        Script.global.defineProperty("channelName", channelName, 0);
-        Script.global.defineProperty("ownerName", ownerName, 0);
+        Script.global.defineProperty("botName", botName.toLowerCase(), 0);
+        Script.global.defineProperty("channelName", channelName.toLowerCase(), 0);
+        Script.global.defineProperty("ownerName", ownerName.toLowerCase(), 0);
         Script.global.defineProperty("ytplayer", (useHttps ? youtubeSocketSecureServer : youtubeSocketServer), 0);
-        Script.global.defineProperty("panelsocketserver", (useHttps ? panelSocketSecureServer : panelSocketServer), 0);
+        if (testPanelServer) {
+            Script.global.defineProperty("panelsocketserver", newPanelSocketServer, 0);
+        } else {
+            Script.global.defineProperty("panelsocketserver", (useHttps ? panelSocketSecureServer : panelSocketServer), 0);
+        }
         Script.global.defineProperty("random", random, 0);
         Script.global.defineProperty("youtube", YouTubeAPIv3.instance(), 0);
         Script.global.defineProperty("shortenURL", GoogleURLShortenerAPIv1.instance(), 0);
@@ -1054,11 +1143,13 @@ public final class PhantomBot implements Listener {
         Script.global.defineProperty("twitter", TwitterAPI.instance(), 0);
         Script.global.defineProperty("twitchCacheReady", PhantomBot.twitchCacheReady, 0);
         Script.global.defineProperty("isNightly", isNightly(), 0);
+        Script.global.defineProperty("isPrerelease", isPrerelease(), 0);
         Script.global.defineProperty("version", botVersion(), 0);
         Script.global.defineProperty("changed", newSetup, 0);
         Script.global.defineProperty("discordAPI", DiscordAPI.instance(), 0);
         Script.global.defineProperty("hasDiscordToken", hasDiscordToken(), 0);
         Script.global.defineProperty("customAPI", CustomAPI.instance(), 0);
+        Script.global.defineProperty("dataRenderServiceAPI", DataRenderServiceAPIv1.instance(), 0);
 
         /* open a new thread for when the bot is exiting */
         Thread thread = new Thread(() -> {
@@ -1075,6 +1166,12 @@ public final class PhantomBot implements Listener {
             com.gmt2001.Console.err.printStackTrace(ex);
         }
 
+        // Moved this to debug only. People are already asking questions.
+        if (PhantomBot.enableDebugging) {
+            /* Check for bot verification. */
+            print("Bot Verification Status: " + (TwitchAPIv5.instance().getBotVerified(this.botName) ? "" : " NOT ") + "Verified.");
+        }
+
         /* Check for a update with PhantomBot */
         doCheckPhantomBotUpdate();
 
@@ -1082,11 +1179,6 @@ public final class PhantomBot implements Listener {
         if (this.backupSQLiteAuto) {
             doBackupSQLiteDB();
         }
-
-        /* Warn the user that the baseport + 5 is being decomissioned. */
-        print("");
-        print("DEPRECATION NOTICE: The web server running on port " + (basePort + 5) + " will be removed in the next release, please start to use port " + basePort + ".");
-        print("");
     }
 
     /*
@@ -1099,22 +1191,39 @@ public final class PhantomBot implements Listener {
         isExiting = true;
 
         print("Stopping all events and message dispatching...");
+        ScriptFileWatcher.instance().kill();
+        ScriptEventManager.instance().kill();
 
         /* Gonna need a way to pass this to all channels */
         if (PhantomBot.getSession(this.channelName) != null) {
-            PhantomBot.getSession(this.channelName).setAllowSendMessages(false);
+            PhantomBot.getSession(this.channelName).kill();
         }
 
         /* Shutdown all caches */
-        print("Terminating the Twitch channel follower cache...");
-        FollowersCache.killall();
-        print("Terminating the Streamlabs cache...");
-        DonationsCache.killall();
-        print("Terminating the StreamTip cache...");
-        StreamTipCache.killall();
+        if (followersCache != null) {
+            print("Terminating the Twitch channel follower cache...");
+            FollowersCache.killall();
+        }
 
-        print("Terminating pending timers...");
-        ScriptApi.instance().kill();
+        if (twitchAlertsCache != null) {
+            print("Terminating the Streamlabs cache...");
+            DonationsCache.killall();
+        }
+
+        if (streamTipCache != null) {
+            print("Terminating the StreamTip cache...");
+            StreamTipCache.killall();
+        }
+
+        if (tipeeeStreamCache != null) {
+            print("Terminating the TipeeeStream cache...");
+            TipeeeStreamCache.killall();
+        }
+
+        if (streamElementCache != null) {
+            print("Terminating the StreamElementsCache cache...");
+            StreamElementsCache.killall();
+        }
 
         print("Terminating all script modules...");
         HashMap<String, Script> scripts = ScriptManager.getScripts();
@@ -1177,15 +1286,11 @@ public final class PhantomBot implements Listener {
         PhantomBot.addChannel(this.chanName, event.getChannel());
         PhantomBot.addSession(this.chanName, this.session);
 
-        /* Say .mods in the channel to check if the bot is a moderator */
-        this.session.saySilent(".mods");
-        /* Start the message timers for this session */
-        this.session.startTimers();
-
         /* Load the caches for each channels */
         this.twitchCache = TwitchCache.instance(this.chanName);
         this.emotesCache = EmotesCache.instance(this.chanName);
         this.followersCache = FollowersCache.instance(this.chanName);
+        this.viewerListCache = ViewerListCache.instance(this.chanName);
         
         /* Start the donations cache if the keys are not null and the module is enabled */
         if (this.twitchAlertsKey != null && !this.twitchAlertsKey.isEmpty() && checkModuleEnabled("./handlers/donationHandler.js")) {
@@ -1202,6 +1307,11 @@ public final class PhantomBot implements Listener {
             this.tipeeeStreamCache = TipeeeStreamCache.instance(this.chanName);
         }
 
+        /* Start the StreamElements cache if the keys are not null and the module is enabled. */
+        if (this.streamElementsJWT != null && !this.streamElementsJWT.isEmpty() && checkModuleEnabled("./handlers/streamElementsHandler.js")) {
+            this.streamElementCache = StreamElementsCache.instance(this.chanName);
+        }
+
         /* Start the twitter cache if the keys are not null and the module is enabled */
         if (this.twitterAuthenticated && checkModuleEnabled("./handlers/twitterHandler.js")) {
             this.twitterCache = TwitterCache.instance(this.chanName);
@@ -1216,6 +1326,12 @@ public final class PhantomBot implements Listener {
         Script.global.defineProperty("twitchcache", this.twitchCache, 0);
         Script.global.defineProperty("emotes", this.emotesCache, 0);
         Script.global.defineProperty("session", this.session, 0);
+        Script.global.defineProperty("usernameCache", this.viewerListCache, 0);
+
+        /* Say .mods in the channel to check if the bot is a moderator */
+        this.session.saySilent(".mods");
+        /* Start the message timers for this session */
+        this.session.startTimers();
     }
 
     /*
@@ -1301,6 +1417,69 @@ public final class PhantomBot implements Listener {
             argument = arguments.split(" ");
         }
 
+        if (message.equalsIgnoreCase("exportpoints")) {
+            print("[CONSOLE] Executing exportpoints, this can take a bit of time.");
+
+            String[] headers = new String[] {"Username", "Seconds", "Points"};
+            String[] keys = dataStore.GetKeyList("points", "");
+            List<String[]> values = new ArrayList<String[]>();
+
+            for (int i = 0; i < keys.length; i++) {
+                String[] str = new String[3];
+                str[0] = keys[i];
+                str[1] = (dataStore.exists("time", keys[i]) ? dataStore.get("time", keys[i]) : "0");
+                str[2] = dataStore.get("points", keys[i]);
+
+                values.add(str);
+            }
+
+            toCSV(headers, values, "points_export.csv");
+            print("[CONSOLE] Points have been exported to points_export.csv");
+        }
+
+        if (message.equalsIgnoreCase("createcmdlist")) {
+        	print("[CONSOLE] Executing createcmdlist, this can take a bit of time.");
+
+        	String[] headers = new String[] {"Command", "Permission", "Module"};
+        	String[] keys = dataStore.GetKeyList("permcom", "");
+        	List<String[]> values = new ArrayList<String[]>();
+
+        	for (int i = 0; i < keys.length; i++) {
+        		String[] str = new String[3];
+        		str[0] = ("!" + keys[i]);
+        		str[1] = dataStore.get("groups", dataStore.get("permcom", keys[i]));
+        		str[2] = Script.callMethod("getCommandScript", (keys[i].contains(" ") ? keys[i].substring(0, keys[i].indexOf(" ")) : keys[i]));
+
+        		// If the module is disabled, return.
+        		if (str[2].contains("Undefined")) {
+        			continue;
+        		}
+        		values.add(str);
+        	}
+
+        	toCSV(headers, values, "command_list.csv");
+            print("[CONSOLE] Command list has been created under command_list.csv");
+        }
+
+        if (message.equalsIgnoreCase("createcustomcmdlist")) {
+        	print("[CONSOLE] Executing createcustomcmdlist, this can take a bit of time.");
+
+        	String[] headers = new String[] {"Command", "Permission"};
+        	String[] keys = dataStore.GetKeyList("command", "");
+        	List<String[]> values = new ArrayList<String[]>();
+
+        	for (int i = 0; i < keys.length; i++) {
+        		String[] str = new String[2];
+        		str[0] = ("!" + keys[i]);
+        		str[1] = dataStore.get("groups", dataStore.get("permcom", keys[i]));
+
+        		values.add(str);
+        	}
+
+        	toCSV(headers, values, "custom_command_list.csv");
+            print("[CONSOLE] Command list has been created under custom_command_list.csv");
+        }
+
         if (message.equalsIgnoreCase("retweettest")) {
             if (argument == null) {
                 com.gmt2001.Console.out.println(">> retweettest requires a Twitter ID (or Twitter IDs)");
@@ -1319,26 +1498,29 @@ public final class PhantomBot implements Listener {
             return;
         }
 
+        if (message.equalsIgnoreCase("botinfo")) {
+            com.gmt2001.Console.out.print(getBotInformation());
+            return;
+        }
+
         if (message.equalsIgnoreCase("revloconvert")) {
             print("[CONSOLE] Executing revloconvert");
             if (arguments.length() > 0) {
-                new RevloConverter(arguments);
+                BotImporter.ImportRevlo(arguments);
+            } else {
+                print("You must specify the file name you want to convert.");
             }
+            return;
         }
 
-        if (message.equalsIgnoreCase("ankhtophantombot")) {
-            print("");
-            print("Not all of AnkhBot's data will be compatible with PhantomBot.");
-            print("This process will take a long time.");
-            print("Are you sure you want to convert AnkhBot's data to PhantomBot? [y/n]");
-            print("");
-            String check = System.console().readLine().trim();
-            if (check.equals("y")) {
-                AnkhConverter.instance();
+        if (message.equalsIgnoreCase("ankhconvert")) {
+            print("[CONSOLE] Executing ankhconvert");
+            if (arguments.length() > 0) {
+                BotImporter.ImportAnkh(arguments);
             } else {
-                print("No changes were made.");
-                return;
+                print("You must specify the file name you want to convert.");
             }
+            return;
         }
 
         if (message.equalsIgnoreCase("backupdb")) {
@@ -1406,7 +1588,7 @@ public final class PhantomBot implements Listener {
         if (message.equalsIgnoreCase("subscribertest")) {
             String randomUser = generateRandomString(10);
             print("[CONSOLE] Executing subscribertest (User: " + randomUser + ")");
-            EventBus.instance().postAsync(new NewSubscriberEvent(PhantomBot.getSession(this.channelName), PhantomBot.getChannel(this.channelName), randomUser));
+            EventBus.instance().postAsync(new SubscriberEvent(PhantomBot.getChannel(this.channelName), randomUser, "1000"));
             return;
         }
 
@@ -1414,7 +1596,7 @@ public final class PhantomBot implements Listener {
         if (message.equalsIgnoreCase("primesubscribertest")) {
             String randomUser = generateRandomString(10);
             print("[CONSOLE] Executing primesubscribertest (User: " + randomUser + ")");
-            EventBus.instance().postAsync(new NewPrimeSubscriberEvent(PhantomBot.getSession(this.channelName), PhantomBot.getChannel(this.channelName), randomUser));
+            EventBus.instance().postAsync(new PrimeSubscriberEvent(PhantomBot.getChannel(this.channelName), randomUser));
             return;
         }
 
@@ -1422,7 +1604,7 @@ public final class PhantomBot implements Listener {
         if (message.equalsIgnoreCase("resubscribertest")) {
             String randomUser = generateRandomString(10);
             print("[CONSOLE] Executing resubscribertest (User: " + randomUser + ")");
-            EventBus.instance().postAsync(new NewReSubscriberEvent(PhantomBot.getSession(this.channelName), PhantomBot.getChannel(this.channelName), randomUser, "10"));
+            EventBus.instance().postAsync(new ReSubscriberEvent(PhantomBot.getChannel(this.channelName), randomUser, "10", "1000"));
             return;
         }
 
@@ -1437,6 +1619,19 @@ public final class PhantomBot implements Listener {
         if (message.equalsIgnoreCase("offlinetest")) {
             print("[CONSOLE] Executing offlinetest");
             EventBus.instance().postAsync(new TwitchOfflineEvent(PhantomBot.getChannel(this.channelName)));
+            return;
+        }
+
+        /* Test the clips event */
+        if (message.equalsIgnoreCase("cliptest")) {
+            String randomUser = "";
+            if (argument == null) {
+                randomUser = generateRandomString(10);
+            } else {
+                randomUser = argument[0];
+            }
+            print("[CONSOLE] Executing cliptest " + randomUser);
+            EventBus.instance().postAsync(new TwitchClipEvent("https://clips.twitch.tv/ThisIsNotARealClipAtAll", randomUser, PhantomBot.getChannel(this.channelName)));
             return;
         }
 
@@ -1470,7 +1665,7 @@ public final class PhantomBot implements Listener {
         /* test the bits event */
         if (message.equalsIgnoreCase("bitstest")) {
             print("[CONSOLE] Executing bitstest");
-            EventBus.instance().postAsync(new BitsEvent(PhantomBot.getSession(this.channelName), PhantomBot.getChannel(this.channelName), this.botName, "100"));
+            EventBus.instance().postAsync(new BitsEvent(PhantomBot.getChannel(this.channelName), this.botName, "100"));
             return;
         }
 
@@ -1486,6 +1681,18 @@ public final class PhantomBot implements Listener {
             print("[CONSOLE] Executing debugoff: Disable Debug Mode");
             PhantomBot.setDebuggingLogOnly(false);
             return;
+        }
+
+        /* Writes the latest logs to a file. */
+        if (message.equalsIgnoreCase("dumplogs")) {
+            print("[CONSOLE] Executing dumplogs");
+            GenerateLogs.writeLogs();
+        }
+
+         /* Prints the latest logs in the console. */
+        if (message.equalsIgnoreCase("printlogs")) {
+            print("[CONSOLE] Executing printlogs");
+            GenerateLogs.printLogs();
         }
 
         /* enables debug mode - log only */
@@ -1708,7 +1915,7 @@ public final class PhantomBot implements Listener {
             };
 
             try {
-                try (FileOutputStream outputStream = new FileOutputStream("botlogin.txt")) {
+                try (FileOutputStream outputStream = new FileOutputStream("./config/botlogin.txt")) {
                     outputProperties.putAll(pbProperties);
                     outputProperties.store(outputStream, "PhantomBot Configuration File");
                 }
@@ -1759,7 +1966,7 @@ public final class PhantomBot implements Listener {
             command = commandString.substring(0, commandString.indexOf(" "));
             arguments = commandString.substring(commandString.indexOf(" ") + 1);
         }
-        ScriptEventManager.instance().runDirect(new CommandEvent(username, command, arguments, null, channel));
+        ScriptEventManager.instance().onEvent(new CommandEvent(username, command, arguments, null, channel));
     }
 
     /* Handle commands */
@@ -1772,7 +1979,7 @@ public final class PhantomBot implements Listener {
             command = commandString.substring(0, commandString.indexOf(" "));
             arguments = commandString.substring(commandString.indexOf(" ") + 1);
         }
-        ScriptEventManager.instance().runDirect(new CommandEvent(username, command, arguments));
+        ScriptEventManager.instance().onEvent(new CommandEvent(username, command, arguments));
     }
 
     /* Handles dev debug commands. */
@@ -1856,7 +2063,6 @@ public final class PhantomBot implements Listener {
                 return;
             }
 
-            ScriptEventManager.instance().runDirect(new DeveloperCommandEvent(sender, command, arguments, id));
             Logger.instance().log(Logger.LogType.Debug, "User: " + sender + " Issued Command: " + command + ". Id: " + id);
             Logger.instance().log(Logger.LogType.Debug, "");
         }
@@ -1896,12 +2102,12 @@ public final class PhantomBot implements Listener {
         }
         sqlite.CloseConnection();
         print("Finished Converting Tables.");
-        print("Moving phantombot.db to phantombot.db.backup");
+        print("Moving ./config/phantombot.db to phantombot.db.backup");
 
         try {
-            FileUtils.moveFile(new java.io.File("phantombot.db"), new java.io.File("phantombot.db.backup"));
+            FileUtils.moveFile(new java.io.File("./config/phantombot.db"), new java.io.File("phantombot.db.backup"));
         } catch (IOException ex) {
-            com.gmt2001.Console.err.println("Failed to move phantombot.db to phantombot.db.backup: " + ex.getMessage());
+            com.gmt2001.Console.err.println("Failed to move ./config/phantombot.db to phantombot.db.backup: " + ex.getMessage());
         }
         print("SQLite to MySQL Conversion is Complete");
     }
@@ -2070,6 +2276,9 @@ public final class PhantomBot implements Listener {
 
     /* Load up main */
     public static void main(String[] args) throws IOException {
+        // Move user files.
+        moveUserConfig();
+
         /* List of properties that must exist. */
         String requiredProperties[] = new String[] { "oauth", "channel", "owner", "user" };
         String requiredPropertiesErrorMessage = "";
@@ -2092,10 +2301,18 @@ public final class PhantomBot implements Listener {
                                         System.getProperty("os.name") + " " + System.getProperty("os.version") +
                                         " (" + System.getProperty("os.arch") + ")");
 
+        /* If prompted, now that the version has been reported, exit. */
+        if (args.length > 0) {
+            if (args[0].equals("--version") || args[0].equals("-v")) {
+                com.gmt2001.Console.out.println("PhantomBot Version: " + RepoVersion.getPhantomBotVersion() + " (" + RepoVersion.getRepoVersion() + ")");
+                System.exit(1);
+            }
+        }
+
         /* Load up the bot info from the bot login file */
         try {
-            if (new File("botlogin.txt").exists()) {
-                FileInputStream inputStream = new FileInputStream("botlogin.txt");
+            if (new File("./config/botlogin.txt").exists()) {
+                FileInputStream inputStream = new FileInputStream("./config/botlogin.txt");
                 startProperties.load(inputStream);
                 inputStream.close();
             } else {
@@ -2105,7 +2322,7 @@ public final class PhantomBot implements Listener {
                 startProperties.setProperty("baseport", "25000");
                 startProperties.setProperty("usehttps", "false");
                 startProperties.setProperty("webenable", "true");
-                startProperties.setProperty("msglimit30", "18.75");
+                startProperties.setProperty("msglimit30", "19.0");
                 startProperties.setProperty("musicenable", "true");
                 startProperties.setProperty("whisperlimit60", "60.0");
             }
@@ -2148,13 +2365,13 @@ public final class PhantomBot implements Listener {
         /* Check to see if there's a webOauth set */
         if (startProperties.getProperty("webauth") == null) {
             startProperties.setProperty("webauth", generateWebAuth());
-            com.gmt2001.Console.debug.println("New webauth key has been generated for botlogin.txt");
+            com.gmt2001.Console.debug.println("New webauth key has been generated for ./config/botlogin.txt");
             changed = true;
         }
         /* Check to see if there's a webOAuthRO set */
         if (startProperties.getProperty("webauthro") == null) {
             startProperties.setProperty("webauthro", generateWebAuth());
-            com.gmt2001.Console.debug.println("New webauth read-only key has been generated for botlogin.txt");
+            com.gmt2001.Console.debug.println("New webauth read-only key has been generated for ./config/botlogin.txt");
             changed = true;
         }
         /* Check to see if there's a panelUsername set */
@@ -2172,13 +2389,13 @@ public final class PhantomBot implements Listener {
         /* Check to see if there's a youtubeOAuth set */
         if (startProperties.getProperty("ytauth") == null) {
             startProperties.setProperty("ytauth", generateWebAuth());
-            com.gmt2001.Console.debug.println("New YouTube websocket key has been generated for botlogin.txt");
+            com.gmt2001.Console.debug.println("New YouTube websocket key has been generated for ./config/botlogin.txt");
             changed = true;
         }
         /* Check to see if there's a youtubeOAuthThro set */
         if (startProperties.getProperty("ytauthro") == null) {
             startProperties.setProperty("ytauthro", generateWebAuth());
-            com.gmt2001.Console.debug.println("New YouTube read-only websocket key has been generated for botlogin.txt");
+            com.gmt2001.Console.debug.println("New YouTube read-only websocket key has been generated for ./config/botlogin.txt");
             changed = true;
         }
 
@@ -2199,7 +2416,7 @@ public final class PhantomBot implements Listener {
                 do {
                     com.gmt2001.Console.out.print("1. Please enter the bot's Twitch username: ");
 
-                    startProperties.setProperty("user", System.console().readLine().trim());
+                    startProperties.setProperty("user", System.console().readLine().trim().toLowerCase());
                 } while (startProperties.getProperty("user", "").length() <= 0);
 
                 // Twitch oauth.
@@ -2252,9 +2469,9 @@ public final class PhantomBot implements Listener {
 
                 com.gmt2001.Console.out.print("\r\n");
                 com.gmt2001.Console.out.print("PhantomBot will launch in 5 seconds.\r\n");
-                com.gmt2001.Console.out.print("If you're hosting the bot locally you can access the panel here: http://localhost:25005/panel \r\n");
+                com.gmt2001.Console.out.print("If you're hosting the bot locally you can access the panel here: http://localhost:25000/panel \r\n");
                 com.gmt2001.Console.out.print("If you're running the bot on a server, make sure to open the following ports: \r\n");
-                com.gmt2001.Console.out.print("25003, 25004, and 25005. You can change 'localhost' to your server ip to access the panel. \r\n");
+                com.gmt2001.Console.out.print("25000, 25003, and 25004. You can change 'localhost' to your server ip to access the panel. \r\n");
 
                 try {
                     Thread.sleep(5000);
@@ -2342,7 +2559,7 @@ public final class PhantomBot implements Listener {
             };
 
             try {
-                try (FileOutputStream outputStream = new FileOutputStream("botlogin.txt")) {
+                try (FileOutputStream outputStream = new FileOutputStream("./config/botlogin.txt")) {
                     outputProperties.putAll(startProperties);
                     outputProperties.store(outputStream, "PhantomBot Configuration File");
                 }
@@ -2370,13 +2587,13 @@ public final class PhantomBot implements Listener {
         pbProperties.setProperty("gamewisprefresh", newTokens[1]);
 
         try {
-            try (FileOutputStream outputStream = new FileOutputStream("botlogin.txt")) {
+            try (FileOutputStream outputStream = new FileOutputStream("./config/botlogin.txt")) {
                 outputProperties.putAll(pbProperties);
                 outputProperties.store(outputStream, "PhantomBot Configuration File");
             }
             print("GameWisp Token has been refreshed.");
         } catch (IOException ex) {
-            com.gmt2001.Console.err.println("!!!! CRITICAL !!!! Failed to update GameWisp Refresh Tokens into botlogin.txt! Must manually add!");
+            com.gmt2001.Console.err.println("!!!! CRITICAL !!!! Failed to update GameWisp Refresh Tokens into ./config/botlogin.txt! Must manually add!");
             com.gmt2001.Console.err.println("!!!! CRITICAL !!!! gamewispauth = " + newTokens[0] + " gamewisprefresh = " + newTokens[1]);
         }
 
@@ -2528,7 +2745,7 @@ public final class PhantomBot implements Listener {
                 Iterator dirIterator = FileUtils.iterateFiles(new File("./dbbackup"), new WildcardFileFilter("phantombot.auto.*"), null);
                 while (dirIterator.hasNext()) {
                     File backupFile = (File) dirIterator.next();
-                    if (FileUtils.isFileOlder(backupFile, System.currentTimeMillis() - (86400000 * backupSQLiteKeepDays))) {
+                    if (FileUtils.isFileOlder(backupFile, (System.currentTimeMillis() / 1000) - (86400 * backupSQLiteKeepDays))) {
                         FileUtils.deleteQuietly(backupFile);
                     }
                 }
@@ -2536,5 +2753,99 @@ public final class PhantomBot implements Listener {
                 com.gmt2001.Console.err.println("Failed to clean up database backup directory: " + ex.getMessage());
             }
         }, 0, backupSQLiteHourFrequency, TimeUnit.HOURS);
+    }
+
+    /*
+     * Method that moves the db and botlogin into a new folder (config)
+     */
+    private static void moveUserConfig() {
+        // Check if the config folder exists.
+        if (!new File("./config/").isDirectory()) {
+            new File("./config/").mkdir();
+        }
+
+        // Move the db and login file. If one of these doesn't exist it means this is a new bot.
+        if (!new File("phantombot.db").exists() || !new File("botlogin.txt").exists()) {
+            return;
+        }
+
+        com.gmt2001.Console.out.println("Moving the phantombot.db and botlogin.txt files into ./config");
+        
+        try {
+            Files.move(Paths.get("botlogin.txt"), Paths.get("./config/botlogin.txt"));
+            Files.move(Paths.get("phantombot.db"), Paths.get("./config/phantombot.db"));
+
+            try {
+                new File("phantombot.db").delete();
+                new File("botlogin.txt").delete();
+            } catch (Exception ex) {
+                com.gmt2001.Console.err.println("Failed to delete files [phantombot.db] [botlogin.txt] [" + ex.getClass().getSimpleName() + "]: " + ex.getMessage());
+            }
+        } catch (Exception ex) {
+            com.gmt2001.Console.err.println("Failed to move files [phantombot.db] [botlogin.txt] [" + ex.getClass().getSimpleName() + "]: " + ex.getMessage());
+        }
+
+        // Move audio hooks and alerts. These two files should always exists.
+        if (!new File("./web/panel/js/ion-sound/sounds").exists() || !new File("./web/alerts/data").exists()) {
+            return;
+        }
+
+        com.gmt2001.Console.out.println("Moving alerts and audio hooks into ./config");
+
+        try {
+            Files.move(Paths.get("./web/panel/js/ion-sound/sounds"), Paths.get("./config/audio-hooks"));
+            Files.move(Paths.get("./web/alerts/data"), Paths.get("./config/gif-alerts"));
+
+            try {
+                FileUtils.deleteDirectory(new File("./web/panel/js/ion-sound/sounds"));
+                FileUtils.deleteDirectory(new File("./web/alerts/data"));
+            } catch (Exception ex) {
+                com.gmt2001.Console.err.println("Failed to delete old audio hooks and alerts [" + ex.getClass().getSimpleName() + "]: " + ex.getMessage());
+            }
+        } catch (Exception ex) {
+            com.gmt2001.Console.err.println("Failed to move audio hooks and alerts [" + ex.getClass().getSimpleName() + "]: " + ex.getMessage());
+        }
+    }
+
+    /*
+     * Method to export a Java list to a csv file.
+     *
+     * @param {String[]} headers
+     * @param {List}     values
+     * @param {String}   fileName
+     */
+    private void toCSV(String[] headers, List<String[]> values, String fileName) {
+        StringBuilder builder = new StringBuilder();
+        FileOutputStream stream = null;
+
+        // Append the headers.
+        builder.append(String.join(",", headers) + "\n");
+    
+        // Append all values.
+        for (String[] value : values) {
+            builder.append(String.join(",", value) + "\n");
+        }
+
+        // Write the data to a file.
+        try {
+            // Create a new stream.
+            stream = new FileOutputStream(new File(fileName));
+
+            // Write the content.
+            stream.write(builder.toString().getBytes(Charset.forName("UTF-8")));
+            stream.flush();
+        } catch (IOException ex) {
+            com.gmt2001.Console.err.println("Failed writing data to file [IOException]: " + ex.getMessage());
+        } catch (SecurityException ex) {
+            com.gmt2001.Console.err.println("Failed writing data to file [SecurityException]: " + ex.getMessage());
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException ex) {
+                    com.gmt2001.Console.err.printStackTrace(ex);
+                }
+            }
+        }
     }
 }

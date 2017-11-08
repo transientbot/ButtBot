@@ -55,9 +55,9 @@
 	}
 
 	/**
-     * @event discordCommand
+     * @event discordChannelCommand
      */
-    $.bind('discordCommand', function(event) {
+    $.bind('discordChannelCommand', function(event) {
     	var sender = event.getSender(),
     		channel = event.getChannel(),
             command = event.getCommand(),
@@ -77,7 +77,7 @@
 				if (twitchName !== null) {
 					gamble(channel, twitchName, mention, sender, parseInt(action));
 				} else {
-					$.discord.discord.say(channel, $.discord.userPrefix(mention) + $.lang.get('discord.accountlink.usage.nolink'));
+					$.discord.say(channel, $.discord.userPrefix(mention) + $.lang.get('discord.accountlink.usage.nolink'));
 				}
 			}
         }
@@ -157,9 +157,9 @@
     });
 
 	/**
-     * @event panelWebSocket
+     * @event webPanelSocketUpdate
      */
-    $.bind('panelWebSocket', function(event) {
+    $.bind('webPanelSocketUpdate', function(event) {
     	if (event.getScript().equalsIgnoreCase('./discord/games/gambling.js')) {
     		reloadGamble();
     	}

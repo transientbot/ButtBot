@@ -5,7 +5,7 @@
  [![Build Status](https://travis-ci.org/PhantomBot/PhantomBot.svg?branch=master)](https://travis-ci.org/PhantomBot/PhantomBot) 
  [<img src="https://discordapp.com/api/guilds/107910097937682432/widget.png?style=shield">](https://discord.gg/Xdh5SRY)
 
-[**PhantomBot**](https://phantombot.tv) is a Twitch chat bot powered by Java. PhantomBot has many modern features out of the box such as a built-in webpanel, enhanced moderation, games, a point system, raffles, custom commands, a music player, [and more](https://phantombot.tv/features)! PhantomBot can also be integrated with many services such as [Discord](https://discordapp.com/), [Twitter](https://twitter.com), [GameWisp](https://gamewisp.com), [StreamTip](https://streamtip.com), [TipeeeStream](https://tipeeestream.com) and [StreamLabs](https://streamlabs.com)!
+[**PhantomBot**](https://phantombot.tv) is a Twitch chat bot powered by Java. PhantomBot has many modern features out of the box such as a built-in webpanel, enhanced moderation, games, a point system, raffles, custom commands, a music player, [and more](https://phantombot.tv/features)! PhantomBot can also be integrated with many services such as [Discord](https://discordapp.com/), [Twitter](https://twitter.com), [GameWisp](https://gamewisp.com), [StreamTip](https://streamtip.com), [TipeeeStream](https://tipeeestream.com), [StreamLabs](https://streamlabs.com) and [StreamElements](https://streamelements.com)!
 
 Additional functionality is enabled through the use of third-party modules.
 
@@ -14,7 +14,7 @@ Additional functionality is enabled through the use of third-party modules.
 * [Community Forums](https://community.phantombot.tv)
 * [Documentation & Installation Instructions](https://docs.phantombot.tv)
 * [PhantomBot Blog](https://blog.phantombot.tv)
-* [Follow us on Twitter](https://www.twitter.com/PhantomBotApp/ "PhantomBot Twitter")
+* [Follow us on Twitter](https://www.twitter.com/PhantomBotApp "PhantomBot Twitter")
 
 ## Screenshots
 
@@ -37,9 +37,11 @@ PhantomBot requires the following software to be installed:
 
 ## Installation
 Please refer to platform-specific installation documentation.
-* [Windows](https://docs.phantombot.tv/kb/setup-guide-windows)
-* [Linux](https://docs.phantombot.tv/kb/linux)
-* [macOS](https://docs.phantombot.tv/kb/macos)
+* [Windows](https://community.phantombot.tv/t/windows-setup-guide/60)
+* Linux:
+  * [Ubuntu 16.04](https://community.phantombot.tv/t/ubuntu-16-04-lts-setup-guide/61)
+  * [CentOS 7](https://community.phantombot.tv/t/centos-7-setup-guide/62)
+* [macOS](https://community.phantombot.tv/t/macos-setup-guide/63)
 
 ## Upgrading PhantomBot
 

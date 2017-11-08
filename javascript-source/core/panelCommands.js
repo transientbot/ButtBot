@@ -9,13 +9,6 @@
             args = event.getArgs(),
             action = args[0];
 
-        /* Reloads the init vars */
-        if (command.equalsIgnoreCase('reloadinit')) {
-            if (!$.isBot(sender)) {
-                return;
-            }
-            $.reloadInit();
-        }
 
         /* reloads the betting vars */
         if (command.equalsIgnoreCase('reloadbet')) {
@@ -45,6 +38,16 @@
                 return;
             }
             $.reloadTipeeeStream();
+        }
+
+         /*
+         * Reloads the streamelements vars.
+         */
+        if (command.equalsIgnoreCase('streamelementsreload')) {
+            if (!$.isBot(sender)) {
+                return;
+            }
+            $.reloadStreamElements();
         }
 
         /*
@@ -186,6 +189,18 @@
             $.updateGame($.channelName, argsString, sender, true);
             return;
         }
+
+        /*
+         * Sets the community on stream
+         */
+        if (command.equalsIgnoreCase('setcommunitysilent')) {
+            if (!$.isBot(sender)) {
+                return;
+            }
+            var argsString = args.join(' ').split(', ');
+            $.updateCommunity($.channelName, argsString, sender, true);
+            return;
+        } 
 
         /*
          * Reloads the adventure variables.
@@ -496,6 +511,8 @@
             $.registerChatCommand('./core/panelCommands.js', 'reloadbet', 30);
             $.registerChatCommand('./core/panelCommands.js', 'tipeeestreamreload', 30);
             $.registerChatCommand('./core/panelCommands.js', 'reloadidle', 30);
+            $.registerChatCommand('./core/panelCommands.js', 'streamelementsreload', 30);
+            $.registerChatCommand('./core/panelCommands.js', 'setcommunitysilent', 30);
         }, 10000);
     });
 })();

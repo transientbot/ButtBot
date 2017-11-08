@@ -90,6 +90,29 @@ public class HTTPServerCommon {
         }
     }
 
+    public static void handleBetaPanel(HttpExchange exchange) throws IOException {
+        URI uriData = exchange.getRequestURI();
+        String uriPath = uriData.getPath();
+
+        // Get the Request Method (GET/PUT)
+        String requestMethod = exchange.getRequestMethod();
+
+        // Get any data from the body, although, we just discard it, this is required
+        InputStream inputStream = exchange.getRequestBody();
+        while (inputStream.read() != -1) {
+            inputStream.skip(0x10000);
+        }
+        inputStream.close();
+
+        if (requestMethod.equals("GET")) {
+            if (uriPath.equals("/beta-panel")) {
+                HTTPServerCommon.handleFile("/web/beta-panel/index.html", exchange, false, false);
+            } else {
+                HTTPServerCommon.handleFile("/web/" + uriPath, exchange, false, false);
+            }
+        }
+    }
+
     public static void handle(HttpExchange exchange, String serverPassword, String serverWebAuth) throws IOException {
         Boolean hasPassword = false;
         Boolean doRefresh = false;
@@ -140,6 +163,8 @@ public class HTTPServerCommon {
         }
         if (headers.containsKey("message")) {
             myHdrMessage = headers.getFirst("message");
+            byte[] myHdrMessageBytes = myHdrMessage.getBytes(StandardCharsets.ISO_8859_1);
+            myHdrMessage = new String(myHdrMessageBytes, StandardCharsets.UTF_8);
         }
 
         // Check the uriQueryList for the webauth
@@ -194,6 +219,10 @@ public class HTTPServerCommon {
                 handleFile("/web/index.html", exchange, hasPassword, false);
             } else if (uriPath.equals("/alerts")) {
                 handleFile("/web/alerts/index.html", exchange, hasPassword, false);
+            } else if (uriPath.startsWith("/config/audio-hooks")) {
+                handleFile(uriPath, exchange, hasPassword, false);
+            } else if (uriPath.startsWith("/config/gif-alerts")) {
+                handleFile(uriPath, exchange, hasPassword, false);
             } else {
                 handleFile("/web" + uriPath, exchange, hasPassword, false);
             }
@@ -206,10 +235,19 @@ public class HTTPServerCommon {
 
     /* Query List:
      *
-     * table=tableName&getKeys       - Get list of keys.
-     * table=tableName&getData=key   - Get a specific row of data.
-     * table=tableName&tableExists   - Return if the table exists or not.
-     * table=tableName&keyExists=key - Return if a key exists in a table or not.
+     * table=tableName&getKeys                             - Get list of keys.
+     * table=tableName&getData=key                         - Get a specific row of data.
+     * table=tableName&tableExists                         - Return if the table exists or not.
+     * table=tableName&keyExists=key                       - Return if a key exists in a table or not.
+     * table=tableName&getAllRows                          - Get all rows from a table.
+     * table=tableName&getSortedRows                       - Get all rows sorted from a table.
+     * table=tableName&getSortedRowsByValue                - Get all rows sorted from a table.
+     * table=tableName&getSortedRows&order=DESC|ASC        - Options for getSortedRows, any combination may be used.
+     * table=tableName&getSortedRows&limit=n
+     * table=tableName&getSortedRows&offset=n
+     * table=tableName&getSortedRowsByValue&order=DESC|ASC
+     * table=tableName&getSortedRowsByValue&limit=n
+     * table=tableName&getSortedRowsByValue&offset=n
      */
     private static void handleDBQuery(String uriPath, String[] uriQueryList, HttpExchange exchange, Boolean hasPassword) {
         JSONStringer jsonObject = new JSONStringer();
@@ -332,7 +370,73 @@ public class HTTPServerCommon {
                 sendData("text/text", jsonObject.toString(), exchange);
                 return;
             }
+
+            // getAllRows and getSortedRows return data in the following format:  
+            // { "table" : { "table_name": "tableName", "results" : [ "key" : "keyString", "value" : "valueString" ] } }
+            if (keyValue[0].equals("getAllRows") || keyValue[0].equals("getSortedRows") || keyValue[0].equals("getSortedRowsByValue")) {
+
+                // Set the default values for the sort options.
+                String sortOrder = "DESC";
+                String sortLimit = String.valueOf(Integer.MAX_VALUE);
+                String sortOffset = "0";
+              
+                String[] dbKeys = null;
+                jsonObject.object();
+                jsonObject.key("table");
+                jsonObject.object();
+                jsonObject.key("table_name").value(dbTable);
+                jsonObject.key("results").array();
+
+                if (keyValue[0].equals("getAllRows")) {
+                    dbKeys = PhantomBot.instance().getDataStore().GetKeyList(dbTable, "");
+                } else {
+                    for (String sortOptions : uriQueryList) {
+                        String[] sortOption = sortOptions.split("=");
+
+                        if (sortOption[0].equals("order")) {
+                            if (sortOption[1].equalsIgnoreCase("asc")) {
+                                sortOrder = "ASC";
+                            } else if (sortOption[1].equalsIgnoreCase("desc")) {
+                                sortOrder = "DESC";
+                            }
+                        }
+
+                        if (sortOption[0].equals("limit")) {
+                            if (sortOption[1] != null) {
+                                sortLimit = sortOption[1];
+                            }
+                        }
+
+                        if (sortOption[0].equals("offset")) {
+                            if (sortOption[1] != null) {
+                                sortOffset = sortOption[1];
+                            }
+                        }
+                    }
+
+                    if (keyValue[0].equals("getSortedRows")) {
+                        dbKeys = PhantomBot.instance().getDataStore().GetKeysByOrder(dbTable, "", sortOrder, sortLimit, sortOffset);
+                    } else {
+                        dbKeys = PhantomBot.instance().getDataStore().GetKeysByOrderValue(dbTable, "", sortOrder, sortLimit, sortOffset);
+                    }
+
+                }
+
+                for (String dbKey : dbKeys) {
+                    jsonObject.object();
+                    jsonObject.key("key").value(dbKey);
+                    jsonObject.key("value").value(PhantomBot.instance().getDataStore().GetString(dbTable, "", dbKey));
+                    jsonObject.endObject();
+                }
+                jsonObject.endArray();
+                jsonObject.endObject();
+                jsonObject.endObject();
+                sendData("text/text", jsonObject.toString(), exchange);
+                return;
+            }
+
         }
+       
         jsonObject.object().key("error").value("malformed request").endObject();
         sendHTMLError(400, jsonObject.toString(), exchange);
         return;

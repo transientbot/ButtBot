@@ -18,8 +18,8 @@
 	 */
 	function reloadBet() {
 		gain = $.getIniDbNumber('bettingSettings', 'gain');
-	    saveBets = $.getIniDbNumber('bettingSettings', 'save');
-	    saveFormat = $.getIniDbNumber('bettingSettings', 'format');
+	    saveBets = $.getIniDbBoolean('bettingSettings', 'save');
+	    saveFormat = $.getIniDbString('bettingSettings', 'format');
 	}
 
 	/**
@@ -57,7 +57,7 @@
 		
 		if (timer !== undefined && !isNaN(parseInt(timer)) && timer > 0) {
 			bet.timer = timer;
-			setTimeout(function() {
+			timeout = setTimeout(function() {
 				stop();
 			}, timer * 6e4);
 		}
@@ -109,7 +109,7 @@
 		for (i in bets) {
 			if (bets[i].option.equalsIgnoreCase(option)) {
 				winners.push(i.toLowerCase());
-				give = ((bet.total * parseFloat(gain / 100)) + parseInt(bets[i].amount));
+				give = (((bet.total / bet.options[option].bets) * parseFloat(gain / 100)) + parseInt(bets[i].amount));
 				total += give;
 				$.inidb.incr('points', i.toLowerCase(), Math.floor(give));
 			}
@@ -256,7 +256,7 @@
 			 * @commandpath bet close ["winning option"] - Closes the current bet.
 			 */
 			} else if (action.equalsIgnoreCase('close')) {
-				close(sender, args.slice(1).join(' ').toLowerCase());
+				close(sender, (args[0] === undefined ? undefined : args.slice(1).join(' ').toLowerCase().trim()));
 				return;
 
 			/**
@@ -330,10 +330,10 @@
 				return;
 
 			/**
-			 * @commandpath bet [amount] [option] - Bets on the option.
+			 * @commandpath bet [amount] [option] - Bets on that option.
 			 */
 			} else {
-				vote(sender, args[0], args.splice(1).join(' ').toLowerCase());
+				vote(sender, args[0], args.splice(1).join(' ').toLowerCase().trim());
 			}
 		}
 	});
@@ -342,16 +342,14 @@
 	 * @event initReady
 	 */
 	$.bind('initReady', function() {
-        if ($.bot.isModuleEnabled('./systems/bettingSystem.js')) {
-            $.registerChatCommand('./systems/bettingSystem.js', 'bet', 7);
-            $.registerChatSubcommand('bet', 'current', 7);
-            $.registerChatSubcommand('bet', 'results', 7);
-            $.registerChatSubcommand('bet', 'open', 2);
-            $.registerChatSubcommand('bet', 'close', 2);
-            $.registerChatSubcommand('bet', 'save', 1);
-            $.registerChatSubcommand('bet', 'saveformat', 1);
-            $.registerChatSubcommand('bet', 'gain', 1);
-        }
+        $.registerChatCommand('./systems/bettingSystem.js', 'bet', 7);
+        $.registerChatSubcommand('bet', 'current', 7);
+        $.registerChatSubcommand('bet', 'results', 7);
+        $.registerChatSubcommand('bet', 'open', 2);
+        $.registerChatSubcommand('bet', 'close', 2);
+        $.registerChatSubcommand('bet', 'save', 1);
+        $.registerChatSubcommand('bet', 'saveformat', 1);
+        $.registerChatSubcommand('bet', 'gain', 1);
     });
 
     /* export to the $ api */

@@ -11,7 +11,9 @@
  * 	- Make sure to comment on every function what their name is and the parameters they require and if they return something.
  */
 (function() {
-	var embedReg = new RegExp(/\(embed\s([\w\s\d]+),\s(.*)\)/);
+	var embedReg = new RegExp(/\(embed\s([\s\d]+),\s([\w\W]+)\)/),
+		fileRegMsg = new RegExp(/\(file\s([\w\W]+),\s?([\r\n\w\W]*)\)/),
+		fileReg = new RegExp(/\(file\s([\w\W]+)\)/);
 
 	/**
 	 * @function userPrefix
@@ -32,7 +34,7 @@
 	 * @return {string}
 	 */
 	function getUserMention(username) {
-		return ($.discordAPI.isUser(username) == true ? $.discordAPI.resolveUser(username).getAsMention() : username);
+		return ($.discordAPI.getUser(username) != null ? $.discordAPI.getUser(username).mention() : username);
 	}
 
 	/**
@@ -43,10 +45,10 @@
 	 * @return {string}
 	 */
 	function getUserMentionOrChannel(argument) {
-		if ($.discordAPI.isUser(argument) == true) {
-			return $.discordAPI.resolveUser(argument).getAsMention();
-		} else if ($.discordAPI.isChannel(argument) == true) {
-			return $.discordAPI.resolveChannel(argument).getAsMention();
+		if ($.discordAPI.getUser(username) != null) {
+			return $.discordAPI.getUser(argument).mention();
+		} else if ($.discordAPI.getChannel(argument) != null) {
+			return $.discordAPI.getChannel(argument).mention();
 		} else {
 			return argument;
 		}
@@ -59,7 +61,7 @@
 	 * @return {string}
 	 */
 	function getRandomUser() {
-		return ($.discordAPI.getUserMembers().get($.randRange(0, $.discordAPI.getUserMembers().size() - 1)).getAsMention());
+		return ($.discordAPI.getUsers().get($.randRange(0, $.discordAPI.getUsers().size() - 1)).mention());
 	}
 
 	/**
@@ -70,8 +72,12 @@
 	 * @param {string} message
 	 */
 	function say(channel, message) {
-		if (message.match(embedReg)) {
+		if (embedReg.test(message)) {
 			$.discordAPI.sendMessageEmbed(channel, message.match(embedReg)[1], message.match(embedReg)[2]);
+		} else if (fileRegMsg.test(message)) {
+			$.discordAPI.sendFile(channel, message.match(fileRegMsg)[2], message.match(fileRegMsg)[1]);
+		} else if (fileReg.test(message)) {
+			$.discordAPI.sendFile(channel, message.match(fileReg)[1]);
 		} else {
 			$.discordAPI.sendMessage(channel, message);
 		}
@@ -115,13 +121,13 @@
 	 * @export $.discord
 	 */
 	function setRole(role, username) {
-		return $.discordAPI.setRole(role, username);
+		return $.discordAPI.addRole(role, username);
 	}
 
 	/**
-	 * @event discordCommand
+	 * @event discordChannelCommand
 	 */
-	$.bind('discordCommand', function(event) {
+	$.bind('discordChannelCommand', function(event) {
 		var sender = event.getSender(),
 		    channel = event.getChannel(),
 		    command = event.getCommand(),
@@ -140,22 +146,23 @@
 			}
 
 			if (action.equalsIgnoreCase('enable')) {
-				var index = $.bot.getModuleIndex(subAction);
+				var module = $.bot.getModule(subAction);
 
-				if (index > -1) {
-					$.setIniDbBoolean('modules', $.bot.modules[index].scriptFile, true);
-					$.bot.modules[index].enabled = true;
-					$.bot.loadScript($.bot.modules[index].scriptFile);
+				if (module !== undefined) {
+					$.setIniDbBoolean('modules', module.scriptName, true);
+                    $.bot.loadScript(module.scriptName);
+                    $.bot.modules[module.scriptName].isEnabled = true;
 
-					var hookIndex = $.bot.getHookIndex($.bot.modules[index].scriptFile, 'initReady');
+					var hookIndex = $.bot.getHookIndex(module.scriptName, 'initReady');
 
 					try {
 						if (hookIndex !== -1) {
-							$.bot.hooks[hookIndex].handler(null);
-							say(channel, userPrefix(mention) + $.lang.get('discord.misc.module.enabled', $.bot.modules[index].getModuleName()));
+							$.bot.getHook(module.scriptName, 'initReady').handler();
 						}
+
+						say(channel, userPrefix(mention) + $.lang.get('discord.misc.module.enabled', module.getModuleName()));
 					} catch (ex) {
-						$.log.error('[DISCORD] Unable to call initReady for enabled module (' + $.bot.modules[index].scriptFile +'): ' + ex.message);
+						$.log.error('[DISCORD] Unable to call initReady for enabled module (' + module.scriptName +'): ' + ex.message);
 					}
 				} else {
 					say(channel, userPrefix(mention) + $.lang.get('discord.misc.module.404', subAction));
@@ -166,13 +173,13 @@
 		     * @discordcommandpath module disable [path] - Disables any modules in the bot, it should only be used to enable discord modules though.
 		     */
 			if (action.equalsIgnoreCase('disable')) {
-				var index = $.bot.getModuleIndex(subAction);
+				var module = $.bot.getModule(subAction);
 
-				if (index > -1) {
-					$.setIniDbBoolean('modules', $.bot.modules[index].scriptFile, false);
-					$.bot.modules[index].enabled = false;
+				if (module !== undefined) {
+					$.setIniDbBoolean('modules', module.scriptName, false);
+                    $.bot.modules[module.scriptName].isEnabled = false;
 
-					say(channel, userPrefix(mention) + $.lang.get('discord.misc.module.disabled', $.bot.modules[index].getModuleName()));
+					say(channel, userPrefix(mention) + $.lang.get('discord.misc.module.disabled', module.getModuleName()));
 				} else {
 					say(channel, userPrefix(mention) + $.lang.get('discord.misc.module.404', subAction));
 				}
@@ -182,13 +189,14 @@
 		     * @discordcommandpath module list - Lists all of the discord modules.
 		     */
 			if (action.equalsIgnoreCase('list')) {
-				var modules = $.bot.modules, 
+				var keys = Object.keys($.bot.modules),
+					modules = $.bot.modules,
 				    list = [],
 				    i;
 
-				for (i in modules) {
-					if (!modules[i].scriptFile.startsWith('./discord/core/') && modules[i].scriptFile.startsWith('./discord/')) {
-						list.push(modules[i].scriptFile + ' [' + (modules[i].enabled === true ? $.lang.get('common.enabled') : $.lang.get('common.disabled')) + ']');
+				for (i in keys) {
+					if (!modules[keys[i]].scriptName.startsWith('./discord/core/') && modules[keys[i]].scriptName.startsWith('./discord/')) {
+						list.push(modules[keys[i]].scriptName + ' [' + (modules[keys[i]].isEnabled === true ? $.lang.get('common.enabled') : $.lang.get('common.disabled')) + ']');
 					}
 				}
 				say(channel, userPrefix(mention) + $.lang.get('discord.misc.module.list', list.join('\r\n')));
