@@ -108,8 +108,8 @@
 			    if (s.match(/\(name\)/)) {
 				    s = $.replace(s, '(name)', $.username.resolve($.channelName));
 			    }
-
-                $.discord.say(channelName, s);
+				
+                $.discord.say(channelName, "TransientGamers just went live with " + $.getGame($.channelName) + " at https://www.twitch.tv/transientgamers @everyone");
 			    $.discordAPI.sendMessageEmbed(channelName, new Packages.sx.blah.discord.util.EmbedBuilder()
         		    .withColor(100, 65, 164)
         		    .withThumbnail($.twitchcache.getLogoLink())
