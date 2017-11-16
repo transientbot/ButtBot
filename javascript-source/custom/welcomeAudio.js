@@ -116,7 +116,7 @@
 		}
 	});
 
-	$.bind('initready', function (event) {
+	$.bind('initReady', function (event) {
 		$.registerChatCommand('./custom/welcomeAudio.js', 'hi', 6);
 		$.registerChatCommand('./custom/welcomeAudio.js', 'reloadwelcome', 30);
 		$.registerChatCommand('./custom/welcomeAudio.js', 'welcomepurgecooldowns', 30);
