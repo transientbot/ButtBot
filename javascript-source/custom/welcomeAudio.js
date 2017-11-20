@@ -63,6 +63,10 @@
 				$.panelsocketserver.triggerAudioPanel(audioHook);
 				user.setData('DateLastWelcome', now);
 			}
+			else
+			{
+				$.say ("Sorry about that, " + sender + " but you don't have a welcome sound.  For the low, low price of 10,000 butts, you could have a short audio clip to announce your presence.");
+			}
 		}
 	}
 
