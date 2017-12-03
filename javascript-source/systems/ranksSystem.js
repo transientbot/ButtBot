@@ -48,6 +48,9 @@
 
         username = username.toLowerCase();
 
+        if ($.checkIndividualRanks (username))
+            return true;
+        
         // Has a custom rank.
         if ($.inidb.exists('viewerRanks', username.toLowerCase())) {
             return true;
