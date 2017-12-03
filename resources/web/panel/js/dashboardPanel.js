@@ -109,13 +109,6 @@
                                     "             onclick=\"$.disableModule('" + module + "', " + idx + ")\">" + settingIcon['false'] +
                                     "        </div>" +
                                     "    </td>" +
-
-                                    // "    <td style=\"width: 25px\">" +
-                                    // "        <div title=\"Reload\" class=\"button\"" +
-                                    // "             onclick=\"$.reloadModule('" + module + "', " + idx + ")\">" + reloadIcon +
-                                    // "        </div>" +
-                                    // "    </td>" +
-
                                     "</tr>";
                         } else {
                             discordHtml += "<tr class=\"textList\">" +
@@ -136,13 +129,6 @@
                                     "             onclick=\"$.disableModule('" + module + "', " + idx + ")\">" + settingIcon['false'] +
                                     "        </div>" +
                                     "    </td>" +
-
-                                    "    <td style=\"width: 25px\">" +
-                                    "        <div title=\"Reload\" class=\"button\"" +
-                                    "             onclick=\"$.reloadModule('" + module + "', " + idx + ")\">" + reloadIcon +
-                                    "        </div>" +
-                                    "    </td>" +
-
                                     "</tr>";
                         }
                     }
@@ -416,18 +402,6 @@
     }
 
     /**
-     * @function reloadModule
-     * @param {String} module
-     */
-    function reloadModule(module, idx) {
-        if (confirm('Are you sure you want to reload this module? In some cases, this is probably likely to break stuff!')) {
-            $("#moduleStatus_" + idx).html("<i style=\"color: #6136b1\" class=\"fa fa-spinner fa-spin\" />");
-            sendCommand("module reload " + module);
-            setTimeout(function() { doQuery(); }, TIMEOUT_WAIT_TIME);
-        }
-    }
-
-    /**
      * @function toggleLog
      * @param {String} mode
      */
@@ -643,16 +617,8 @@
     function toggleTwitchChat() {
         if ($("#chatsidebar").is(":visible")) {
             $("#chatsidebar").fadeOut(1000);
-            localStorage.setItem('phantombot_chattoggle', 'false');
         } else {
             $("#chatsidebar").fadeIn(1000);
-            // Load the iframe if it isn't there.
-            if ($("#chatsidebar").html().indexOf(getChannelName().toLowerCase()) === -1) {
-                $("#chatsidebar").append("<iframe id=\"chat\" frameborder=\"0\" scrolling=\"no\" onload=\"hideLoadingImage()\"" +
-                                             "src=\"https://www.twitch.tv/" + getChannelName().toLowerCase() + "/chat?popout=\">");
-                $("#chatsidebar").draggable({ iframeFix: true });
-            }
-            localStorage.setItem('phantombot_chattoggle', 'true');
         }
     }
 
@@ -731,7 +697,6 @@
     $.toggleLog = toggleLog;
     $.enableModule = enableModule;
     $.disableModule = disableModule;
-    $.reloadModule = reloadModule;
     $.adjustDeathCounter = adjustDeathCounter;
     $.shoutOut = shoutOut;
     $.disconnect = disconnect;

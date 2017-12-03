@@ -135,7 +135,6 @@
         var now = $.systemTime(),
             uUsers = [],
             username,
-            defaultamount,
             amount,
             i;
 
@@ -143,32 +142,15 @@
             return;
         }
 
-        var idlePoints = $.idlePoints();
-        var activePoints = $.activePoints();
-        var activeUsers;
-        var notidleUsers;
-
-        if ($.idlePointsDuration() != false) {
-            notidleUsers = getRecentChatters ($.idlePointsDuration());
-        } else {
-            notidleUsers = false;
-        }
-
-        if ($.activePointsDuration() != false) {
-            activeUsers = getRecentChatters ($.activePointsDuration());
-        } else {
-            activeUsers = false;
-        }
-
         if ($.isOnline($.channelName)) {
             if (onlinePayoutInterval > 0 && (lastPayout + (onlinePayoutInterval * 6e4)) <= now) {
-                defaultamount = onlineGain;
+                amount = onlineGain;
             } else {
                 return;
             }
         } else {
             if (offlinePayoutInterval > 0 && (lastPayout + (offlinePayoutInterval * 6e4)) <= now) {
-                defaultamount = offlineGain;
+                amount = offlineGain;
             } else {
                 return;
             }
@@ -232,16 +214,6 @@
             }
 
             if (!getUserPenalty(username)) {
-                // If the channel is online, the channel is giving out a different number of points to idle users, and the user is not active,
-                // assign the different number of points.  This value does not get affected by bonuses.
-                if ($.isOnline($.channelName) && $.idlePointsDuration() && notidleUsers.indexOf(username + "") == -1) {
-                    amount = idlePoints;
-                }
-                
-                if ($.activePointsDuration() && activeUsers.indexOf(username + "") > -1) {
-                    amount += activePoints;
-                }
-
                 $.inidb.incr('points', username, amount);
                 uUsers.push(username + '(' + amount + ')');
             }
@@ -359,11 +331,7 @@
      */
     function getPointsMessage(username, displayName) {
         var s = pointsMessage;
-		if (username.toLowerCase() != displayName.toLowerCase())
-        {
-            var how = [ "sniff", "check out", "stare at", "ogle", "poke", "touch", "squint at" ];
-            s = "It is impolite to " + how[Math.floor(Math.random() * how.length)] + " another person's butt.  You should be ashamed, " + username + ".";
-        }
+
         if (s.match(/\(userprefix\)/)) {
             s = $.replace(s, '(userprefix)', $.whisperPrefix(username));
         }

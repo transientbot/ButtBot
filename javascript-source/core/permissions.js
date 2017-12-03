@@ -608,46 +608,6 @@
     }
 
     /**
-     * @event ircChannelJoinUpdate
-     *
-     * @info Event that is sent when a large amount of people join/leave. This is done on a new thread.
-     */
-    $.bind('ircChannelUsersUpdate', function(event) {
-        setTimeout(function() {
-            var usernames = event.getUsers(),
-                joins = event.getJoins(),
-                parts = event.getParts(),
-                now = $.systemTime(),
-                newUsers = [];
-
-            // Handle parts
-            for (var i in parts) {
-                restoreSubscriberStatus(parts[i], true);
-                $.username.removeUser(parts[i]);
-            }
-
-            // Handle joins.
-            $.inidb.setAutoCommit(false);
-            for (var i in joins) {
-                if (!$.user.isKnown(joins[i])) {
-                    $.setIniDbBoolean('visited', joins[i], true);
-                }
-                $.checkGameWispSub(username);
-            }
-            $.inidb.setAutoCommit(true);
-            $.inidb.SaveAll(true);
-
-            // Set the new users array.
-            for (var i in usernames) {
-                newUsers.push([usernames[i], now]);
-            }
-            // Set the new array.
-            users = newUsers;
-            lastJoinPart = $.systemTime();
-        }, 0);
-    });
-
-    /**
      * @event ircChannelJoin
      */
     $.bind('ircChannelJoin', function(event) {
@@ -818,9 +778,9 @@
         }
 
         /**
-         * @commandpath moderators - List mods currently in the channel
+         * @commandpath mods - List mods currently in the channel
          */
-        if (command.equalsIgnoreCase('moderators')) {
+        if (command.equalsIgnoreCase('mods')) {
             var tmp = getUsernamesArrayByGroupId(2);
             if (tmp.length > 20) {
                 $.say($.whisperPrefix(sender) + $.lang.get('permissions.current.listtoolong', tmp.length));
@@ -968,8 +928,8 @@
         $.registerChatCommand('./core/permissions.js', 'permissions', 1);
         $.registerChatCommand('./core/permissions.js', 'permissionlist', 1);
         $.registerChatCommand('./core/permissions.js', 'permissionpoints', 1);
-        //$.registerChatCommand('./core/permissions.js', 'users', 2);       // This command is a useless piece of uselessness.
-        //$.registerChatCommand('./core/permissions.js', 'moderators', 2);  // This command is a useless piece of uselessness.
+        $.registerChatCommand('./core/permissions.js', 'users', 2);
+        $.registerChatCommand('./core/permissions.js', 'mods', 2);
 
         /** Load groups and generate default groups if they don't exist */
         reloadGroups();

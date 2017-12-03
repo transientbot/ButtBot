@@ -1,4 +1,4 @@
-/*
+/* 
  * This script is used to reload variables from scripts when you edit stuff on the panel. Only the bot can use these, and you can't disable them
  */
 
@@ -60,28 +60,28 @@
 
             if (args.length == 2) {
                 var group = args[1];
-
+    
                 if (isNaN(parseInt(group))) {
                     group = $.getGroupIdByName(group);
                 }
-
+    
                 var list = $.inidb.GetKeyList('aliases', ''), i;
                 for (i in list) {
                     if (list[i].equalsIgnoreCase(action)) {
                         $.inidb.set('permcom', $.inidb.get('aliases', list[i]), group);
                         $.updateCommandGroup($.inidb.get('aliases', list[i]), group);
-                    }
+                    } 
                 }
                 $.inidb.set('permcom', action, group);
                 $.updateCommandGroup(action, group);
                 return;
             }
-
+    
             var subcommand = args[1], group = args[2];
             if (isNaN(parseInt(group))) {
                 group = $.getGroupIdByName(group);
             }
-
+    
             $.inidb.set('permcom', action + ' ' + subcommand, group);
             $.updateSubcommandGroup(action, subcommand, group);
             return;
@@ -174,7 +174,7 @@
                 return;
             }
             var argsString = args.splice(0).join(' ');
-            $.updateStatus($.channelName, argsString, sender, true);
+            $.updateStatus($.channelName, argsString, sender, true); 
             return;
         }
 
@@ -188,7 +188,7 @@
             var argsString = args.splice(0).join(' ');
             $.updateGame($.channelName, argsString, sender, true);
             return;
-        }
+        } 
 
         /*
          * Sets the community on stream
@@ -356,16 +356,6 @@
         }
 
         /*
-         * Reloads the idle settings variables.
-         */
-        if (command.equalsIgnoreCase('reloadidle')) {
-            if (!$.isBot(sender)) {
-                return;
-            }
-            $.reloadIdle();
-        }
-
-        /*
          * Reloads the points variables.
          */
         if (command.equalsIgnoreCase('reloadpoints')) {
@@ -388,7 +378,7 @@
         }
 
         /*
-         * Gives points to everyone in the channel
+         * Gives points to everyone in the channel 
          */
         if (command.equalsIgnoreCase('pointsallpanel')) {
             if (!$.isBot(sender)) {
@@ -507,10 +497,8 @@
             $.registerChatCommand('./core/panelCommands.js', 'reloadtraffle', 30);
             $.registerChatCommand('./core/panelCommands.js', 'updatetimesettings', 30);
             $.registerChatCommand('./core/panelCommands.js', 'reloadlogs', 30);
-            $.registerChatCommand('./core/panelCommands.js', 'reloadinit', 30);
             $.registerChatCommand('./core/panelCommands.js', 'reloadbet', 30);
             $.registerChatCommand('./core/panelCommands.js', 'tipeeestreamreload', 30);
-            $.registerChatCommand('./core/panelCommands.js', 'reloadidle', 30);
             $.registerChatCommand('./core/panelCommands.js', 'streamelementsreload', 30);
             $.registerChatCommand('./core/panelCommands.js', 'setcommunitysilent', 30);
         }, 10000);

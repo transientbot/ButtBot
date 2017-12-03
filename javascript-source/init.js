@@ -604,13 +604,6 @@
         });
 
         /*
-         * @event ircChannelUsersUpdate
-         */
-        $api.on($script, 'ircChannelUsersUpdate', function(event) {
-            callHook('ircChannelUsersUpdate', event, false);
-        });
-
-        /*
          * @event ircChannelLeave
          */
         $api.on($script, 'ircChannelLeave', function(event) {

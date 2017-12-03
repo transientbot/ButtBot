@@ -74,18 +74,16 @@
         		// Get max chatters.
         		var maxChatters = Math.max.apply(null, chatters);
 
-                $.discord.say(channelName, offlineMessage.replace('\(name\)', $.username.resolve($.channelName)));
         		// Send the message as an embed.
         		$.discordAPI.sendMessageEmbed(channelName, new Packages.sx.blah.discord.util.EmbedBuilder()
         			.withColor(100, 65, 164)
         			.withThumbnail($.twitchcache.getLogoLink())
-        			.withTitle(offlineMessage.replace('\(name\)', $.username.resolve($.channelName)))
+        			.withTitle(offlineMessage.replace('\(name\)', $.channelName))
         			.appendField($.lang.get('discord.streamhandler.offline.game'), $.getGame($.channelName), true)
         			.appendField($.lang.get('discord.streamhandler.offline.viewers'), $.lang.get('discord.streamhandler.offline.viewers.stat', avgViewers, maxViewers), true)
         			.appendField($.lang.get('discord.streamhandler.offline.chatters'), $.lang.get('discord.streamhandler.offline.chatters.stat', avgChatters, maxChatters), true)
         			.appendField($.lang.get('discord.streamhandler.offline.followers'), $.lang.get('discord.streamhandler.offline.followers.stat', follows, $.getFollows($.channelName)), true)
-        			.appendField(JSON.parse($.twitch.GetChannelVODs($.channelName, 'archives') + '').videos[0].url, true)
-                    .withUrl('https://twitch.tv/' + $.channelName).build());
+        			.withUrl('https://twitch.tv/' + $.channelName).bulid());
 
                 $.inidb.RemoveFile('discordStreamStats');
         	}
@@ -99,29 +97,25 @@
 		if (onlineToggle === false || channelName == '') {
 			return;
 		}
-        
-        // Wait a minute for Twitch to generate a real thumbnail and make sure again that we are online.
-        setTimeout(function() {
-		    if ($.isOnline($.channelName) && ($.systemTime() - $.getIniDbNumber('discordSettings', 'lastOnlineEvent', 0) >= timeout)) {
-			    var s = onlineMessage;
 
-			    if (s.match(/\(name\)/)) {
-				    s = $.replace(s, '(name)', $.username.resolve($.channelName));
-			    }
-				
-                $.discord.say(channelName, "TransientGamers just went live with " + $.getGame($.channelName) + " at <https://www.twitch.tv/transientgamers> @everyone");
-			    $.discordAPI.sendMessageEmbed(channelName, new Packages.sx.blah.discord.util.EmbedBuilder()
-        		    .withColor(100, 65, 164)
-        		    .withThumbnail($.twitchcache.getLogoLink())
-        		    .withTitle(s)
-        		    .appendField($.lang.get('discord.streamhandler.common.game'), $.getGame($.channelName), false)
-        		    .appendField($.lang.get('discord.streamhandler.common.title'), $.getStatus($.channelName), false)
-        		    .withUrl('https://twitch.tv/' + $.channelName)
-        		    .withImage($.twitchcache.getPreviewLink()).build());
+		if ($.systemTime() - $.getIniDbNumber('discordSettings', 'lastOnlineEvent', 0) >= timeout) {
+			var s = onlineMessage;
 
-                $.setIniDbNumber('discordSettings', 'lastOnlineEvent', $.systemTime());
-		    }
-        }, 6e4);
+			if (s.match(/\(name\)/)) {
+				s = $.replace(s, '(name)', $.username.resolve($.channelName));
+			}
+
+			$.discordAPI.sendMessageEmbed(channelName, new Packages.sx.blah.discord.util.EmbedBuilder()
+        		.withColor(100, 65, 164)
+        		.withThumbnail($.twitchcache.getLogoLink())
+        		.withTitle(s)
+        		.appendField($.lang.get('discord.streamhandler.common.game'), $.getGame($.channelName), false)
+        		.appendField($.lang.get('discord.streamhandler.common.title'), $.getStatus($.channelName), false)
+        		.withUrl('https://twitch.tv/' + $.channelName)
+        		.withImage($.twitchcache.getPreviewLink()).build());
+
+            $.setIniDbNumber('discordSettings', 'lastOnlineEvent', $.systemTime());
+		}
         if (botGameToggle === true) {
             $.discord.setStream($.getStatus($.channelName), ('https://twitch.tv/' + $.channelName));
         }
@@ -141,7 +135,6 @@
 			s = $.replace(s, '(name)', $.username.resolve($.channelName));
 		}
 
-        $.discord.say(channelName, s);
 		$.discordAPI.sendMessageEmbed(channelName, new Packages.sx.blah.discord.util.EmbedBuilder()
         	.withColor(100, 65, 164)
         	.withThumbnail($.twitchcache.getLogoLink())

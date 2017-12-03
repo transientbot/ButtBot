@@ -24,6 +24,7 @@
  * Drives the Audio Panel
  */
 (function() {
+
     /**
      * Sounds Object
      *
@@ -179,51 +180,6 @@
             $('#ytplayerBUser').html(html);
             handleInputFocus();
         }
-
-        if (panelCheckQuery(msgObject, 'audio_Commands')) {
-            html = '<table>';
-            html +=     '<tr><th>Command</th>' +
-                        '<th>Audio Hook</th></tr>';
-            for (var idx in msgObject['results']) {
-                var name = msgObject['results'][idx]['key'];
-                var hook = msgObject['results'][idx]['value'];
-                html += '<tr style="textList">' +
-                        '    <td>!' + name + '</td>' +
-                        '    <td>' + hook + '</td>' +
-                        '</tr>';
-            }
-            html += '</table>';
-            $('#audiocommands').html(html);
-        }
-
-        if (panelCheckQuery(msgObject, 'audio_hookcommandsenabled')) {
-            var val = msgObject['results']['audiohookcommandsenabled'];
-
-            if (val == undefined || val == 'true') {
-                html =  "Custom Audio Commands: <div id=\"audioCommandsEnabled\"" +
-                         "         data-toggle=\"tooltip\" title=\"Disable Audio Commands\" class=\"button\" onclick=\"$.toggleAudioHookCommands('disable');\">" +
-                         "    <i style=\"color: #6136b1\" class=\"fa fa-toggle-on\" /></div>";
-                $('#audiocommands').show();
-            } else {
-                html =  "Custom Audio Commands: <div id=\"audioCommandsEnabled\"" +
-                         "         data-toggle=\"tooltip\" title=\"Enable Audio Commands\" class=\"button\" onclick=\"$.toggleAudioHookCommands('enable');\">" +
-                         "    <i style=\"color: #6136b1\" class=\"fa fa-toggle-off\" /></div>";
-                $('#audiocommands').hide();
-            }
-
-            $('#audiohookcommandsenabled').html(html);
-        }
-    }
-
-    function toggleAudioHookCommands(prmWhich) {
-        if (panelMatch(prmWhich, 'enable')) {
-            $('#audioCommandsEnabled').html('<i style="color: #333333" class="fa fa-toggle-on" />');
-            sendCommand('audiohook customcommand enable');
-        } else {
-            $('#audioCommandsEnabled').html('<i style="color: #333333" class="fa fa-toggle-off" />');
-            sendCommand('audiohook customcommand disable');
-        }
-        setTimeout(function() { doQuery(); }, TIMEOUT_WAIT_TIME);
     }
 
     /**
@@ -238,9 +194,6 @@
         sendDBKeys('audio_songblacklist', 'ytpBlacklistedSong');
         sendDBKeys('audio_userblacklist', 'ytpBlacklist');
         sendDBKeys('audio_hook', 'audio_hooks');
-
-        sendDBQuery('audio_hookcommandsenabled', 'settings', 'audiohookcommandsenabled');
-        sendDBKeys('audio_Commands', 'audioCommands');
     }
 
     /**
@@ -512,5 +465,4 @@
     $.playlists = playlists;
     $.loadYtplaylist = loadYtplaylist;
     $.reloadAudioHooks = reloadAudioHooks;
-    $.toggleAudioHookCommands = toggleAudioHookCommands;
 })();

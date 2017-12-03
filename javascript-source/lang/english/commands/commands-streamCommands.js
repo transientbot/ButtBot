@@ -18,4 +18,3 @@ $.lang.register('streamcommand.online.online', 'Stream is online.');
 $.lang.register('streamcommand.createdat.404', 'Please provide a channel');
 $.lang.register('streamcommand.createdat.error', 'The channel does not exist or a Twitch API error occurred.');
 $.lang.register('streamcommand.createdat', 'Channel: $1 | Created At: $2');
-$.lang.register('streamcommand.titleonly', "Current Status: $1");

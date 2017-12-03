@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
+/* 
  * @author IllusionaryOne
  */
 
@@ -229,7 +229,7 @@
                 handlePanel('./discord/systems/greetingsSystem.js', '#_discord_greetingSystem', moduleEnabled);
             }
             if (panelMatch(module, './discord/commands/customCommands.js')) {
-                handlePanel('./discord/commands/customCommands.js', '#_discord_customCommands', moduleEnabled);
+                handlePanel('./discord/games/customCommands.js', '#_discord_customCommands', moduleEnabled);
             }
             if (panelMatch(module, './discord/games/slotMachine.js')) {
                 handlePanel('./discord/games/slotMachine.js', '#_discord_slotMachine', moduleEnabled);
@@ -240,16 +240,9 @@
             if (panelMatch(module, './discord/games/roll.js')) {
                 handlePanel('./discord/games/roll.js', '#_discord_roll', moduleEnabled);
             }
-            //Butt Custom
-            if (panelMatch(module, './custom/idleChatters.js')) {
-                handlePanel('./custom/idleChatters.js', '#_idlePanel', moduleEnabled);
-            }
-            if (panelMatch(module, './custom/welcomeAudio.js')) {
-                handlePanel('./custom/welcomeAudio.js', '#_welcomeSubPanel', moduleEnabled);
-            }
         }
     }
 
     // Export Function
-    $.disablePanels = disablePanels;
+    $.disablePanels = disablePanels
 })();

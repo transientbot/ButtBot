@@ -575,22 +575,19 @@
      * @event initReady
      */
     $.bind('initReady', function() {
-        if ($.bot.isModuleEnabled('./discord/commands/customCommands.js')) {
-            $.discord.registerCommand('./discord/commands/customCommands.js', 'addcom', 1);
-            $.discord.registerCommand('./discord/commands/customCommands.js', 'delcom', 1);
-            $.discord.registerCommand('./discord/commands/customCommands.js', 'editcom', 1);
-            $.discord.registerCommand('./discord/commands/customCommands.js', 'permcom', 1);
-            $.discord.registerCommand('./discord/commands/customCommands.js', 'coolcom', 1);
-            $.discord.registerCommand('./discord/commands/customCommands.js', 'channelcom', 1);
-            $.discord.registerCommand('./discord/commands/customCommands.js', 'pricecom', 1);
-            $.discord.registerCommand('./discord/commands/customCommands.js', 'aliascom', 1);
-            $.discord.registerCommand('./discord/commands/customCommands.js', 'delalias', 1);
-            //$.discord.registerCommand('./discord/commands/customCommands.js', 'commands', 0);
-            //$.discord.registerCommand('./discord/commands/customCommands.js', 'botcommands', 1);
-
-            loadCustomCommands();
-            // $.unbind('initReady'); Needed or not?
-        }
+        $.discord.registerCommand('./discord/commands/customCommands.js', 'addcom', 1);
+        $.discord.registerCommand('./discord/commands/customCommands.js', 'delcom', 1);
+        $.discord.registerCommand('./discord/commands/customCommands.js', 'editcom', 1);
+        $.discord.registerCommand('./discord/commands/customCommands.js', 'permcom', 1);
+        $.discord.registerCommand('./discord/commands/customCommands.js', 'coolcom', 1);
+        $.discord.registerCommand('./discord/commands/customCommands.js', 'channelcom', 1);
+        $.discord.registerCommand('./discord/commands/customCommands.js', 'pricecom', 1);
+        $.discord.registerCommand('./discord/commands/customCommands.js', 'aliascom', 1);
+        $.discord.registerCommand('./discord/commands/customCommands.js', 'delalias', 1);
+        $.discord.registerCommand('./discord/commands/customCommands.js', 'commands', 0);
+        $.discord.registerCommand('./discord/commands/customCommands.js', 'botcommands', 1);
+        
+        loadCustomCommands();
     });
 
     /**
@@ -618,7 +615,7 @@
                         $.discord.clearChannelCommands(event.getArgs()[0]);
                         var keys = event.getArgs()[2].split(', '),
                             i;
-
+ 
                         for (i in keys) {
                             $.discord.setCommandChannel(event.getArgs()[0], keys[i], false);
                         }

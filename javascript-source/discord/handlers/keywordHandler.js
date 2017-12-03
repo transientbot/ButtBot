@@ -56,7 +56,7 @@
             }
 
             /**
-             * @discordcomandpath keyword add [keyword] [response] - Adds a custom keyword.
+             * @discordcommandpath keyword add [keyword] [response] - Adds a custom keyword.
              */
             if (action.equalsIgnoreCase('add')) {
                 if (subAction === undefined || args[2] === undefined) {
@@ -74,7 +74,7 @@
             }
 
             /**
-             * @discordcomandpath keyword edit [keyword] [response] - Edits a custom keyword.
+             * @discordcommandpath keyword edit [keyword] [response] - Edits a custom keyword.
              */
             if (action.equalsIgnoreCase('edit')) {
                 if (subAction === undefined || args[2] === undefined) {
@@ -92,7 +92,7 @@
             }
 
             /**
-             * @discordcomandpath keyword remove [keyword] - Removes a custom keyword.
+             * @discordcommandpath keyword remove [keyword] - Removes a custom keyword.
              */
             if (action.equalsIgnoreCase('remove')) {
                 if (subAction === undefined) {
