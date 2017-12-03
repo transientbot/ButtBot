@@ -90,7 +90,7 @@ public class GenerateLogs {
 		try {
 			if (new File(file).exists()) {
 				bufferedReader = new BufferedReader(new FileReader(file));
-		
+
 				while ((line = bufferedReader.readLine()) != null) {
 					data += (line + "\r\n");
 				}

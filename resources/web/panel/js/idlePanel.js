@@ -221,7 +221,7 @@
             doQuery();
         }
     }, 3e4);
-    
+
     // Export to HTML
     $.idleDoQuery = doQuery;
     $.idleOnMessage = onMessage;

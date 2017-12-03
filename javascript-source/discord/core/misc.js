@@ -129,12 +129,12 @@
 	 */
 	$.bind('discordChannelCommand', function(event) {
 		var sender = event.getSender(),
-		    channel = event.getChannel(),
-		    command = event.getCommand(),
-		    mention = event.getMention(),
-		    args = event.getArgs(),
-		    action = args[0],
-		    subAction = args[1];
+			channel = event.getChannel(),
+			command = event.getCommand(),
+			mention = event.getMention(),
+			args = event.getArgs(),
+			action = args[0],
+			subAction = args[1];
 
 		/**
 		 * @discordcommandpath module enable [path] - Enables any modules in the bot, it should only be used to enable discord modules though.
@@ -150,8 +150,8 @@
 
 				if (module !== undefined) {
 					$.setIniDbBoolean('modules', module.scriptName, true);
-                    $.bot.loadScript(module.scriptName);
-                    $.bot.modules[module.scriptName].isEnabled = true;
+					$.bot.loadScript(module.scriptName);
+					$.bot.modules[module.scriptName].isEnabled = true;
 
 					var hookIndex = $.bot.getHookIndex(module.scriptName, 'initReady');
 
@@ -170,14 +170,14 @@
 			}
 
 			/**
-		     * @discordcommandpath module disable [path] - Disables any modules in the bot, it should only be used to enable discord modules though.
-		     */
+			 * @discordcommandpath module disable [path] - Disables any modules in the bot, it should only be used to enable discord modules though.
+			 */
 			if (action.equalsIgnoreCase('disable')) {
 				var module = $.bot.getModule(subAction);
 
 				if (module !== undefined) {
 					$.setIniDbBoolean('modules', module.scriptName, false);
-                    $.bot.modules[module.scriptName].isEnabled = false;
+					$.bot.modules[module.scriptName].isEnabled = false;
 
 					say(channel, userPrefix(mention) + $.lang.get('discord.misc.module.disabled', module.getModuleName()));
 				} else {
@@ -186,13 +186,13 @@
 			}
 
 			/**
-		     * @discordcommandpath module list - Lists all of the discord modules.
-		     */
+			 * @discordcommandpath module list - Lists all of the discord modules.
+			 */
 			if (action.equalsIgnoreCase('list')) {
 				var keys = Object.keys($.bot.modules),
 					modules = $.bot.modules,
-				    list = [],
-				    i;
+					list = [],
+					i;
 
 				for (i in keys) {
 					if (!modules[keys[i]].scriptName.startsWith('./discord/core/') && modules[keys[i]].scriptName.startsWith('./discord/')) {

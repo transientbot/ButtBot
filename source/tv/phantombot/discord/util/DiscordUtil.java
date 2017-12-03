@@ -435,7 +435,7 @@ public class DiscordUtil {
     public void removeRole(String roleName, String userName) {
         removeRole(getRole(roleName), getUser(userName));
     }
-    
+
     /*
      * Method to create a new role.
      *
@@ -514,7 +514,7 @@ public class DiscordUtil {
                     RequestBuffer.request(() -> {
                         try {
                             List<IMessage> messages = channel.getMessageHistory(amount < 2 ? 2 : amount);
-                            
+
                             channel.bulkDelete(messages);
                         } catch (DiscordException ex) {
                             com.gmt2001.Console.err.println("Failed to bulk delete messages: [" + ex.getClass().getSimpleName() + "] " + ex.getMessage());
@@ -522,7 +522,7 @@ public class DiscordUtil {
                     });
                 }
             }, "tv.phantombot.discord.util.DiscordUtil::bulkDelete");
-    
+
             thread.start();
         }
     }
@@ -548,7 +548,7 @@ public class DiscordUtil {
             RequestBuffer.request(() -> {
                 try {
                     List<IMessage> messages = Arrays.asList(list);
-                
+
                     channel.bulkDelete(messages);
                 } catch (DiscordException ex) {
                     com.gmt2001.Console.err.println("Failed to bulk delete messages: [" + ex.getClass().getSimpleName() + "] " + ex.getMessage());

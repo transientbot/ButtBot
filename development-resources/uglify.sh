@@ -18,19 +18,19 @@ fi
 
 if [[ $1 == "ALL" ]]; then
   for file in $(find . -name "*.js"); do
-    file=${file#./}
-    echo "uglifyjs ${file} -c -m > ../resources/scripts/${file}"
-    uglifyjs ${file} -c -m > ../resources/scripts/${file}
+	file=${file#./}
+	echo "uglifyjs ${file} -c -m > ../resources/scripts/${file}"
+	uglifyjs ${file} -c -m > ../resources/scripts/${file}
   done
   exit
 fi
 
 while (( $# )); do
   if [[ ! -e $1 ]]; then
-    echo "warning: file not found: $1"
+	echo "warning: file not found: $1"
   else
-    echo "uglifyjs $1 -c -m > ../resources/scripts/$1"
-    uglifyjs $1 -c -m > ../resources/scripts/$1
+	echo "uglifyjs $1 -c -m > ../resources/scripts/$1"
+	uglifyjs $1 -c -m > ../resources/scripts/$1
   fi
   shift
 done

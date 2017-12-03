@@ -224,7 +224,7 @@
                     sendDBUpdate('discord_update', 'discordSettings', 'cbenniToggle', 'false');
                 }
             }
-          
+
             console.log(table + ':' + key + ':' + data);
             sendDBUpdate('discord_update', table, key, String(data));
 
@@ -292,19 +292,19 @@
             sendDBUpdate('discord_command', 'discordPermcom', command, permission.toString());
             sendDBUpdate('discord_command', 'discordCooldown', command, JSON.stringify({command: String(command), seconds: String(cooldown), isGlobal: String(checked)}));
             sendDBUpdate('discord_command', 'discordPricecom', command, price.toString());
-            
+
             if (channel.length > 0) {
                 sendDBUpdate('discord_command', 'discordChannelcom', command, channel.toString());
             } else {
                 sendDBDelete('discord_command', 'discordChannelcom', command);
             }
-            
+
             if (alias.length > 0) {
                 sendDBUpdate('discord_command', 'discordAliascom', command, alias.toString());
             } else {
                 sendDBDelete('discord_command', 'discordAliascom', command);
             }
-            
+
             setTimeout(function() { sendWSEvent('discord', './discord/commands/customCommands.js', null, [command, permission, channel, alias, price]); }, TIMEOUT_WAIT_TIME);
         }
 

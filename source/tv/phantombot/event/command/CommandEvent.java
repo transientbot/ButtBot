@@ -73,7 +73,7 @@ public class CommandEvent extends Event {
         List<String> tmpArgs = new LinkedList<>();
         boolean inquote = false;
         String tmpStr = "";
-        
+
         for (char c : arguments.toCharArray()) {
             if (c == '"') {
                 inquote = !inquote;

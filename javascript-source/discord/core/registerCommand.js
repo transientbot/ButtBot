@@ -89,7 +89,7 @@
 	 * 
 	 * @export $.discord
 	 * @param {string} command
-	 * @param {int}    cost
+	 * @param {int}	cost
 	 */
 	function setCommandCost(command, cost) {
 		if (commandExists(command)) {
@@ -226,7 +226,7 @@
 			} else {
 				commands[command].channel['_default_global_'] = '';
 			}
-				
+
 
 			if (commands[command].alias !== '') {
 				aliases[commands[command].alias] = command;

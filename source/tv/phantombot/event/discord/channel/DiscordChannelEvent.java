@@ -23,7 +23,7 @@ import sx.blah.discord.handle.obj.IUser;
 import tv.phantombot.event.discord.DiscordEvent;
 
 public class DiscordChannelEvent extends DiscordEvent {
-	
+
 	protected DiscordChannelEvent(IUser user) {
 		super(user);
 	}

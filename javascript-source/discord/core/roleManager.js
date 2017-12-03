@@ -190,70 +190,70 @@
 	 */
 	$.bind('discordChannelCommand', function(event) {
 		var sender = event.getSender(),
-            channel = event.getChannel(),
-            command = event.getCommand(),
-            mention = event.getMention(),
-            args = event.getArgs(),
-            action = args[0],
-            subAction = args[1],
-            actionArgs = args[2];
+			channel = event.getChannel(),
+			command = event.getCommand(),
+			mention = event.getMention(),
+			args = event.getArgs(),
+			action = args[0],
+			subAction = args[1],
+			actionArgs = args[2];
 
-        if (command.equalsIgnoreCase('rolemanager')) {
-        	if (action === undefined) {
-        		$.discord.say(channel, $.discord.userPrefix(mention) + $.lang.get('discord.rolemanager.usage'));
-        		return;
-        	}
+		if (command.equalsIgnoreCase('rolemanager')) {
+			if (action === undefined) {
+				$.discord.say(channel, $.discord.userPrefix(mention) + $.lang.get('discord.rolemanager.usage'));
+				return;
+			}
 
-        	/*
-        	 * @discordcommandpath rolemanager togglesyncpermissions - Makes the bot sync default permissions with those who have their accounts linked.
-        	 */
-        	if (action.equalsIgnoreCase('togglesyncpermissions')) {
-        		autoSetPermissions = !autoSetPermissions;
-        		$.setIniDbBoolean('discordSettings', 'autoSetPermissions', autoSetPermissions);
-        		$.discord.say(channel, $.discord.userPrefix(mention) + (autoSetPermissions ? $.lang.get('discord.rolemanager.permission.sync.on') : $.lang.get('discord.rolemanager.permission.sync.off')));
-        	}
+			/*
+			 * @discordcommandpath rolemanager togglesyncpermissions - Makes the bot sync default permissions with those who have their accounts linked.
+			 */
+			if (action.equalsIgnoreCase('togglesyncpermissions')) {
+				autoSetPermissions = !autoSetPermissions;
+				$.setIniDbBoolean('discordSettings', 'autoSetPermissions', autoSetPermissions);
+				$.discord.say(channel, $.discord.userPrefix(mention) + (autoSetPermissions ? $.lang.get('discord.rolemanager.permission.sync.on') : $.lang.get('discord.rolemanager.permission.sync.off')));
+			}
 
-        	/*
-        	 * @discordcommandpath rolemanager togglesyncranks - Makes the bot sync ranks with those who have their accounts linked.
-        	 */
-        	if (action.equalsIgnoreCase('togglesyncranks')) {
-        		autoSetRanks = !autoSetRanks;
-        		$.setIniDbBoolean('discordSettings', 'autoSetRanks', autoSetRanks);
-        		$.discord.say(channel, $.discord.userPrefix(mention) + (autoSetRanks ? $.lang.get('discord.rolemanager.ranks.sync.on') : $.lang.get('discord.rolemanager.ranks.sync.off')));
-        	}
+			/*
+			 * @discordcommandpath rolemanager togglesyncranks - Makes the bot sync ranks with those who have their accounts linked.
+			 */
+			if (action.equalsIgnoreCase('togglesyncranks')) {
+				autoSetRanks = !autoSetRanks;
+				$.setIniDbBoolean('discordSettings', 'autoSetRanks', autoSetRanks);
+				$.discord.say(channel, $.discord.userPrefix(mention) + (autoSetRanks ? $.lang.get('discord.rolemanager.ranks.sync.on') : $.lang.get('discord.rolemanager.ranks.sync.off')));
+			}
 
-        	/*
-        	 * @discordcommandpath rolemanager blacklist [add / remove] [permission or rank] - Blacklist a rank or permission from being used.
-        	 */
-        	if (action.equalsIgnoreCase('blacklist')) {
-        		if (subAction === undefined) {
-        			$.discord.say(channel, $.discord.userPrefix(mention) + $.lang.get('discord.rolemanager.blacklist.usage'));
-        			return;
-        		}
-        		
-        		if (subAction.equalsIgnoreCase('add')) {
-        			if (actionArgs === undefined) {
-        				$.discord.say(channel, $.discord.userPrefix(mention) + $.lang.get('discord.rolemanager.blacklist.add.usage'));
-        				return;
-        			}
+			/*
+			 * @discordcommandpath rolemanager blacklist [add / remove] [permission or rank] - Blacklist a rank or permission from being used.
+			 */
+			if (action.equalsIgnoreCase('blacklist')) {
+				if (subAction === undefined) {
+					$.discord.say(channel, $.discord.userPrefix(mention) + $.lang.get('discord.rolemanager.blacklist.usage'));
+					return;
+				}
 
-        			var blacklist = args.slice(2).join(' ').toLowerCase();
-        			$.setIniDbString('blacklistedDiscordRoles', blacklist, 'true');
-        			$.discord.say(channel, $.discord.userPrefix(mention) + $.lang.get('discord.rolemanager.blacklist.add.success', blacklist));
-        		}
+				if (subAction.equalsIgnoreCase('add')) {
+					if (actionArgs === undefined) {
+						$.discord.say(channel, $.discord.userPrefix(mention) + $.lang.get('discord.rolemanager.blacklist.add.usage'));
+						return;
+					}
 
-        		if (subAction.equalsIgnoreCase('remove')) {
-        			if (actionArgs === undefined) {
-        				$.discord.say(channel, $.discord.userPrefix(mention) + $.lang.get('discord.rolemanager.blacklist.remove.usage'));
-        				return;
-        			}
+					var blacklist = args.slice(2).join(' ').toLowerCase();
+					$.setIniDbString('blacklistedDiscordRoles', blacklist, 'true');
+					$.discord.say(channel, $.discord.userPrefix(mention) + $.lang.get('discord.rolemanager.blacklist.add.success', blacklist));
+				}
 
-        			var blacklist = args.slice(2).join(' ').toLowerCase();
-        			$.inidb.del('blacklistedDiscordRoles', blacklist);
-        			$.discord.say(channel, $.discord.userPrefix(mention) + $.lang.get('discord.rolemanager.blacklist.remove.success', blacklist));
-        		}
-        	}
-        }
+				if (subAction.equalsIgnoreCase('remove')) {
+					if (actionArgs === undefined) {
+						$.discord.say(channel, $.discord.userPrefix(mention) + $.lang.get('discord.rolemanager.blacklist.remove.usage'));
+						return;
+					}
+
+					var blacklist = args.slice(2).join(' ').toLowerCase();
+					$.inidb.del('blacklistedDiscordRoles', blacklist);
+					$.discord.say(channel, $.discord.userPrefix(mention) + $.lang.get('discord.rolemanager.blacklist.remove.success', blacklist));
+				}
+			}
+		}
 	});
 
 	/*

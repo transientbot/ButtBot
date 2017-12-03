@@ -132,7 +132,7 @@ public class YTWebSocketServer extends WebSocketServer {
         super(new InetSocketAddress(port));
         this.authString = authString;
         this.authStringRO = authStringRO;
-    
+
         Thread.setDefaultUncaughtExceptionHandler(com.gmt2001.UncaughtExceptionHandler.instance());
     }
 

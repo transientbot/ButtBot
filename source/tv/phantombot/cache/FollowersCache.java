@@ -44,7 +44,7 @@ public class FollowersCache implements Runnable {
     private Boolean hasFail = false;
     private Boolean killed = false;
     private int numfail = 0;
-    
+
     /*
      * @function instance
      *
@@ -119,7 +119,7 @@ public class FollowersCache implements Runnable {
         if (jsonObject.getBoolean("_success")) {
             if (jsonObject.getInt("_http") == 200) {
                 JSONArray jsonArray = jsonObject.getJSONArray("follows");
-                
+
                 for (int i = 0; i < jsonArray.length(); i++) {
                     String follower = jsonArray.getJSONObject(i).getJSONObject("user").getString("name").toLowerCase();
 

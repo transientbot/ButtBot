@@ -190,7 +190,7 @@ public class TwitchAPIv5 {
     private String getIDFromChannel(String channel) {
         return UsernameCache.instance().getID(channel);
     }
-    
+
 
     /**
      * Gets a channel object

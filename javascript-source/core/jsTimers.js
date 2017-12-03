@@ -5,80 +5,80 @@
  */
 
 var setTimeout,
-    clearTimeout,
-    setInterval,
-    clearInterval;
+	clearTimeout,
+	setInterval,
+	clearInterval;
 
 (function() {
-    var counter = 1,
-        registry = {};
+	var counter = 1,
+		registry = {};
 
-    /**
-     * @function setTimeout
-     * @param {Function} fn
-     * @param {Number} delay
-     * @param {String} name
-     
-     * @returns {Number}
-    */
-    setTimeout = function(fn, delay, name) {
-        var id = counter++,
-            timer;
+	/**
+	 * @function setTimeout
+	 * @param {Function} fn
+	 * @param {Number} delay
+	 * @param {String} name
 
-        if (name !== undefined) {
-            timer =  new java.util.Timer(name);
-        } else {
-            timer =  new java.util.Timer();
-        }
+	 * @returns {Number}
+	*/
+	setTimeout = function(fn, delay, name) {
+		var id = counter++,
+			timer;
 
-        registry[id] = new JavaAdapter(java.util.TimerTask, { run: fn });
-        timer.schedule(registry[id], delay);
+		if (name !== undefined) {
+			timer =  new java.util.Timer(name);
+		} else {
+			timer =  new java.util.Timer();
+		}
 
-        return id;
-    };
+		registry[id] = new JavaAdapter(java.util.TimerTask, { run: fn });
+		timer.schedule(registry[id], delay);
 
-    /**
-     * @function setInterval
-     * @param {Function} fn
-     * @param {Number} interval
-     * @param {String} name
-     *
-     * @returns {Number}
-     */
-    setInterval = function(fn, interval, name) {
-        var id = counter++,
-            timer;
+		return id;
+	};
 
-        if (name !== undefined) {
-            timer =  new java.util.Timer(name);
-        } else {
-            timer =  new java.util.Timer();
-        }
+	/**
+	 * @function setInterval
+	 * @param {Function} fn
+	 * @param {Number} interval
+	 * @param {String} name
+	 *
+	 * @returns {Number}
+	 */
+	setInterval = function(fn, interval, name) {
+		var id = counter++,
+			timer;
 
-        registry[id] = new JavaAdapter(java.util.TimerTask, { run: fn });
-        timer.schedule(registry[id], interval, interval);
+		if (name !== undefined) {
+			timer =  new java.util.Timer(name);
+		} else {
+			timer =  new java.util.Timer();
+		}
 
-        return id;
-    };
+		registry[id] = new JavaAdapter(java.util.TimerTask, { run: fn });
+		timer.schedule(registry[id], interval, interval);
 
-    /**
-     * @function clearTimeout
-     * @param {Number} id
-     */
-    clearTimeout = function(id) {
-        if (id == undefined) {
-            return;
-        }
+		return id;
+	};
 
-        if (registry[id] != undefined) {
-            registry[id].cancel();
-        }
+	/**
+	 * @function clearTimeout
+	 * @param {Number} id
+	 */
+	clearTimeout = function(id) {
+		if (id == undefined) {
+			return;
+		}
 
-        delete registry[id];
-    };
+		if (registry[id] != undefined) {
+			registry[id].cancel();
+		}
 
-    /**
-     * @type {clearTimeout}
-     */
-    clearInterval = clearTimeout;
+		delete registry[id];
+	};
+
+	/**
+	 * @type {clearTimeout}
+	 */
+	clearInterval = clearTimeout;
 })();

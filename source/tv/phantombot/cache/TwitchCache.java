@@ -177,7 +177,7 @@ public class TwitchCache implements Runnable {
         }
 
         JSONObject clipsObj = TwitchAPIv5.instance().getClipsToday(this.channel);
-        
+
         String createdAt = "";
         String clipURL = "";
         String creator = "";
@@ -313,7 +313,7 @@ public class TwitchCache implements Runnable {
                             }
                             this.gameTitle = gameTitle;
                         }
-    
+
                         if (forcedGameTitleUpdate && this.gameTitle.equals(gameTitle)) {
                             forcedGameTitleUpdate = false;
                         }
@@ -371,7 +371,7 @@ public class TwitchCache implements Runnable {
         } catch (InterruptedException ex) {
             com.gmt2001.Console.debug.println(ex);
         }
-        
+
         /* Update communities */
         try {
             JSONObject object = TwitchAPIv5.instance().GetCommunities(this.channel);

@@ -252,7 +252,7 @@ function handlePlay(id, title, duration, requester) {
         } else {
             $("#mutedDiv").html("<i class=\"fa fa-volume-off fa-lg\" style=\"color: #ffffff\" />");
         }
-       
+
         if (playerPaused) {
             $("#playPauseDiv").html("<i class=\"fa fa-pause\" />");
         } else {

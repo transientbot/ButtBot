@@ -379,7 +379,7 @@ public class HTTPServerCommon {
                 String sortOrder = "DESC";
                 String sortLimit = String.valueOf(Integer.MAX_VALUE);
                 String sortOffset = "0";
-              
+
                 String[] dbKeys = null;
                 jsonObject.object();
                 jsonObject.key("table");
@@ -436,7 +436,7 @@ public class HTTPServerCommon {
             }
 
         }
-       
+
         jsonObject.object().key("error").value("malformed request").endObject();
         sendHTMLError(400, jsonObject.toString(), exchange);
         return;
@@ -537,7 +537,7 @@ public class HTTPServerCommon {
                     refreshString = "<html><head><meta http-equiv=\"refresh\" content=\"5\" /></head>" +
                                     "<body>" + fileStringData + "</body></html>";
                 }
-                
+
                 sendData("text/html", refreshString, exchange);
             } catch (FileNotFoundException ex) {
                 sendHTMLError(404, "Not Found", exchange);

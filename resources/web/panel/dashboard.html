@@ -14,7 +14,7 @@
 
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- 
+
  @author IllusionaryOne
 -->
 
@@ -42,7 +42,7 @@
             </div>
         </form>
         <br>
-        
+
         <form role="form">
             <div class="form-group" onkeypress="return event.keyCode != 13">
                 <label for="gameTitle">Game Title</label>
@@ -196,13 +196,13 @@
                 </div>
             </form>
             <br>
-            
+
             <button type="button" class="btn btn-danger pull-right" onclick="$.clearHighlights()">Clear Highlights</button>
             <strong>Current Highlights</strong><br>
             <span id="showHighlights" />
         </div>
     </div>
-    
+
     <h3>Death Counter</h3>
     <div>
         <div id="_deathCtrPanelDisabled" />
@@ -240,7 +240,7 @@
                            data-toggle="tooltip" title="Place channels that you want to be in the multi-link, separate them with a space. Do not include your channel in this." />
                 </div>
             </form>
-    
+
             <form role="form">
                  <div class="form-group" onkeypress="return event.keyCode != 13">
                     <label for="multi-link">Timer Interval</label>
@@ -249,7 +249,7 @@
                         data-toggle="tooltip" title="Set the interval (in minutes) for the multi-link to be said in chat. Minimum is 5 minutes." />
                 </div>
             </form>
-    
+
             <form role="form">
                  <div class="form-group" onkeypress="return event.keyCode != 13">
                     <label for="multi-link">Required Messages</label>
@@ -258,7 +258,7 @@
                         data-toggle="tooltip" title="Set the amount of messages required before sending the multi-link." />
                 </div>
             </form>
-    
+
             <button type="button" class="btn btn-success" onclick="$.multiLinkTimerOn()">Multi-Link Timer On</button>
             <button type="button" class="btn btn-danger" onclick="$.multiLinkTimerOff()">Multi-Link Timer Off</button>
             <button type="button" class="btn btn-danger" onclick="$.clearMultiLink()">Clear Multi-Link</button>

@@ -366,15 +366,15 @@ public class MySQLStore extends DataStore {
                 try (PreparedStatement statement = connection.prepareStatement(statementStr)) {
                     statement.setQueryTimeout(10);
                     statement.setString(1, section);
-    
+
                     try (ResultSet rs = statement.executeQuery()) {
-    
+
                         ArrayList<String> s = new ArrayList<>();
-    
+
                         while (rs.next()) {
                             s.add(rs.getString("variable"));
                         }
-    
+
                         return s.toArray(new String[s.size()]);
                     }
                 } catch (SQLException ex) {
@@ -438,15 +438,15 @@ public class MySQLStore extends DataStore {
                 try (PreparedStatement statement = connection.prepareStatement(statementStr)) {
                     statement.setQueryTimeout(10);
                     statement.setString(1, section);
-    
+
                     try (ResultSet rs = statement.executeQuery()) {
-    
+
                         ArrayList<String> s = new ArrayList<>();
-    
+
                         while (rs.next()) {
                             s.add(rs.getString("variable"));
                         }
-    
+
                         return s.toArray(new String[s.size()]);
                     }
                 } catch (SQLException ex) {
@@ -594,10 +594,10 @@ public class MySQLStore extends DataStore {
                     statement.setQueryTimeout(10);
                     statement.setString(1, section);
                     statement.setString(2, "%" + search + "%");
-                    
+
                     try (ResultSet rs = statement.executeQuery()) {
                         ArrayList<String> s = new ArrayList<>();
-                        
+
                         while(rs.next()) {
                             s.add(rs.getString("variable"));
                         }
@@ -610,10 +610,10 @@ public class MySQLStore extends DataStore {
                 try (PreparedStatement statement = connection.prepareStatement("SELECT variable FROM phantombot_" + fName + " WHERE variable LIKE ? ORDER BY variable " + order + " LIMIT " + limit + " OFFSET " + offset + ";")) {
                     statement.setQueryTimeout(10);
                     statement.setString(1, "%" + search + "%");
-                    
+
                     try (ResultSet rs = statement.executeQuery()) {
                         ArrayList<String> s = new ArrayList<>();
-                        
+
                         while(rs.next()) {
                             s.add(rs.getString("variable"));
                         }

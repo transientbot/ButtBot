@@ -176,7 +176,7 @@ public class TwitchWSIRC extends WebSocketClient {
             return false;
         }
     }
-     
+
     /*
      * Callback for connection opening to WS-IRC.  Calls send() directly to login to Twitch
      * IRC rather than sendAddQueue().  We set the lastPing time here as while Twitch has not

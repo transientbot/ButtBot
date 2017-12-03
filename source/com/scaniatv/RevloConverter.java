@@ -49,7 +49,7 @@ public class RevloConverter {
 
 			while ((brLine = bufferedReader.readLine()) != null) {
 				String[] spl = brLine.split(",");
-				
+
 				db.set("points", spl[0].toLowerCase(), spl[2]);
 				com.gmt2001.Console.out.println("Imported: " + spl[0] + " - Points: " + spl[2]);
 			}

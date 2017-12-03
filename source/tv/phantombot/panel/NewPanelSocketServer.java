@@ -201,7 +201,7 @@ public class NewPanelSocketServer {
             }
         });
     }
-     
+
 
     /**
      * Starts the created WebsocketServer
@@ -550,7 +550,7 @@ public class NewPanelSocketServer {
         } else {
             webSocket.send(jsonObject.toString());
         }
-       
+
     }
 
     /**
@@ -874,7 +874,7 @@ public class NewPanelSocketServer {
         if (value.equals(authUsername)) {
             return true;
         }
-        
+
         return false;
     }
 

@@ -363,7 +363,7 @@
     function modifyUserPoints(action) {
         var username = $("#adjustUserPointsNameInput").val(),
             points = $("#adjustUserPointsInput").val();
-        
+
         username = username.replace(/\s+/g, '');
 
         if (action == "take") {
