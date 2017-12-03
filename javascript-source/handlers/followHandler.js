@@ -158,9 +158,9 @@
         }
 
         /*
-         * @commandpath shoutout [streamer] - Give a shout out to a streamer.
+         * @commandpath follow [streamer] - Recommend to the chat that they follow someone.
          */
-        if (command.equalsIgnoreCase('shoutout')) {
+        if (command.equalsIgnoreCase('follow')) {
             if (action === undefined) {
                 $.say($.whisperPrefix(sender) + $.lang.get('followhandler.shoutout.usage', command));
                 return;
@@ -192,7 +192,7 @@
         $.registerChatCommand('./handlers/followHandler.js', 'followdelay', 1);
         $.registerChatCommand('./handlers/followHandler.js', 'followmessage', 1);
         $.registerChatCommand('./handlers/followHandler.js', 'checkfollow', 2);
-        $.registerChatCommand('./handlers/followHandler.js', 'shoutout', 2);
+        $.registerChatCommand('./handlers/followHandler.js', 'follow', 2);
 
         setInterval(function() { runFollows(); }, 2e3, 'scripts::handlers::followHandler.js');
     });
