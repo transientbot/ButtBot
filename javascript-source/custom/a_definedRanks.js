@@ -1,3 +1,5 @@
+/* This file is named a_definedRanks.js so that it loads before customRanks.js.  No other reason. */
+
 (function ()
 {
 	function loadIndividualRanks ()
