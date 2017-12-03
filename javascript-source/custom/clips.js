@@ -60,7 +60,7 @@
         }
     });
 
-	$.bind('initready', function (event)
+	$.bind('initReady', function (event)
 	{
 		$.registerChatCommand('./custom/clips.js', 'clip', 6);
 	});

@@ -18,7 +18,7 @@
         followQueue = new java.util.concurrent.ConcurrentLinkedQueue,
         lastFollow = $.systemTime(),
         announceFollows = false;
-        
+
     /*
      * @function updateFollowConfig
      */
@@ -73,7 +73,7 @@
             if (followReward > 0) {
                 $.inidb.incr('points', follower, followReward);
             }
-            
+
             $.writeToFile(follower + ' ', './addons/followHandler/latestFollower.txt', false);
             $.inidb.set('streamInfo', 'lastFollow', follower);
         }
@@ -158,7 +158,7 @@
         }
 
         /*
-         * @commandpath follow [streamer] - Recommend to the chat that they follow someone.
+         * @commandpath follow [streamer] - Give a shout out to a streamer.
          */
         if (command.equalsIgnoreCase('follow')) {
             if (action === undefined) {

@@ -14,7 +14,7 @@
 
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- 
+
  @author IllusionaryOne
 -->
 
@@ -65,7 +65,7 @@
             </span>
             <div id="newPanelAlert" class="alert" style="display:none"></div>
         </div>
-             
+
         <span id="panelLoader"><i style="color: purple" class="fa fa-spinner fa-spin fa-5x"></i><br><br>Loading PhantomBot Control Panel</span>
 
         <div id="newVersionDialog" title="New Version Available" style="font-size: 90%"> </div>
@@ -112,6 +112,7 @@
                 <li> <a href="#discord">Discord</a> </li>
                 <li> <a href="#audio">Audio</a> </li>
                 <li> <a href="#help">Information</a> </li>
+                <li> <a href="#idle">Idle Rules</a> </li>
                 <li> <a href="#buttCustom">ButtBot Custom</a> </li>
             </ul>
 
@@ -210,6 +211,11 @@
                 <script type="text/javascript" src="panel/js/discordPanel.js"></script>
             </div>
 
+            <div role="tabpanel" class="tab-pane" id="idle">
+                <div id="idlePanel"></div>
+                <script type="text/javascript" src="panel/js/idlePanel.js"></script>
+            </div>
+
             <div role="tabpanel" class="tab-pane" id="buttCustom">
                 <div id="buttCustomPanel"></div>
                 <script type="text/javascript" src="panel/js/buttCustomPanel.js"></script>
@@ -244,18 +250,26 @@
             </div>
             <!-- <span id="iframeLoader"><i style="color: purple" class="fa fa-spinner fa-spin fa-5x"></i><br><br>Loading Twitch Chat</span> -->
              <script>
-                $("#chatsidebar").append("<iframe id=\"chat\" frameborder=\"0\" scrolling=\"no\" onload=\"hideLoadingImage()\"" +
-                                         "src=\"https://www.twitch.tv/" + getChannelName().toLowerCase() + "/chat?popout=\">");
-                /*$("#chat").hide(); ** This breaks things in firefox. */
-                $("#chatsidebar").draggable({ iframeFix: true });
+                (function($) {
+                    var toggle = localStorage.getItem('phantombot_chattoggle');
+
+                    if (toggle === 'false') {
+                        $("#chatsidebar").hide();
+                        return;
+                    }
+
+                    $("#chatsidebar").append("<iframe id=\"chat\" frameborder=\"0\" scrolling=\"no\" onload=\"hideLoadingImage()\"" +
+                                             "src=\"https://www.twitch.tv/" + getChannelName().toLowerCase() + "/chat?popout=\">");
+                    $("#chatsidebar").draggable({ iframeFix: true });
+                })(jQuery);
             </script>
         </div>
 
         <br>
         <br>
-        
+
         <div id="copyright">
-            Control Panel by: 
+            Control Panel by:
             <a href="https://phantombot.tv">phantombot.tv</a>
         </div>
 
