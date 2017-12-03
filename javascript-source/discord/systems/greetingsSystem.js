@@ -1,24 +1,24 @@
 (function() {
 	var joinToggle = $.getSetIniDbBoolean('discordSettings', 'joinToggle', false),
-	    partToggle = $.getSetIniDbBoolean('discordSettings', 'partToggle', false),
-	    joinMessage = $.getSetIniDbString('discordSettings', 'joinMessage', '(name) just joined the server!'),
-	    partMessage = $.getSetIniDbString('discordSettings', 'partMessage', '(name) just left the server!'),
-	    channelName = $.getSetIniDbString('discordSettings', 'greetingsChannel', ''),
-	    joinGroup = $.getSetIniDbString('discordSettings', 'greetingsDefaultGroup', '');
+		partToggle = $.getSetIniDbBoolean('discordSettings', 'partToggle', false),
+		joinMessage = $.getSetIniDbString('discordSettings', 'joinMessage', '(name) just joined the server!'),
+		partMessage = $.getSetIniDbString('discordSettings', 'partMessage', '(name) just left the server!'),
+		channelName = $.getSetIniDbString('discordSettings', 'greetingsChannel', ''),
+		joinGroup = $.getSetIniDbString('discordSettings', 'greetingsDefaultGroup', '');
 
 	/**
-     * @event webPanelSocketUpdate
-     */
-    $.bind('webPanelSocketUpdate', function(event) {
-        if (event.getScript().equalsIgnoreCase('./discord/systems/greetingsSystem.js')) {
-        	joinToggle = $.getIniDbBoolean('discordSettings', 'joinToggle', false);
-	    	partToggle = $.getIniDbBoolean('discordSettings', 'partToggle', false);
-	    	joinMessage = $.getIniDbString('discordSettings', 'joinMessage', '(name) just joined the server!');
-	    	partMessage = $.getIniDbString('discordSettings', 'partMessage', '(name) just left the server!');
-	    	channelName = $.getIniDbString('discordSettings', 'greetingsChannel', '');
-	    	joinGroup = $.getIniDbString('discordSettings', 'greetingsDefaultGroup', '');
-        }
-    });
+	 * @event webPanelSocketUpdate
+	 */
+	$.bind('webPanelSocketUpdate', function(event) {
+		if (event.getScript().equalsIgnoreCase('./discord/systems/greetingsSystem.js')) {
+			joinToggle = $.getIniDbBoolean('discordSettings', 'joinToggle', false);
+			partToggle = $.getIniDbBoolean('discordSettings', 'partToggle', false);
+			joinMessage = $.getIniDbString('discordSettings', 'joinMessage', '(name) just joined the server!');
+			partMessage = $.getIniDbString('discordSettings', 'partMessage', '(name) just left the server!');
+			channelName = $.getIniDbString('discordSettings', 'greetingsChannel', '');
+			joinGroup = $.getIniDbString('discordSettings', 'greetingsDefaultGroup', '');
+		}
+	});
 
 	/**
 	 * @event discordChannelJoin
@@ -29,8 +29,8 @@
 		}
 
 		var username = event.getUsername(),
-		    mention = event.getMention(),
-		    s = joinMessage;
+			mention = event.getMention(),
+			s = joinMessage;
 
 		if (s.match(/\(@name\)/)) {
 			s = $.replace(s, '(@name)', mention);
@@ -60,8 +60,8 @@
 		}
 
 		var username = event.getUsername(),
-		    mention = event.getMention(),
-		    s = partMessage;
+			mention = event.getMention(),
+			s = partMessage;
 
 		if (s.match(/\(@name\)/)) {
 			s = $.replace(s, '(@name)', mention);
@@ -80,11 +80,11 @@
 	$.bind('discordChannelCommand', function(event) {
 		var sender = event.getSender(),
 			command = event.getCommand(),
-		    channel = event.getChannel(),
-		    mention = event.getMention(),
-		    args = event.getArgs(),
-		    action = args[0],
-		    subAction = args[1];
+			channel = event.getChannel(),
+			mention = event.getMention(),
+			args = event.getArgs(),
+			action = args[0],
+			subAction = args[1];
 
 		if (command.equalsIgnoreCase('greetingssystem')) {
 			if (action === undefined) {

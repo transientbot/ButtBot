@@ -4,52 +4,52 @@
  * This module will generate a random string of letters when we type the command in chat.
  */
 (function() {
-    // Global variables for this script if needed.
-    var myRandomVariableToGetAndSetDbString = $.getSetIniDbString('my_db_table', 'my_db_key', 'my_db_string'),
-        myRandomVariableToGetAndSetDbBoolean = $.getSetIniDbBoolean('my_db_table', 'my_db_key', false),
-        myRandomVariableToGetAndSetDbNumber = $.getSetIniDbNumber('my_db_table', 'my_db_key', 0),
-        myRandomStaticVariable = 'something';
+	// Global variables for this script if needed.
+	var myRandomVariableToGetAndSetDbString = $.getSetIniDbString('my_db_table', 'my_db_key', 'my_db_string'),
+		myRandomVariableToGetAndSetDbBoolean = $.getSetIniDbBoolean('my_db_table', 'my_db_key', false),
+		myRandomVariableToGetAndSetDbNumber = $.getSetIniDbNumber('my_db_table', 'my_db_key', 0),
+		myRandomStaticVariable = 'something';
 
-    // Function to generate a random string of letters.
-    function getRandomString(size) {
-        // Local variables just for this function.
-        var letters = 'abcdefghijklmnopqrstuvwxyz',
-            data = '',
-            i;
+	// Function to generate a random string of letters.
+	function getRandomString(size) {
+		// Local variables just for this function.
+		var letters = 'abcdefghijklmnopqrstuvwxyz',
+			data = '',
+			i;
 
-        for (i = 0; i < size; i++) {
-            data += letters.charAt(Math.floor(Math.random() * letters.length));
-        }
+		for (i = 0; i < size; i++) {
+			data += letters.charAt(Math.floor(Math.random() * letters.length));
+		}
 
-        return data;
-    }
+		return data;
+	}
 
-    // Command event for when someone types a command for this module.
-    $.bind('command', function(event) {
-        var command = event.getCommand(), // command name all lower case.
-            sender = event.getSender(),   // user who sent the command lower case.
-            args = event.getArgs();       // each argument after the command in an array.
+	// Command event for when someone types a command for this module.
+	$.bind('command', function(event) {
+		var command = event.getCommand(), // command name all lower case.
+			sender = event.getSender(),   // user who sent the command lower case.
+			args = event.getArgs();	   // each argument after the command in an array.
 
-        // Command name.
-        if (command.equalsIgnoreCase('randomstring')) {
-            // Check for arguments, if needed.
-            if (args[0] === undefined) {
-                // Say something to the user.
-                $.say($.whisperPrefix(sender) + 'Usage: !randomstring [length of the string]');
-                // Stop here.
-                return;
-            }
+		// Command name.
+		if (command.equalsIgnoreCase('randomstring')) {
+			// Check for arguments, if needed.
+			if (args[0] === undefined) {
+				// Say something to the user.
+				$.say($.whisperPrefix(sender) + 'Usage: !randomstring [length of the string]');
+				// Stop here.
+				return;
+			}
 
-            // Argument was said, say this in chat now.
-            $.say('Random string: ' + getRandomString(parseInt(args[0])));
-        }
-    });
+			// Argument was said, say this in chat now.
+			$.say('Random string: ' + getRandomString(parseInt(args[0])));
+		}
+	});
 
-    // Event that runs once at boot-up if the module is enabled.
-    $.bind('initReady', function() {
-        // Register the command with the: module path, command name, and command permission.
-        $.registerChatCommand('./commands/moduleExample.js', 'randomstring', 7);
-    });
+	// Event that runs once at boot-up if the module is enabled.
+	$.bind('initReady', function() {
+		// Register the command with the: module path, command name, and command permission.
+		$.registerChatCommand('./commands/moduleExample.js', 'randomstring', 7);
+	});
 })();
 
 // INFORMATION ABOUT SUBMITING A PULL-REQUEST FOR A NEW MODULE. PLEASE READ:

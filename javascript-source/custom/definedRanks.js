@@ -6,6 +6,6 @@
 		return [
 		];
 	};
-	
+
 	$.loadIndividualRanks = loadIndividualRanks;
 })();

@@ -197,7 +197,7 @@ public class NoticeTimer implements Runnable {
         lastNoticeTime = -1L;
         processScheduledTimers(currentMinute);
     }
-  
+
 
     /*
      * Performs the main procesing of ordered timers.
@@ -225,7 +225,7 @@ public class NoticeTimer implements Runnable {
         if (noticeTimeDiff < noticeTimeInterval) {
             return;
         }
-        
+
         /* Get the required messages and compare to how many lines have been posted into chat. */
         int noticeReqMessages = dataStore.GetInteger("noticeSettings", "", "reqmessages");
         if (noticeReqMessages > this.session.chatLinesGet() && noticeReqMessages != 0) {
@@ -247,7 +247,7 @@ public class NoticeTimer implements Runnable {
         if (message0.length() == 0 && lastNoticeID == 0) {
             return;
         }
-      
+
         /*
          * Get the notice.  If it is null or empty, assume we are at the end of the list and reset to 0.
          */
@@ -260,7 +260,7 @@ public class NoticeTimer implements Runnable {
             lastNoticeID = 0;
             message = message0;
         }
-        
+
         /* See if the message is really a command and handle accordingly. */
         if (message.startsWith("command:")) {
             String arguments = "";
@@ -324,7 +324,7 @@ public class NoticeTimer implements Runnable {
             if (!foundMinuteMatch) {
                 continue;
             }
-            
+
             /* Pull chatlines.  0 means ignore lines in chat. */
             String chatlines = dataStore.GetString("notices", section, "chatlines");
             if (chatlines == null) {
@@ -347,7 +347,7 @@ public class NoticeTimer implements Runnable {
                     }
                 }
             }
-    
+
             /* Pull the message (or command). */
             String message = dataStore.GetString("notices", section, "message");
             if (message == null) {

@@ -108,13 +108,13 @@ public class DataRenderServiceAPIv1 {
                                            "(KHTML, like Gecko) Chrome/44.0.2403.52 Safari/537.36 PhantomBotJ/2015");
                 httpsUrlConn.connect();
                 httpsUrlConn.getOutputStream().write(postRequest);
-    
+
                 if (httpsUrlConn.getResponseCode() == 200) {
                     inputStream = httpsUrlConn.getInputStream();
                 } else {
                     inputStream = httpsUrlConn.getErrorStream();
                 }
-    
+
                 BufferedReader rd = new BufferedReader(new InputStreamReader(inputStream, Charset.forName("UTF-8")));
                 jsonText = readAll(rd);
                 jsonResult = new JSONObject(jsonText);
@@ -131,13 +131,13 @@ public class DataRenderServiceAPIv1 {
                                            "(KHTML, like Gecko) Chrome/44.0.2403.52 Safari/537.36 PhantomBotJ/2015");
                 httpUrlConn.connect();
                 httpUrlConn.getOutputStream().write(postRequest);
-   
+
                 if (httpUrlConn.getResponseCode() == 200) {
                     inputStream = httpUrlConn.getInputStream();
                 } else {
                     inputStream = httpUrlConn.getErrorStream();
                 }
-   
+
                 BufferedReader rd = new BufferedReader(new InputStreamReader(inputStream, Charset.forName("UTF-8")));
                 jsonText = readAll(rd);
                 jsonResult = new JSONObject(jsonText);

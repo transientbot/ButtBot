@@ -32,7 +32,7 @@ public class BitsEvent extends TwitchEvent {
 
     public BitsEvent(Channel channel, String username, String bits) {
         super(channel);
-        
+
         this.username = username;
         this.bits = bits;
     }

@@ -107,13 +107,13 @@ In ./development-resources there's a template (module-template.js) which you can
 - Please don't leave spaces inside at the start and end of your if/while/for statements.
 - Hugging braces.
 
-Examples:     
+Examples:  
 
 Proper if statement:
 
 ```
 if (something) {
-```    
+```	
 
 Improper if statements:
 
@@ -124,13 +124,13 @@ if (something)
 {
 ```
 
-Proper for loop:    
+Proper for loop:	
 
 ```
 for (i = 0; i < 10; i++) {
 ```
 
-Improper for loops:    
+Improper for loops:	
 
 ```
 for ( i = 0; i < 10; i++ ) {

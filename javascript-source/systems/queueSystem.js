@@ -379,7 +379,7 @@
 	$.bind('initReady', function() {
 		$.registerChatCommand('./systems/queueSystem.js', 'joinqueue', 7);
 		$.registerChatCommand('./systems/queueSystem.js', 'queue', 7);
-		
+
 		$.registerChatSubcommand('queue', 'open', 1);
 		$.registerChatSubcommand('queue', 'close', 1);
 		$.registerChatSubcommand('queue', 'clear', 1);
@@ -392,31 +392,31 @@
 	});
 
 	/**
-     * @event webPanelSocketUpdate
-     */
-    $.bind('webPanelSocketUpdate', function(event) {
-        if (event.getScript().equalsIgnoreCase('./systems/queueSystem.js')) {
-        	var action = event.getArgs()[0];
+	 * @event webPanelSocketUpdate
+	 */
+	$.bind('webPanelSocketUpdate', function(event) {
+		if (event.getScript().equalsIgnoreCase('./systems/queueSystem.js')) {
+			var action = event.getArgs()[0];
 
-        	if (action.equalsIgnoreCase('open')) {
-        		open($.channelName, event.getArgs()[1], event.getArgs().slice(2).join(' '));
-        	} else if (action.equalsIgnoreCase('close')) {
-        		close($.channelName);
-        	} else if (action.equalsIgnoreCase('pick')) {
-        		pick($.channelName, event.getArgs()[1]);
-        	} else if (action.equalsIgnoreCase('remove')) {
-        		if (event.getArgs()[1] !== undefined && queue[event.getArgs()[1]] !== undefined) {
-        			$.consoleLn('remove:' + event.getArgs()[1]);
-        			delete queue[event.getArgs()[1].toLowerCase()];
-        			$.inidb.del('queue', event.getArgs()[1].toLowerCase());
-        			resetPosition(-1);
-        		}
-        	} else if (action.equalsIgnoreCase('clear')) {
-        		queue = {};
+			if (action.equalsIgnoreCase('open')) {
+				open($.channelName, event.getArgs()[1], event.getArgs().slice(2).join(' '));
+			} else if (action.equalsIgnoreCase('close')) {
+				close($.channelName);
+			} else if (action.equalsIgnoreCase('pick')) {
+				pick($.channelName, event.getArgs()[1]);
+			} else if (action.equalsIgnoreCase('remove')) {
+				if (event.getArgs()[1] !== undefined && queue[event.getArgs()[1]] !== undefined) {
+					$.consoleLn('remove:' + event.getArgs()[1]);
+					delete queue[event.getArgs()[1].toLowerCase()];
+					$.inidb.del('queue', event.getArgs()[1].toLowerCase());
+					resetPosition(-1);
+				}
+			} else if (action.equalsIgnoreCase('clear')) {
+				queue = {};
 				info = {};
 				isOpened = false;
 				$.inidb.RemoveFile('queue');
 			}
-        }
-    });
+		}
+	});
 })();

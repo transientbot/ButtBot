@@ -35,7 +35,7 @@ public class TwitchChannelCache implements Runnable {
 	private boolean killed;
 	private Map<String, JSONObject> cache = new HashMap<>();
 	private Map<String, String> users = new HashMap<>();
-	
+
 	/*
 	 * Method to start and return this instance.
 	 *
@@ -111,16 +111,16 @@ public class TwitchChannelCache implements Runnable {
 					this.cache = newCache;
 					return;
 				}
-	
+
 				// Get the streams array.
 				streams = object.getJSONArray("streams");
-	
+
 				for (int i = 0; i < streams.length(); i++) {
 					JSONObject obj = streams.getJSONObject(i);
 
 					// The channel's real name and not the display name.
 					String channel = obj.getJSONObject("channel").getString("name");
-					
+
 					// Make sure the channel is live and it's not a vodcast or playlist.
 					if (obj.getString("stream_type").equals("live")) {
 						if (!cache.containsKey(channel)) {
@@ -129,7 +129,7 @@ public class TwitchChannelCache implements Runnable {
 						newCache.put(channel, obj);
 					}
 				}
-	
+
 				// Set the new cache.
 				this.cache = newCache;
 			} else {
@@ -160,14 +160,14 @@ public class TwitchChannelCache implements Runnable {
 				if (!this.users.containsKey(channel)) {
 					object = TwitchAPIv5.instance().GetUser(String.join(",", channelNames));
 					newCache = new HashMap<>();
-	
+
 					// Make sure the call was successful .
 					if (object.getBoolean("_success") && object.getInt("_http") == 200) {
 						users = object.getJSONArray("users");
-	
+
 						for (int i = 0; i < users.length(); i++) {
 							JSONObject user = users.getJSONObject(i);
-	
+
 							// Put the user in the cache.
 							newCache.put(user.getString("name"), user.getString("_id"));
 						}

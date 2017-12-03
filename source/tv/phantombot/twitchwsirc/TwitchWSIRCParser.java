@@ -313,7 +313,7 @@ public class TwitchWSIRCParser {
                 }
             }
         }
-        
+
         /* Check if the message is a command */
         if (message.startsWith("!")) {
             commandEvent(message, username, tagsMap);

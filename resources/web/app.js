@@ -116,7 +116,7 @@ function handlePause(d) {
 
 function handleAdd(d) {
     vids.push(d[1]);
-    
+
 }
 
 function handleCurrentId(d) {

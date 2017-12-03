@@ -55,7 +55,7 @@ public class Session implements Runnable {
     private String botName;
     private int writes = 0;
     private String oAuth;
-    
+
     /*
      * Method to start and get this instance.
      *
@@ -68,7 +68,7 @@ public class Session implements Runnable {
      */
     public static Session instance(Channel channel, String channelName, String botName, String oAuth, EventBus eventBus) {
         Session instance = instances.get(botName);
-        
+
         if (instance == null) {
             instance = new Session(channel, channelName, botName, oAuth, eventBus);
             instances.put(botName, instance);
@@ -300,7 +300,7 @@ public class Session implements Runnable {
                 message = queue.take();
                 // Set the current time.
                 time = System.currentTimeMillis();
-                
+
                 // if the message is a timeout, and we sent less than 100, send the timeout.
                 if (sendMessages && (nextWrite < time || (message.hasPriority && writes < 99))) {
                     if (lastWrite > time) {
@@ -313,7 +313,7 @@ public class Session implements Runnable {
                         writes = 0;
                         lastWrite = (time + 30200);
                     }
-    
+
                     send(message.message);
                 }
             } catch (Exception ex) {

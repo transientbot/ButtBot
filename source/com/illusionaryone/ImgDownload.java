@@ -54,7 +54,7 @@ public class ImgDownload {
                 }   outputStream.close();
             }
             byte[] imgData = outputStream.toByteArray();
-    
+
             if (!new File ("./addons/downloadHTTP").exists()) {
                 new File ("./addons/downloadHTTP").mkdirs();
             }

@@ -102,7 +102,7 @@
 		}
 
 		/*Panel Commands*/
-		if (command.equalsIgnoreCase('reloadwelcome')) {    //DON'T FORGET TO REGISTER CHAT COMMAND BELOW
+		if (command.equalsIgnoreCase('reloadwelcome')) {	//DON'T FORGET TO REGISTER CHAT COMMAND BELOW
 			if (!$.isBot(sender)) {
 				return;
 			}

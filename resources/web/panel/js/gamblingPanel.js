@@ -300,7 +300,7 @@
 
         sendDBUpdate('raffle_sub_luck', 'raffleSettings', 'subscriberBonusRaffle', String(sub));
         sendDBUpdate('raffle_sub_luck', 'raffleSettings', 'regularBonusRaffle', String(reg));
-        
+
         // For some slower drives sometimes this makes it before it has time to write the new data.
         setTimeout(function() {
             sendCommand('reloadraffle');
@@ -340,7 +340,7 @@
 
         sendDBUpdate('raffle_sub_luck', 'raffleSettings', 'subscriberBonusRaffle', String(sub));
         sendDBUpdate('raffle_sub_luck', 'raffleSettings', 'regularBonusRaffle', String(reg));
-        
+
         // For some slower drives sometimes this makes it before it has time to write the new data.
         setTimeout(function() {
             sendCommand('reloadraffle');

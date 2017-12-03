@@ -5,12 +5,12 @@
  */
 (function() {
 	var bets = {},
-	    timeout,
-	    gain = $.getSetIniDbNumber('bettingSettings', 'gain', 40),
-	    saveBets = $.getSetIniDbBoolean('bettingSettings', 'save', true),
-	    saveFormat = $.getSetIniDbString('bettingSettings', 'format', 'yyyy.M.dd'),
-	    warningMessages = $.getSetIniDbBoolean('bettingSettings', 'warningMessages', false),
-	    bet = { status: false, opened: false, entries: 0, total: 0, minimum: 0, maximum: 0, timer: 0, pointsWon: 0, title: '', winners: '', options: {}, opt: [] };
+		timeout,
+		gain = $.getSetIniDbNumber('bettingSettings', 'gain', 40),
+		saveBets = $.getSetIniDbBoolean('bettingSettings', 'save', true),
+		saveFormat = $.getSetIniDbString('bettingSettings', 'format', 'yyyy.M.dd'),
+		warningMessages = $.getSetIniDbBoolean('bettingSettings', 'warningMessages', false),
+		bet = { status: false, opened: false, entries: 0, total: 0, minimum: 0, maximum: 0, timer: 0, pointsWon: 0, title: '', winners: '', options: {}, opt: [] };
 
 	/**
 	 * @function reloadBet
@@ -18,8 +18,8 @@
 	 */
 	function reloadBet() {
 		gain = $.getIniDbNumber('bettingSettings', 'gain');
-	    saveBets = $.getIniDbBoolean('bettingSettings', 'save');
-	    saveFormat = $.getIniDbString('bettingSettings', 'format');
+		saveBets = $.getIniDbBoolean('bettingSettings', 'save');
+		saveFormat = $.getIniDbString('bettingSettings', 'format');
 	}
 
 	/**
@@ -54,7 +54,7 @@
 		bet.maximum = parseInt(maximum);
 		bet.status = true;
 		bet.opened = true;
-		
+
 		if (timer !== undefined && !isNaN(parseInt(timer)) && timer > 0) {
 			bet.timer = timer;
 			timeout = setTimeout(function() {
@@ -99,9 +99,9 @@
 		bet.opened = false;
 
 		var winners = [],
-		    total = 0,
-		    give = 0,
-		    i;
+			total = 0,
+			give = 0,
+			i;
 
 		$.say($.lang.get('bettingsystem.close.success', option));
 
@@ -142,13 +142,13 @@
 	function save() {
 		if (saveBets) {
 			var dateFormat = new java.text.SimpleDateFormat(saveFormat),
-			    date = dateFormat.format(new Date());
+				date = dateFormat.format(new Date());
 			if (!$.inidb.exists('bettingResults', date)) {
-			    $.inidb.set('bettingResults', date, $.lang.get('bettingsystem.save.format', bet.title, bet.opt.join(', '), bet.total, bet.entries, bet.pointsWon));
+				$.inidb.set('bettingResults', date, $.lang.get('bettingsystem.save.format', bet.title, bet.opt.join(', '), bet.total, bet.entries, bet.pointsWon));
 			} else {
 				var keys = $.inidb.GetKeyList('bettingResults', ''),
-				    a = 1,
-				    i;
+					a = 1,
+					i;
 				for (i in keys) {
 					if (keys[i].includes(date)) {
 						a++;
@@ -167,7 +167,7 @@
 	function clear() {
 		save();
 		bets = {};
-	    bet = { status: false, opened: false, entries: 0, total: 0, minimum: 0, maximum: 0, timer: 0, pointsWon: 0, title: '', winners: '', options: {}, opt: [] };
+		bet = { status: false, opened: false, entries: 0, total: 0, minimum: 0, maximum: 0, timer: 0, pointsWon: 0, title: '', winners: '', options: {}, opt: [] };
 	}
 
 	/**
@@ -234,10 +234,10 @@
 	 */
 	$.bind('command', function(event) {
 		var sender = event.getSender(),
-		    command = event.getCommand(),
-		    args = event.getArgs(),
-		    action = args[0],
-		    subAction = args[1];
+			command = event.getCommand(),
+			args = event.getArgs(),
+			action = args[0],
+			subAction = args[1];
 
 		if (command.equalsIgnoreCase('bet')) {
 			if (action === undefined) {
@@ -277,7 +277,7 @@
 				$.say($.whisperPrefix(sender) + $.lang.get('bettingsystem.warning.messages', (warningMessages === true ? $.lang.get('bettingsystem.now') : $.lang.get('bettingsystem.not'))));
 				return;
 
-		    /**
+			/**
 			 * @commandpath bet saveformat [date format] - Changes the date format past bets are saved in default is yyyy.mm.dd
 			 */
 			} else if (action.equalsIgnoreCase('saveformat')) {
@@ -342,16 +342,16 @@
 	 * @event initReady
 	 */
 	$.bind('initReady', function() {
-        $.registerChatCommand('./systems/bettingSystem.js', 'bet', 7);
-        $.registerChatSubcommand('bet', 'current', 7);
-        $.registerChatSubcommand('bet', 'results', 7);
-        $.registerChatSubcommand('bet', 'open', 2);
-        $.registerChatSubcommand('bet', 'close', 2);
-        $.registerChatSubcommand('bet', 'save', 1);
-        $.registerChatSubcommand('bet', 'saveformat', 1);
-        $.registerChatSubcommand('bet', 'gain', 1);
-    });
+		$.registerChatCommand('./systems/bettingSystem.js', 'bet', 7);
+		$.registerChatSubcommand('bet', 'current', 7);
+		$.registerChatSubcommand('bet', 'results', 7);
+		$.registerChatSubcommand('bet', 'open', 2);
+		$.registerChatSubcommand('bet', 'close', 2);
+		$.registerChatSubcommand('bet', 'save', 1);
+		$.registerChatSubcommand('bet', 'saveformat', 1);
+		$.registerChatSubcommand('bet', 'gain', 1);
+	});
 
-    /* export to the $ api */
-    $.reloadBet = reloadBet;
+	/* export to the $ api */
+	$.reloadBet = reloadBet;
 })();

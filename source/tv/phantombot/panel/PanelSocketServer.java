@@ -154,7 +154,7 @@ public class PanelSocketServer extends WebSocketServer {
         super(new InetSocketAddress(port));
         this.authString = authString;
         this.authStringRO = authStringRO;
-    
+
         Thread.setDefaultUncaughtExceptionHandler(com.gmt2001.UncaughtExceptionHandler.instance());
     }
 
@@ -853,7 +853,7 @@ public class PanelSocketServer extends WebSocketServer {
         if (value.equals(authUsername)) {
             return true;
         }
-        
+
         return false;
     }
 

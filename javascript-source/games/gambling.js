@@ -1,19 +1,19 @@
 (function() {
 	var winGainPercent = $.getSetIniDbNumber('gambling', 'winGainPercent', 30),
-	    winRange = $.getSetIniDbNumber('gambling', 'winRange', 50),
-	    max = $.getSetIniDbNumber('gambling', 'max', 100),
-	    min = $.getSetIniDbNumber('gambling', 'min', 5),
-	    gain = Math.abs(winGainPercent / 100);
+		winRange = $.getSetIniDbNumber('gambling', 'winRange', 50),
+		max = $.getSetIniDbNumber('gambling', 'max', 100),
+		min = $.getSetIniDbNumber('gambling', 'min', 5),
+		gain = Math.abs(winGainPercent / 100);
 
 	/**
 	 * @function reloadGamble
 	 */
 	function reloadGamble() {
 	 	winGainPercent = $.getIniDbNumber('gambling', 'winGainPercent');
-	    winRange = $.getIniDbNumber('gambling', 'winRange');
-	    max = $.getIniDbNumber('gambling', 'max');
-	    min = $.getIniDbNumber('gambling', 'min');
-	    gain = Math.abs(winGainPercent / 100);
+		winRange = $.getIniDbNumber('gambling', 'winRange');
+		max = $.getIniDbNumber('gambling', 'max');
+		min = $.getIniDbNumber('gambling', 'min');
+		gain = Math.abs(winGainPercent / 100);
 	}
 
 	/**
@@ -24,8 +24,8 @@
 	 */
 	function gamble(sender, amount) {
 		var winnings = 0,
-		    winSpot = 0,
-		    range = $.randRange(1, 100);
+			winSpot = 0,
+			range = $.randRange(1, 100);
 
 		if ($.getUserPoints(sender) < amount) {
 			$.say($.whisperPrefix(sender) + $.lang.get('gambling.need.points', $.pointNameMultiple));
@@ -46,7 +46,7 @@
 			$.say($.lang.get('gambling.lost', $.resolveRank(sender), range, $.getPointsString(amount), $.getPointsString($.getUserPoints(sender) - amount), $.gameMessages.getLose(sender, 'gamble')));
 			$.inidb.decr('points', sender, amount);
 		} else {
-            winnings = Math.floor(amount + (amount * gain));
+			winnings = Math.floor(amount + (amount * gain));
 			$.say($.lang.get('gambling.won', $.resolveRank(sender), range, $.getPointsString(winnings - amount), $.getPointsString($.getUserPoints(sender) + (winnings - amount)), $.gameMessages.getWin(sender, 'gamble')));
 			$.inidb.decr('points', sender, amount);
 			$.inidb.incr('points', sender, winnings);
@@ -55,9 +55,9 @@
 
 	$.bind('command', function(event) {
 		var sender = event.getSender(),
-		    command = event.getCommand(),
-		    args = event.getArgs(),
-		    action = args[0];
+			command = event.getCommand(),
+			args = event.getArgs(),
+			action = args[0];
 
 		 /**
 		 * @commandpath gamble [amount] - Gamble your points.
@@ -125,12 +125,12 @@
 	});
 
 	$.bind('initReady', function() {
-        $.registerChatCommand('./games/gambling.js', 'gamble', 7);
-        $.registerChatCommand('./games/gambling.js', 'gamblesetmax', 1);
-        $.registerChatCommand('./games/gambling.js', 'gamblesetmin', 1);
-        $.registerChatCommand('./games/gambling.js', 'gamblesetwinningrange', 1);
-        $.registerChatCommand('./games/gambling.js', 'gamblesetgainpercent', 1);
-    });
+		$.registerChatCommand('./games/gambling.js', 'gamble', 7);
+		$.registerChatCommand('./games/gambling.js', 'gamblesetmax', 1);
+		$.registerChatCommand('./games/gambling.js', 'gamblesetmin', 1);
+		$.registerChatCommand('./games/gambling.js', 'gamblesetwinningrange', 1);
+		$.registerChatCommand('./games/gambling.js', 'gamblesetgainpercent', 1);
+	});
 
-    $.reloadGamble = reloadGamble;
+	$.reloadGamble = reloadGamble;
 })();
