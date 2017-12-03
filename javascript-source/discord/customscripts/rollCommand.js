@@ -91,9 +91,11 @@
 
 
   /**
-   * @event discordCommand
+   * @event discordChannelCommand
+   *
+   * Pretty sure discordCommand became discordChannelCommand. 
    */
-  $.bind('discordCommand', function(event) {
+  $.bind('discordChannelCommand', function(event) {
 	  var sender = event.getSender(),
 		  channel = event.getChannel(),
 		  command = event.getCommand(),

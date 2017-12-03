@@ -6,7 +6,7 @@
 
 	var cachedRanks = { };
 
-  function checkIndividualRanks (user)
+  	function checkIndividualRanks (user)
 	{
 		var time = new Date().getTime();
 
