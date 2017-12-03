@@ -49,9 +49,10 @@
         username = username.toLowerCase();
 
         // Has a custom rank.
-        if ($.inidb.exists('viewerRanks', username.toLowerCase())) {
-            return true;
-        }
+		if ($.checkIndividualRanks(username))
+		{
+			return true;
+		}
 
         // Look for data in the ranksMapping table, if none, the user has no rank, else, has a rank.
         if (ranksTimeTable === undefined) {
