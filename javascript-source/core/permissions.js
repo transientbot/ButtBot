@@ -928,8 +928,8 @@
         $.registerChatCommand('./core/permissions.js', 'permissions', 1);
         $.registerChatCommand('./core/permissions.js', 'permissionlist', 1);
         $.registerChatCommand('./core/permissions.js', 'permissionpoints', 1);
-        $.registerChatCommand('./core/permissions.js', 'users', 2);
-        $.registerChatCommand('./core/permissions.js', 'mods', 2);
+        // $.registerChatCommand('./core/permissions.js', 'users', 2);  // This command uselessly lists the users in the room.
+        // $.registerChatCommand('./core/permissions.js', 'mods', 2);   // This command uselessly lists the moderators in the room.
 
         /** Load groups and generate default groups if they don't exist */
         reloadGroups();
