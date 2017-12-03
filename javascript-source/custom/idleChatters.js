@@ -206,7 +206,7 @@
 		}
 	});
 
-	$.bind('initready', function (event)
+	$.bind('initReady', function (event)
 	{
 		$.registerChatCommand('./custom/idlechatters.js', 'reportidletimes', 2);
 		$.registerChatCommand('./custom/idlechatters.js', 'reportactiveusers', 2);
