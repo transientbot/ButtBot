@@ -85,37 +85,7 @@
 	 * @returns {string}
 	 */
 	function getRank(username) {
-		var userTime,
-			userLevel;
-
-		username = username.toLowerCase();
-
-		if (!hasRank(username)) {
-			return '';
-		}
-
-		// Return Custom Rank
-		if ($.inidb.exists('viewerRanks', username.toLowerCase())) {
-			return $.inidb.get('viewerRanks', username.toLowerCase());
-		}
-
-		// Return System Rank
-		userLevel = -1;
-		userTime = parseInt(parseInt($.inidb.get('time', username)) / 3600);
-		if (isNaN(userTime)) {
-			userTime = 0;
-		}
-		for (var i = 0; i < ranksTimeTable.length; i++) {
-			if (parseInt(userTime) >= parseInt(ranksTimeTable[i])) {
-				userLevel = i;
-			} else {
-				i = ranksTimeTable.length;
-			}
-		}
-		if (userLevel != -1) {
-			return $.inidb.get('ranksMapping', ranksTimeTable[userLevel].toString());
-		}
-		return '';
+		return $.checkIndividualRanks (username.toLowerCase());
 	}
 
 	/**
