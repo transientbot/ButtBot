@@ -104,10 +104,9 @@
 			if (s.match(/\(name\)/)) {
 				s = $.replace(s, '(name)', $.username.resolve($.channelName));
 			}
-			if (s.match(/\(game)\)/)) {
+			if (s.match(/\(game\)/)) {
 				s = $.replace(s, '(game)', $.getGame($.channelName));
 			}
-
 
 			$.discord.say(channelName, "TransientGamers just went live with " + $.getGame($.channelName) + " at <https://www.twitch.tv/TransientGamers> @everyone");
 			
@@ -140,7 +139,7 @@
 		if (s.match(/\(name\)/)) {
 			s = $.replace(s, '(name)', $.username.resolve($.channelName));
 		}
-		if (s.match(/\(game)\)/)) {
+		if (s.match(/\(game\)/)) {
 			s = $.replace(s, '(game)', $.getGame($.channelName));
 		}
 
