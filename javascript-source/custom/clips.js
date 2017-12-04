@@ -41,7 +41,7 @@
 						message = "Grumble, mumble, making me do work on a " + [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ][new Date ().getDay ()] + "...";
 						break;
 					case 7:
-						message = "!clip " + args[0] + (args[1] ? " \"" + args[1] + "\" ": "") + "That's you.  That's what you sound like.";
+						message = "!clip " + args[0] + (args[1] ? " \"" + args[1] + "\" ": " ") + "That's you.  That's what you sound like.";
 						break;
 					case 8:
 						message = "TransientGamers doesn't pay me enough for this.";
