@@ -104,7 +104,13 @@
 			if (s.match(/\(name\)/)) {
 				s = $.replace(s, '(name)', $.username.resolve($.channelName));
 			}
+			if (s.match(/\(game)\)/)) {
+				s = $.replace(s, '(game)', $.getGame($.channelName));
+			}
 
+
+			$.discord.say(channelName, "TransientGamers just went live with " + $.getGame($.channelName) + " at <https://www.twitch.tv/TransientGamers> @everyone");
+			
 			$.discordAPI.sendMessageEmbed(channelName, new Packages.sx.blah.discord.util.EmbedBuilder()
 				.withColor(100, 65, 164)
 				.withThumbnail($.twitchcache.getLogoLink())
@@ -133,6 +139,9 @@
 
 		if (s.match(/\(name\)/)) {
 			s = $.replace(s, '(name)', $.username.resolve($.channelName));
+		}
+		if (s.match(/\(game)\)/)) {
+			s = $.replace(s, '(game)', $.getGame($.channelName));
 		}
 
 		$.discordAPI.sendMessageEmbed(channelName, new Packages.sx.blah.discord.util.EmbedBuilder()
