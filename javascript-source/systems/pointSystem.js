@@ -134,6 +134,7 @@
 	function runPointsPayout() {
 		var now = $.systemTime(),
 			uUsers = [],
+			activeUsers = [],
 			username,
 			amount,
 			i;
@@ -154,6 +155,15 @@
 			} else {
 				return;
 			}
+		}
+		
+		var idlePoints = $.idlePoints;
+		var activeUsers;
+		
+		if ($.idlePointsDuration () != false) {
+			activeUsers = getRecentChatters ($.idlePointsDuration ());
+		} else {
+			activeUsers = false;
 		}
 
 		$.inidb.setAutoCommit(false);
@@ -214,6 +224,10 @@
 			}
 
 			if (!getUserPenalty(username)) {
+				if ($.isOnline ($.channelName) && $.idlePointsDuration () && activeUsers.indexOf (username + "") == -1)
+				{
+					amount = idlePoints;
+				}
 				$.inidb.incr('points', username, amount);
 				uUsers.push(username + '(' + amount + ')');
 			}
