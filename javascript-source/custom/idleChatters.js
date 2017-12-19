@@ -71,30 +71,35 @@
 					  $.getIniDbNumber('idleSettings', 'randomminutes') * 60 +
 					  $.getIniDbNumber('idleSettings', 'randomseconds')) * 1000;
 	}
+	
+	function idleModuleActive ()
+	{
+		return active;
+	}
 
 	function getActivePoints ()
 	{
-		return active && activePoints;
+		return activePoints;
 	}
 
 	function getIdlePoints ()
 	{
-		return active && idlePoints;
+		return idlePoints;
 	}
 
 	function activePointsDuration ()
 	{
-		return active && activeTime;
+		return activeTime;
 	}
 
 	function idlePointsDuration ()
 	{
-		return active && idleTime;
+		return idleTime;
 	}
 
 	function idleRandomDuration ()
 	{
-		return active && randomTime;
+		return randomTime;
 	}
 
 	function convertMilliseconds (duration)
@@ -215,6 +220,8 @@
 	});
 
 	$.reloadIdle = idleUpdate;
+	
+	$.idleModuleActive = idleModuleActive;
 
 	$.receivedChatMessage = receivedChatMessage;
 	$.mostRecentChatMessage = mostRecentChatMessage;

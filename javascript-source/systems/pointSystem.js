@@ -224,7 +224,7 @@
 			}
 
 			if (!getUserPenalty(username)) {
-				if ($.isOnline ($.channelName) && $.idlePointsDuration () && activeUsers.indexOf (username + "") == -1)
+				if ($.isOnline ($.channelName) && $.idleModuleActive () && $.idlePointsDuration () && activeUsers.indexOf (username + "") == -1)
 				{
 					amount = idlePoints;
 				}
