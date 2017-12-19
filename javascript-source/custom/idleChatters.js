@@ -208,8 +208,8 @@
 
 	$.bind('initReady', function (event)
 	{
-		$.registerChatCommand('./custom/idlechatters.js', 'reportidletimes', 2);
-		$.registerChatCommand('./custom/idlechatters.js', 'reportactiveusers', 2);
+		$.registerChatCommand('./custom/idleChatters.js', 'reportidletimes', 2);
+		$.registerChatCommand('./custom/idleChatters.js', 'reportactiveusers', 2);
 
 		idleUpdate ();
 	});
