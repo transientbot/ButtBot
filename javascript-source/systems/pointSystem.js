@@ -157,7 +157,7 @@
 			}
 		}
 		
-		var idlePoints = $.idlePoints;
+		var idlePoints = $.idlePoints ();
 		var activeUsers;
 		
 		if ($.idlePointsDuration () != false) {
