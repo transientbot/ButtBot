@@ -405,13 +405,14 @@
 		 * @commandpath points - Announce points in chat when no parameters are given.
 		 */
 		if (command.equalsIgnoreCase('points') || command.equalsIgnoreCase('point') || command.equalsIgnoreCase(pointNameMultiple) || command.equalsIgnoreCase(pointNameSingle)) {
-			if (!action) {
+			if (!action || $.user.sanitize(action) == $.user.sanitize(username)) {
 				$.say(getPointsMessage(sender, username));
 			} else {
 				// Replace everything that is not \w
 				action = $.user.sanitize(action);
 				if ($.user.isKnown(action)) {
-					$.say($.whisperPrefix(sender) + $.lang.get('pointsystem.user.success', $.username.resolve(action), getPointsString(getUserPoints(action))));
+					$.say(username + " just checked out " + action + "'s butt.  Sassy.");
+//					$.say($.whisperPrefix(sender) + $.lang.get('pointsystem.user.success', $.username.resolve(action), getPointsString(getUserPoints(action))));
 				}
 
 				/**
@@ -805,7 +806,7 @@
 	$.bind('initReady', function() {
 		$.registerChatCommand('./systems/pointSystem.js', 'makeitrain', 1);
 		$.registerChatCommand('./systems/pointSystem.js', 'points', 7);
-		$.registerChatCommand('./systems/pointSystem.js', 'gift', 7);
+//		$.registerChatCommand('./systems/pointSystem.js', 'gift', 7);
 		$.registerChatCommand('./systems/pointSystem.js', 'penalty', 2);
 
 		$.registerChatSubcommand('points', 'add', 1);
