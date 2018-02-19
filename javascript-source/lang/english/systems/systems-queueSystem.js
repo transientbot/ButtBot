@@ -10,8 +10,10 @@ $.lang.register('queuesystem.clear.success', 'The queue has been reset and clear
 $.lang.register('queuesystem.join.error.joined', 'You are already in the queue.');
 $.lang.register('queuesystem.join.error.full', 'The queue is currently full.');
 $.lang.register('queuesystem.remove.usage', 'Usage: !queue remove [username]');
-$.lang.register('queuesystem.remove.404', 'That user does not seem to be in the queue.');
-$.lang.register('queuesystem.remove.removed', 'User $1 has been removed from the queue!');
+$.lang.register('queuesystem.remove.other.404', 'That user does not seem to be in the queue.');
+$.lang.register('queuesystem.remove.self.404', 'You are not in the queue.');
+$.lang.register('queuesystem.remove.other.removed', 'User $1 has been removed from the queue!');
+$.lang.register('queuesystem.remove.self.removed', 'You have been removed from the queue!');
 $.lang.register('queuesystem.info.success', 'Current queue informaton: Title: [$1], Users: [$2], Max Size: [$3], Opened At: [$4]');
 $.lang.register('queuesystem.time.info', '($1 ago)');
 $.lang.register('queuesystem.position.self', 'You are currently position #$1 in the queue and you joined at: $2');

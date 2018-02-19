@@ -117,10 +117,10 @@
 	 */
 	function leaveCommand(username) {
 		if (queue[username.toLowerCase()] === undefined) {
-			$.say(username + $.lang.get('queuesystem.remove.404'));
+			$.say($.whisperPrefix(username) + $.lang.get('queuesystem.remove.self.404'));
 		} else {
 			remove(username);
-			$.say($.lang.get('queuesystem.remove.removed', username));
+			$.say($.whisperPrefix(username) + $.lang.get('queuesystem.remove.self.removed', username));
 		}
 	}
 	/*
@@ -315,7 +315,7 @@
 	 * @param {String} sender
 	 * @param {Array} args
 	 */
-	function queueSubCommand(sender, args) {
+	function queueSubCommand(sender, args, command) {
 		var action = args[0];
 		var subAction = args[1];
 
@@ -357,10 +357,24 @@
 		}
 
 		/*
+		 * @commandpath queue leave - Remove user from the queue
+		 */
+		else if (action.equalsIgnoreCase('leave')) {
+			leaveCommand(sender);
+		}
+
+		/*
 		 * @commandpath queue list - Gives you the current queue list. Note that if the queue list is very long it will only show the first 5 users in the queue.
 		 */
 		else if (action.equalsIgnoreCase('list')) {
 			listCommand(sender);
+		}
+
+		/*
+		 * @commandpath queue leave - Remove user from the queue
+		 */
+		else if (action.equalsIgnoreCase('join')) {
+			joinCommand(sender, args.join(' '), command);
 		}
 
 		/*
@@ -440,10 +454,10 @@
 		if (action === undefined) {
 			$.say($.whisperPrefix(username) + $.lang.get('queuesystem.remove.usage'));
 		} else if (queue[action.toLowerCase()] === undefined) {
-			$.say($.whisperPrefix(username) + $.lang.get('queuesystem.remove.404'));
+			$.say($.whisperPrefix(username) + $.lang.get('queuesystem.remove.other.404'));
 		} else {
 			remove(action);
-			$.say($.whisperPrefix(username) + $.lang.get('queuesystem.remove.removed', action));
+			$.say($.whisperPrefix(username) + $.lang.get('queuesystem.remove.other.removed', action));
 		}
 	}
 
@@ -469,7 +483,7 @@
 			args = event.getArgs();
 
 		if (command.equalsIgnoreCase('queue')) {
-			queueSubCommand(sender, args);
+			queueSubCommand(sender, args, command);
 		} else if (command.equalsIgnoreCase('joinqueue')) {
 			/*
 		     * @commandpath joinqueue [gamertag] - Adds you to the current queue. Note that the gamertag part is optional.
@@ -490,10 +504,12 @@
 		$.registerChatSubcommand('queue', 'clear', 1);
 		$.registerChatSubcommand('queue', 'remove', 1);
 		$.registerChatSubcommand('queue', 'pick', 1);
-		$.registerChatSubcommand('queue', 'list', 7);
-		$.registerChatSubcommand('queue', 'next', 7);
-		$.registerChatSubcommand('queue', 'info', 7);
-		$.registerChatSubcommand('queue', 'position', 7);
+		$.registerChatSubcommand('queue', 'leave', 3);
+		$.registerChatSubcommand('queue', 'list', 3);
+		$.registerChatSubcommand('queue', 'join', 3);
+		$.registerChatSubcommand('queue', 'next', 3);
+		$.registerChatSubcommand('queue', 'info', 3);
+		$.registerChatSubcommand('queue', 'position', 3);
 	});
 
 	/**
