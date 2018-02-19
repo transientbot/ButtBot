@@ -96,6 +96,7 @@
 
 		var temp = { 'tag' : String((action === undefined ? '' : action)), 'time': String(date(new Date(), true)), 'position': String(Object.keys(queue).length), 'username': String(username) };
 		$.inidb.set('queue', username, JSON.stringify(temp));
+		position(username);
 	}
 
 	/*
