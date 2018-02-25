@@ -103,6 +103,7 @@
 			$.say($.whisperPrefix(username) + $.lang.get('queuesystem.join.error.full'));
 			$.returnCommandCost(username, command, $.isMod(username));
 		} else if (isOpened === false) {
+			$.say($.whisperPrefix(username) + $.lang.get('queuesystem.join.error.notopen'));
 			$.returnCommandCost(username, command, $.isMod(username));
 		} else {
 			join(username, action);

@@ -1,4 +1,5 @@
 $.lang.register('queuesystem.open.error.opened', 'A queue is already opened.');
+$.lang.register('queuesystem.join.error.notopen', 'The queue is not currently open.');
 $.lang.register('queuesystem.open.error.usage', 'Usage: !queue open [size] [title] - Make the size zero if you want it to be unlimited.');
 $.lang.register('queuesystem.open.usage', 'Usage: !queue open [size] [title]');
 $.lang.register('queuesystem.open.error.clear', 'The previous queue was not cleared. Use "!queue clear" to clear it.');
