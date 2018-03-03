@@ -1,19 +1,27 @@
 (function() {
-	var isOpened = false,
-	 	info = {},
-		queue = {};
+	const intervalKey = 'interval';
+	const noticeToggleKey = 'noticeToggle';
+	const tableName = 'queue';
 
-	/*
+	var info = {};
+	var interval;
+	var isOpened = false;
+	var lastNoticeSent = 0;
+	var noticeInterval = $.getSetIniDbNumber(tableName, intervalKey, 10);
+	var noticeToggle = $.getSetIniDbBoolean(tableName, noticeToggleKey, true);
+	var queue = {};
+
+	/**
 	 * @function clear
 	 */
 	function clear() {
 		queue = {};
 		info = {};
 		isOpened = false;
-		$.inidb.RemoveFile('queue');
+		$.inidb.RemoveFile(tableName);
 	}
 
-	/*
+	/**
 	 * @function clearCommand
 	 *
 	 * @param {String} username
@@ -23,14 +31,14 @@
 		$.say($.whisperPrefix(username) + $.lang.get('queuesystem.clear.success'));
 	}
 
-	/*
+	/**
 	 * @function close
 	 */
 	function close() {
 		isOpened = false;
 	}
 
-	/*
+	/**
 	 * @function closeCommand
 	 *
 	 * @param {String} username
@@ -45,10 +53,11 @@
 		$.say($.lang.get('queuesystem.close.success'));
 	}
 
-	/*
+	/**
 	 * @function date
 	 *
-	 * @param  {Number} time
+	 * @param {Number} time
+	 * @param {Boolean} simple
 	 * @return {String}
 	 */
 	function date(time, simple) {
@@ -65,7 +74,30 @@
 		}
 	}
 
-	/*
+	/**
+	 * @function intervalCommand
+	 *
+	 * @param {String} sender
+	 * @param {String} intervalStr
+	 */
+	function intervalCommand(sender, intervalStr) {
+		if (intervalStr === undefined) {
+			$.say($.whisperPrefix(sender) + $.lang.get('noticehandler.notice-interval-usage'));
+			return;
+		}
+
+		var interval = parseInt(intervalStr);
+
+		if (isNaN(interval) || interval < 5) {
+			$.say($.whisperPrefix(sender) + $.lang.get('noticehandler.notice-interval-404'));
+		} else {
+			$.inidb.set(tableName, intervalKey, interval);
+			$.say($.whisperPrefix(sender) + $.lang.get('noticehandler.notice-inteval-success'));
+			reloadQueueSettings();
+		}
+	}
+
+	/**
 	 * @function join
 	 *
 	 * @param {String} username
@@ -85,10 +117,10 @@
 			'position': String(Object.keys(queue).length),
 			'username': String(username) };
 
-		$.inidb.set('queue', username, JSON.stringify(temp));
+		$.inidb.set(tableName, username, JSON.stringify(temp));
 	}
 
-	/*
+	/**
 	 * @function joinCommand
 	 *
 	 * @param {String} username
@@ -111,7 +143,7 @@
 		}
 	}
 
-	/*
+	/**
 	 * @function leaveCommand
 	 *
 	 * @param {String} username
@@ -124,7 +156,8 @@
 			$.say($.whisperPrefix(username) + $.lang.get('queuesystem.remove.self.removed', username));
 		}
 	}
-	/*
+
+	/**
 	 * @function list
 	 */
 	function list() {
@@ -139,7 +172,7 @@
 		return queuePositions;
 	}
 
-	/*
+	/**
 	 * @function listCommand
 	 *
 	 * @param {String} username
@@ -158,7 +191,7 @@
 		}
 	}
 
-	/*
+	/**
 	 * @function next
 	 *
 	 * @param {String} action
@@ -182,7 +215,7 @@
 	}
 
 
-	/*
+	/**
 	 * @function nextCommand
 	 *
 	 * @param {String} username
@@ -198,10 +231,10 @@
 		}
 	}
 
-	/*
+	/**
 	 * @function open
 	 *
-	 * @param {Number} size
+	 * @param {String} size
 	 * @param {String} title
 	 */
 	function open(size, title) {
@@ -216,24 +249,28 @@
 		isOpened = true;
 	}
 
-	/*
+	/**
 	 * @function openCommand
 	 *
 	 * @param {String} username
-	 * @param {Number} size
-	 * @param {String} title
+	 * @param {String} subAction
+	 * @param {Array} args
 	 */
-	function openCommand(username, size, title) {
+	function openCommand(username, subAction, args) {
+		var isNotANumber = isNaN(parseInt(subAction));
+		var size = isNotANumber ? 0 : subAction;
+		var title = isNotANumber ? args.slice(1).join(' ') : args.slice(2).join(' ');
+
 		if (isOpened === true) {
 			$.say($.whisperPrefix(username) + $.lang.get('queuesystem.open.error.opened'));
 		} else if (size === undefined || isNaN(parseInt(size))) {
 			$.say($.whisperPrefix(username) + $.lang.get('queuesystem.open.error.usage'));
-		} else if (title === undefined) {
+		} else if (title === undefined || title === '') {
 			$.say($.whisperPrefix(username) + $.lang.get('queuesystem.open.usage'));
 		} else if (Object.keys(queue).length !== 0) {
 			$.say($.whisperPrefix(username) + $.lang.get('queuesystem.open.error.clear'));
 		} else {
-			open(username, size, title);
+			open(size, title);
 
 			if (parseInt(size) === 0) {
 				$.say($.lang.get('queuesystem.open.normal', title));
@@ -243,7 +280,7 @@
 		}
 	}
 
-	/*
+	/**
 	 * @function pick
 	 *
 	 * @param {String} action
@@ -269,7 +306,7 @@
 		return picks;
 	}
 
-	/*
+	/**
 	 * @function pickCommand
 	 *
 	 * @param {String} username
@@ -285,7 +322,7 @@
 		}
 	}
 
-	/*
+	/**
 	 * @function position
 	 *
 	 * @param {String} username
@@ -310,11 +347,12 @@
 		}
 	}
 
-	/*
+	/**
 	 * @function queueSubCommand
 	 *
 	 * @param {String} sender
 	 * @param {Array} args
+	 * @param {String} command
 	 */
 	function queueSubCommand(sender, args, command) {
 		var action = args[0];
@@ -325,89 +363,72 @@
 			return;
 		}
 
-		/*
-		 * @commandpath queue open [max size] [title] - Opens a new queue. Max size is optional.
-		 */
 		if (action.equalsIgnoreCase('open')) {
-			var isNotANumber = isNaN(parseInt(subAction));
-			var size = isNotANumber ? 0 : subAction;
-			var title = isNotANumber ? args.slice(1).join(' ') : args.slice(2).join(' ');
+			// @commandpath queue open [max size] [title]
+			// Opens a new queue. Max size is optional.
 
-			openCommand(sender, size, title);
-		}
-
-		/*
-		 * @commandpath queue close - Closes the current queue that is opened.
-		 */
-		else if (action.equalsIgnoreCase('close')) {
+			openCommand(sender, subAction, args);
+		} else if (action.equalsIgnoreCase('close')) {
+			// @commandpath queue close
+			// Closes the current queue that is opened.
 			closeCommand(sender);
-		}
-
-		/*
-		 * @commandpath queue clear - Closes and resets the current queue.
-		 */
-		else if (action.equalsIgnoreCase('clear')) {
+		} else if (action.equalsIgnoreCase('clear')) {
+			// @commandpath queue clear
+			// Closes and resets the current queue.
 			clearCommand(sender);
-		}
-
-		/*
-		 * @commandpath queue remove [username] - Removes that username from the queue.
-		 */
-		else if (action.equalsIgnoreCase('remove')) {
+		} else if (action.equalsIgnoreCase('remove')) {
+			// @commandpath queue remove [username]
+			// Removes that username from the queue.
 			removeCommand(sender, subAction);
-		}
-
-		/*
-		 * @commandpath queue leave - Remove user from the queue
-		 */
-		else if (action.equalsIgnoreCase('leave')) {
+		} else if (action.equalsIgnoreCase('leave')) {
+			// @commandpath queue leave
+			// Remove user from the queue
 			leaveCommand(sender);
-		}
-
-		/*
-		 * @commandpath queue list - Gives you the current queue list. Note that if the queue list is very long it will only show the first 5 users in the queue.
-		 */
-		else if (action.equalsIgnoreCase('list')) {
+		} else if (action.equalsIgnoreCase('list')) {
+			// @commandpath queue list
+			// Gives you the current queue list.
+			// Note that if the queue list is very long it will only show the first 5 users in the queue.
 			listCommand(sender);
-		}
+		} else if (action.equalsIgnoreCase('join')) {
+			// @commandpath queue leave
+			// Remove user from the queue
+			var subCommandArgs = args.splice(1);
 
-		/*
-		 * @commandpath queue leave - Remove user from the queue
-		 */
-		else if (action.equalsIgnoreCase('join')) {
-			joinCommand(sender, args.join(' '), command);
-		}
-
-		/*
-		 * @commandpath queue next [amount] - Shows the players that are to be picked next. Note if the amount is not specified it will only show one.
-		 */
-		else if (action.equalsIgnoreCase('next')) {
+			joinCommand(sender, subCommandArgs.join(' '), command);
+		} else if (action.equalsIgnoreCase('next')) {
+			// @commandpath queue next [amount]
+			// Shows the players that are to be picked next.
+			// Note if the amount is not specified it will only show one.
 			nextCommand(sender, subAction);
-		}
-
-		/*
-		 * @commandpath queue pick [amount] - Picks the players next in line from the queue. Note if the amount is not specified it will only pick one.
-		 */
-		else if (action.equalsIgnoreCase('pick')) {
+		} else if (action.equalsIgnoreCase('pick')) {
+			// @commandpath queue pick [amount]
+			// Picks the players next in line from the queue.
+			// Note if the amount is not specified it will only pick one.
 			pickCommand(sender, subAction);
-		}
-
-		/*
-		 * @commandpath queue position [username] - Tells what position that user is in the queue and at what time he joined.
-		 */
-		else if (action.equalsIgnoreCase('position')) {
+		} else if (action.equalsIgnoreCase('position')) {
+			// @commandpath queue position [username]
+			// Tells what position that user is in the queue and at what time they joined.
 			position(sender, subAction);
-		}
-
-		/*
-		 * @commandpath queue info - Gives you the current information about the queue that is opened
-		 */
-		else if (action.equalsIgnoreCase('info')) {
+		} else if (action.equalsIgnoreCase('info')) {
+			//@commandpath queue info
+			// Gives you the current information about the queue that is opened
 			stats(sender);
+		} else if (action.equalsIgnoreCase('interval')) {
+			// @commandpath notice interval [minutes]
+			// Sets the notice interval in minutes
+			intervalCommand(sender, subAction);
 		}
 	}
 
-	/*
+	/**
+	 * @function reloadQueueSettings
+	 */
+	function reloadQueueSettings() {
+		noticeToggle = $.getIniDbBoolean(tableName, noticeToggleKey);
+		noticeInterval = $.getIniDbNumber(tableName, intervalKey);
+	}
+
+	/**
 	 * @function resetPosition
 	 */
 	function resetPosition(splice) {
@@ -417,7 +438,7 @@
 
 		for (i in keys) {
 			if (splice !== -1 && t <= splice) {
-				$.inidb.del('queue', keys[i]);
+				$.inidb.del(tableName, keys[i]);
 				delete queue[keys[i]];
 			}
 			t++;
@@ -428,15 +449,15 @@
 		$.inidb.setAutoCommit(false);
 		for (i in keys) {
 			queue[keys[i]].position = t;
-			var temp = JSON.parse($.inidb.get('queue', keys[i]));
+			var temp = JSON.parse($.inidb.get(tableName, keys[i]));
 			temp.position = t;
-			$.inidb.set('queue', keys[i], JSON.stringify(temp));
+			$.inidb.set(tableName, keys[i], JSON.stringify(temp));
 			t++;
 		}
 		$.inidb.setAutoCommit(true);
 	}
 
-	/*
+	/**
 	 * @function remove
 	 *
 	 * @param {String} username
@@ -445,7 +466,7 @@
 		delete queue[username.toLowerCase()];
 	}
 
-	/*
+	/**
 	 * @function removeCommand
 	 *
 	 * @param {String} username
@@ -462,7 +483,14 @@
 		}
 	}
 
-	/*
+	/**
+	 * @function sendNotice
+	 */
+	function sendNotice() {
+		$.say($.lang.get('queuesystem.open.normal', info.title));
+	}
+
+	/**
 	 * @function stats
 	 *
 	 * @param {String} username
@@ -476,6 +504,21 @@
 	}
 
 	/*
+	 * Set the interval to announce
+	 */
+	interval = setInterval(function() {
+		var isEnabled = $.bot.isModuleEnabled('./systems/queueSystem.js');
+		var isOnline = $.isOnline($.channelName);
+		var nextNotice = lastNoticeSent + (noticeInterval * 6e4);
+		var isPastNoticeCooldown = nextNotice <= $.systemTime();
+
+		if (noticeToggle && isEnabled && isOpened && isPastNoticeCooldown && isOnline) {
+			sendNotice();
+			lastNoticeSent = $.systemTime();
+		}
+	}, 1e4, 'scripts::handlers::queueSystem.js');
+
+	/**
 	 * @event command
 	 */
 	$.bind('command', function(event) {
@@ -487,7 +530,9 @@
 			queueSubCommand(sender, args, command);
 		} else if (command.equalsIgnoreCase('joinqueue')) {
 			/*
-		     * @commandpath joinqueue [gamertag] - Adds you to the current queue. Note that the gamertag part is optional.
+		     * @commandpath joinqueue [gamertag]
+		     * Adds you to the current queue.
+		     * Note that the gamertag part is optional.
 		     */
 			joinCommand(sender, args.join(' '), command);
 		} else if (command.equalsIgnoreCase('leavequeue')) {
@@ -495,21 +540,26 @@
 		}
 	});
 
+	/**
+	 * @event initReady
+	 */
 	$.bind('initReady', function() {
 		$.registerChatCommand('./systems/queueSystem.js', 'joinqueue', 3);
 		$.registerChatCommand('./systems/queueSystem.js', 'leavequeue', 3);
 		$.registerChatCommand('./systems/queueSystem.js', 'queue', 3);
 
-		$.registerChatSubcommand('queue', 'open', 2);
-		$.registerChatSubcommand('queue', 'close', 2);
 		$.registerChatSubcommand('queue', 'clear', 2);
-		$.registerChatSubcommand('queue', 'remove', 2);
+		$.registerChatSubcommand('queue', 'close', 2);
+		$.registerChatSubcommand('queue', 'interval', 2);
+		$.registerChatSubcommand('queue', 'open', 2);
 		$.registerChatSubcommand('queue', 'pick', 2);
+		$.registerChatSubcommand('queue', 'remove', 2);
+
+		$.registerChatSubcommand('queue', 'info', 3);
+		$.registerChatSubcommand('queue', 'join', 3);
 		$.registerChatSubcommand('queue', 'leave', 3);
 		$.registerChatSubcommand('queue', 'list', 3);
-		$.registerChatSubcommand('queue', 'join', 3);
 		$.registerChatSubcommand('queue', 'next', 3);
-		$.registerChatSubcommand('queue', 'info', 3);
 		$.registerChatSubcommand('queue', 'position', 3);
 	});
 
@@ -530,14 +580,14 @@
 				if (event.getArgs()[1] !== undefined && queue[event.getArgs()[1]] !== undefined) {
 					$.consoleLn('remove:' + event.getArgs()[1]);
 					delete queue[event.getArgs()[1].toLowerCase()];
-					$.inidb.del('queue', event.getArgs()[1].toLowerCase());
+					$.inidb.del(tableName, event.getArgs()[1].toLowerCase());
 					resetPosition(-1);
 				}
 			} else if (action.equalsIgnoreCase('clear')) {
 				queue = {};
 				info = {};
 				isOpened = false;
-				$.inidb.RemoveFile('queue');
+				$.inidb.RemoveFile(tableName);
 			}
 		}
 	});

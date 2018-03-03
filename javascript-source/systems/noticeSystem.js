@@ -99,8 +99,7 @@
 			command = event.getCommand(),
 			argsString = event.getArguments().trim(),
 			args = event.getArgs(),
-			action = args[0],
-			message = '';
+			action = args[0];
 
 		/**
 		 * @commandpath notice - Base command for managing notices
@@ -248,7 +247,7 @@
 					$.inidb.set('noticeSettings', 'interval', args[1]);
 					noticeInterval = parseInt(args[1]);
 					$.say($.whisperPrefix(sender) + $.lang.get('noticehandler.notice-inteval-success'));
-					reloadNoticeSettings()
+					reloadNoticeSettings();
 					return;
 				}
 			}
