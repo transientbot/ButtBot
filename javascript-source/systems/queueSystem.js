@@ -496,15 +496,15 @@
 	});
 
 	$.bind('initReady', function() {
-		$.registerChatCommand('./systems/queueSystem.js', 'joinqueue', 7);
-		$.registerChatCommand('./systems/queueSystem.js', 'leavequeue', 7);
-		$.registerChatCommand('./systems/queueSystem.js', 'queue', 7);
+		$.registerChatCommand('./systems/queueSystem.js', 'joinqueue', 3);
+		$.registerChatCommand('./systems/queueSystem.js', 'leavequeue', 3);
+		$.registerChatCommand('./systems/queueSystem.js', 'queue', 3);
 
-		$.registerChatSubcommand('queue', 'open', 1);
-		$.registerChatSubcommand('queue', 'close', 1);
-		$.registerChatSubcommand('queue', 'clear', 1);
-		$.registerChatSubcommand('queue', 'remove', 1);
-		$.registerChatSubcommand('queue', 'pick', 1);
+		$.registerChatSubcommand('queue', 'open', 2);
+		$.registerChatSubcommand('queue', 'close', 2);
+		$.registerChatSubcommand('queue', 'clear', 2);
+		$.registerChatSubcommand('queue', 'remove', 2);
+		$.registerChatSubcommand('queue', 'pick', 2);
 		$.registerChatSubcommand('queue', 'leave', 3);
 		$.registerChatSubcommand('queue', 'list', 3);
 		$.registerChatSubcommand('queue', 'join', 3);

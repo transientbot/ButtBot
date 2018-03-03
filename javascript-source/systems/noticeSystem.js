@@ -5,16 +5,16 @@
  */
 
 (function() {
-	var noticeReqMessages = $.getSetIniDbNumber('noticeSettings', 'reqmessages', 25),
-		noticeInterval = $.getSetIniDbNumber('noticeSettings', 'interval', 10),
-		noticeToggle = $.getSetIniDbBoolean('noticeSettings', 'noticetoggle', false),
-		numberOfNotices = (parseInt($.inidb.GetKeyList('notices', '').length) ? parseInt($.inidb.GetKeyList('notices', '').length) : 0),
-		noticeOffline = $.getSetIniDbBoolean('noticeSettings', 'noticeOfflineToggle', false),
-		isReloading = false,
-		messageCount = 0,
-		RandomNotice = 0,
-		lastNoticeSent = 0,
-		interval;
+	var noticeReqMessages = $.getSetIniDbNumber('noticeSettings', 'reqmessages', 25);
+	var noticeInterval = $.getSetIniDbNumber('noticeSettings', 'interval', 10);
+	var noticeToggle = $.getSetIniDbBoolean('noticeSettings', 'noticetoggle', false);
+	var numberOfNotices = (parseInt($.inidb.GetKeyList('notices', '').length) ? parseInt($.inidb.GetKeyList('notices', '').length) : 0);
+	var noticeOffline = $.getSetIniDbBoolean('noticeSettings', 'noticeOfflineToggle', false);
+	var isReloading = false;
+	var messageCount = 0;
+	var RandomNotice = 0;
+	var lastNoticeSent = 0;
+	var interval;
 
 	/**
 	 * @function reloadNotices
