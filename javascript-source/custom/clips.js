@@ -59,7 +59,7 @@
 			}
 			else
 			{
-				$.say("Usage:  !clip [clip URL] {\"clip message in quotes\"}");
+				$.say("Usage:  !clip <clip URL> \"optional title\"");
 			}
 		}
 	});
