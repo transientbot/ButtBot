@@ -1,21 +1,23 @@
 (function() {
-	$.bind('command', function(event) {
-	var sender = event.getSender(),
-		command = event.getCommand(),
-		args = event.getArgs(),
-		random;
-	
-	if (command.equalsIgnoreCase('addtimer'))
+	$.bind('command', function(event)
 	{
-		if (args.length < 2)
+		var sender = event.getSender(),
+			command = event.getCommand(),
+			args = event.getArgs(),
+			random;
+		
+		if (command.equalsIgnoreCase('addtimer'))
 		{
-			$.say("Usage: !timer \"Reminder.\" <number of minutes>");
+			if (args.length < 2)
+			{
+				$.say("Usage: !timer \"Reminder.\" <number of minutes>");
+			}
+			else
+			{
+				setTimeout(function () { $.say (args[0]); }, args[1] * 60 * 1000);
+			}
 		}
-		else
-		{
-			setTimeout(function () { $.say (args[0]); }, args[1] * 60 * 1000);
-		}
-	}
+	});
 	
 	$.bind('initReady', function (event)
 	{
