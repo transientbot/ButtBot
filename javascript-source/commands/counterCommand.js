@@ -148,7 +148,7 @@
 	}
 
 	function usage() {
-		$.say('Usage: !' + COMMAND + ' <counter> <add|sub|set|reset>');
+		$.say('Usage: !' + COMMAND + ' <counter> [add|sub|set|reset]');
 	}
 
 	/**
