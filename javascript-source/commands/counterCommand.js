@@ -7,8 +7,10 @@
 	const ADD = 'add';
 	const COMMAND = 'counter';
 	const COUNTER_DIR = './addons/counter/';
+	const CREATE = 'create';
 	const DB_FILE = 'count';
 	const DECR = 'decr';
+	const DELETE = 'delete';
 	const FILE_SUFFIX = '.txt';
 	const INCR = 'incr';
 	const MINUS = '-';
@@ -22,23 +24,35 @@
 	 *
 	 * @param {String} counter Counter to increment
 	 */
-	function add(counter) {
+	function addCommand(counter) {
 		const currentValue = getIntFromDb(counter);
-		const newValue = currentValue + 1;
 
-		change(counter, newValue);
+		if (isNaN(currentValue)) {
+			$.say($.lang.get('counter.error', counter));
+		} else {
+			const newValue = currentValue + 1;
+
+			set(counter, newValue);
+			$.say($.lang.get('counter.change', counter, newValue));
+		}
 	}
 
-	/**
-	 * Change the value of counter.
-	 *
-	 * @param {String} counter Counter to change
-	 * @param {Number} count New value of counter
-	 */
-	function change(counter, count) {
-		$.say($.lang.get('counter.change', counter, count));
-		setDbValue(counter, count);
-		updateFile(counter, count);
+	function createCommand(counter) {
+		if (isNaN(getIntFromDb(counter))) {
+			set(counter, 0);
+			$.say($.lang.get('counter.create', counter));
+		} else {
+			$.say($.lang.get('counter.already-exists', counter));
+		}
+	}
+
+	function deleteCommand(counter) {
+		if (isNaN(getIntFromDb(counter))) {
+			$.say($.lang.get('counter.error', counter));
+		} else {
+			$.inidb.del(DB_FILE, counter);
+			$.say($.lang.get('counter.delete', counter));
+		}
 	}
 
 	/**
@@ -46,7 +60,7 @@
 	 *
 	 * @param {String} counter Counter to print
 	 */
-	function echo(counter) {
+	function echoCommand(counter) {
 		const value = parseInt($.inidb.get(DB_FILE, counter.toLowerCase()));
 
 		if (isNaN(value)) {
@@ -73,9 +87,7 @@
 	 * @returns {number} Value of key
 	 */
 	function getIntFromDb(dbKey) {
-		const value = parseInt($.inidb.get(DB_FILE, dbKey.toLowerCase()));
-
-		return (isNaN(value)) ? 0 : value;
+		return parseInt($.inidb.get(DB_FILE, dbKey.toLowerCase()));
 	}
 
 	/**
@@ -83,10 +95,20 @@
 	 *
 	 * @param {String} counter Counter to reset
 	 */
-	function reset(counter) {
+	function resetCommand(counter) {
+		set(counter, 0);
 		$.say($.lang.get('counter.reset', counter));
-		setDbValue(counter, 0);
-		updateFile(counter, 0);
+	}
+
+	/**
+	 * Change the value of counter.
+	 *
+	 * @param {String} counter Counter to change
+	 * @param {Number} count New value of counter
+	 */
+	function set(counter, count) {
+		setDbValue(counter, count);
+		updateFile(counter, count);
 	}
 
 	/**
@@ -95,13 +117,12 @@
 	 * @param {String} counter Counter to set
 	 * @param {Number} count New value of counter
 	 */
-	function set(counter, count) {
+	function setCommand(counter, count) {
 		if (isNaN(count)) {
 			$.say('Usage: !' + COMMAND + ' <counter> set <value>');
 		} else {
+			set(counter, count);
 			$.say($.lang.get('counter.change', counter, count));
-			setDbValue(counter, count);
-			updateFile(counter, count);
 		}
 	}
 
@@ -119,14 +140,20 @@
 	 * Decrement
 	 * @param counter
 	 */
-	function sub(counter) {
+	function subCommand(counter) {
 		const currentValue = getIntFromDb(counter);
-		const newValue = currentValue - 1;
 
-		if (newValue < 0) {
-			$.say($.lang.get('counter.sub-zero', counter));
+		if (isNaN(currentValue)) {
+			$.say($.lang.get('counter.error', counter));
 		} else {
-			change(counter, newValue);
+			const newValue = currentValue - 1;
+
+			if (newValue < 0) {
+				$.say($.lang.get('counter.sub-zero', counter));
+			} else {
+				set(counter, newValue);
+				$.say($.lang.get('counter.change', counter, newValue));
+			}
 		}
 	}
 
@@ -171,16 +198,20 @@
 		const action = args[1];
 
 		if (action === undefined) {
-			echo(counter);
+			echoCommand(counter);
+		} else if (action.equalsIgnoreCase(CREATE)) {
+			createCommand(counter);
+		} else if (action.equalsIgnoreCase(DELETE)) {
+			deleteCommand(counter);
 		} else if (action.equalsIgnoreCase(RESET)) {
-			reset(counter);
+			resetCommand(counter);
 		} else if (action.equalsIgnoreCase(SET)) {
 			const value = parseInt(args[2]);
-			set(counter, value);
+			setCommand(counter, value);
 		} else if (action.equalsIgnoreCase(ADD) || action.equalsIgnoreCase(INCR) || action.equalsIgnoreCase(PLUS)) {
-			add(counter);
+			addCommand(counter);
 		} else if (action.equalsIgnoreCase(SUB) || action.equalsIgnoreCase(DECR) || action.equalsIgnoreCase(MINUS)) {
-			sub(counter);
+			subCommand(counter);
 		} else {
 			usage();
 		}
@@ -192,6 +223,8 @@
 	$.bind('initReady', function() {
 		$.registerChatCommand('./commands/counterCommand.js', COMMAND, 7);
 
+		$.registerChatSubcommand(COMMAND, CREATE, 2);
+		$.registerChatSubcommand(COMMAND, DELETE, 2);
 		$.registerChatSubcommand(COMMAND, RESET, 2);
 		$.registerChatSubcommand(COMMAND, SET, 2);
 		$.registerChatSubcommand(COMMAND, ADD, 2);
@@ -201,9 +234,4 @@
 		$.registerChatSubcommand(COMMAND, DECR, 2);
 		$.registerChatSubcommand(COMMAND, MINUS, 2);
 	});
-
-	/*
-	 * Export functions to API 
-	 */
-	$.updateCounterFile = updateFile;
 })();
