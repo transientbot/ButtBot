@@ -1,8 +1,8 @@
-$.lang.register('ticketrafflesystem.err.raffle.opened', 'A ticket raffle is already opened.');
+$.lang.register('ticketrafflesystem.err.raffle.opened', 'A ticket raffle is already open.');
 $.lang.register('ticketrafflesystem.err.missing.syntax', 'Usage: !traffle open (max entries) (cost) (-followers)');
 $.lang.register('ticketrafflesystem.msg.need.to.be.follwing', 'You need to be following to enter.');
 $.lang.register('ticketrafflesystem.raffle.opened', 'Ticket raffle is now open! Buy up to $1 tickets with !tickets - you can purchase multiple times. Tickets cost $2. $3');
-$.lang.register('ticketrafflesystem.err.raffle.not.opened', 'There is no ticket raffle opened.');
+$.lang.register('ticketrafflesystem.err.raffle.not.opened', 'There is no ticket raffle open.');
 $.lang.register('ticketrafflesystem.raffle.closed', 'The ticket raffle is now closed.');
 $.lang.register('ticketrafflesystem.raffle.close.err', 'The ticket raffle ended. No one entered.');
 $.lang.register('ticketrafflesystem.raffle.repick', 'New winner is: $1! $2');

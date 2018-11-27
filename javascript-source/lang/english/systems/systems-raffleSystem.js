@@ -1,8 +1,8 @@
 $.lang.register('rafflesystem.open.error.opened', 'A raffle is currently in progress.');
 $.lang.register('rafflesystem.open.usage', 'Usage: !raffle open [-usetime minutes | -usepoints entry_fee] [keyword] [close timer minutes] [-followers | -subscribers]. [keyword] required.');
-$.lang.register('rafflesystem.open.time', 'A raffle is now opened! Type $1 to enter. You need to have been in chat for $2 minutes $3 to enter. $4');
-$.lang.register('rafflesystem.open.points', 'A raffle is now opened! Type $1 to enter. Entering cost $2! $3');
-$.lang.register('rafflesystem.open', 'A raffle is now opened! Type $1 to enter$2! $3');
+$.lang.register('rafflesystem.open.time', 'A raffle is now open! Type $1 to enter. You need to have been in chat for $2 minutes $3 to enter. $4');
+$.lang.register('rafflesystem.open.points', 'A raffle is now open! Type $1 to enter. Entering cost $2! $3');
+$.lang.register('rafflesystem.open', 'A raffle is now open! Type $1 to enter$2! $3');
 $.lang.register('rafflesystem.close.error.closed', 'There is no raffle in progress.');
 $.lang.register('rafflesystem.close.success', 'The raffle is now closed! No more entries will be counted.');
 $.lang.register('rafflesystem.winner', 'The winner of this raffle is $1! $2');
@@ -16,7 +16,7 @@ $.lang.register('rafflesystem.enter.subscriber', 'You need to be subscribed to e
 $.lang.register('rafflesystem.enter.points', 'You don\'t have enough $1 to enter this raffle.');
 $.lang.register('rafflesystem.enter.time', 'You have not been in the channel long enough to enter this raffle.');
 $.lang.register('rafflesystem.usage', 'Usage: !raffle [open / close / repick / results / subscriberbonus/ regularbonus / whisperwinner]');
-$.lang.register('rafflesystem.results', 'A raffle is still opened! Keyword: $1 - Total entries: $2');
+$.lang.register('rafflesystem.results', 'A raffle is still open! Keyword: $1 - Total entries: $2');
 $.lang.register('rafflesystem.fee', ' - Entry fee: $1');
 $.lang.register('rafflesystem.subbonus.usage', 'Usage: !raffle subscriberbonus [1-10]');
 $.lang.register('rafflesystem.subbonus.set', 'Subscriber bonus luck set to $1!');
