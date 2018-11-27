@@ -5,6 +5,7 @@
  */
 (function() {
 	var messageToggle = $.getSetIniDbBoolean('settings', 'audiohookmessages', false);
+	var customCommandsEnabled = $.getSetIniDbBoolean('settings', 'audiohookcommandsenabled', true);
 
 	/**
 	 * @function updateAudioHookDB
@@ -73,7 +74,7 @@
 	 * @function loadAudioHookCommands
 	 */
 	function loadAudioHookCommands() {
-		if ($.bot.isModuleEnabled('./systems/audioPanelSystem.js')) {
+		if ($.bot.isModuleEnabled('./systems/audioPanelSystem.js') && customCommandsEnabled) {
 			var commands = $.inidb.GetKeyList('audioCommands', ''),
 				i;
 
@@ -85,7 +86,33 @@
 				}
 			}
 		}
-	};
+	}
+
+	function unloadAudioHookCommands() {
+		var commands = $.inidb.GetKeyList('audioCommands', ''),
+			i;
+		for (i in commands) {
+			if ($.commandExists(commands[i])) {
+				$.unregisterChatCommand(commands[i]);
+			}
+		}
+	}
+
+	function enableCustomCommands() {
+		if (!customCommandsEnabled) {
+			customCommandsEnabled = true;
+			$.setIniDbBoolean('settings', 'audiohookcommandsenabled', true);
+			loadAudioHookCommands();
+		}
+	}
+
+	function disableCustomCommands() {
+		if (customCommandsEnabled) {
+			customCommandsEnabled = false;
+			$.setIniDbBoolean('settings', 'audiohookcommandsenabled', false);
+			unloadAudioHookCommands();
+		}
+	}
 
 	/**
 	 * @event command
@@ -208,6 +235,14 @@
 					return;
 				}
 
+				if (action.equalsIgnoreCase('enable')) {
+					enableCustomCommands();
+				}
+
+				if (action.equalsIgnoreCase('disable')) {
+					disableCustomCommands();
+				}
+
 				if (action.equalsIgnoreCase('add')) {
 					if (subAction === undefined || actionArgs === undefined) {
 						$.say($.whisperPrefix(sender) + $.lang.get('audiohook.customcommand.add.usage'));
@@ -224,7 +259,7 @@
 					if (actionArgs.equalsIgnoreCase('(list)')) {
 						$.say($.whisperPrefix(sender) + $.lang.get('audiohook.customcommand.add.list', subAction));
 						$.inidb.set('audioCommands', subAction.toLowerCase(), actionArgs);
-						$.registerChatCommand('./systems/audioPanelSystem.js', subAction.toLowerCase(), 7);
+						if (customCommandsEnabled) $.registerChatCommand('./systems/audioPanelSystem.js', subAction.toLowerCase(), 7);
 						return;
 					}
 
